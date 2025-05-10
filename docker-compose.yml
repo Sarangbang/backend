@@ -1,0 +1,23 @@
+# docker compose --profile dev up -d
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "9912:3306" # MySQL 포트를 환경 변수로 관리
+    profiles:
+      - "dev"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DEV_DB_PASSWORD}
+      MYSQL_DATABASE: sarangbang
+    volumes:
+      - sarangbang-data:/var/lib/mysql
+    networks:
+      - sarangbang-network
+
+volumes:
+  sarangbang-data:
+
+networks:
+  sarangbang-network:
+    driver: bridge
