@@ -60,7 +60,6 @@ public class TestUserGenerator implements ApplicationRunner { // 클래스 이�
         log.info("DEV Profile: 테스트 사용자 (직업 마커: '{}') {}명이 생성되었습니다.", TEST_USER_JOB_MARKER, testUsersToCreate.size());
         return;
         }
-        log.error("TEST");
         log.info("DEV Profile: 테스트 사용자 (직업 마커: '{}')가 이미 존재하여 생성하지 않았습니다.", TEST_USER_JOB_MARKER);
     }
 } 
