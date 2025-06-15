@@ -18,39 +18,23 @@ public class User extends BaseEntity {
     @Column(length = 36) // UUID 문자열 길이에 맞춰 컬럼 크기 지정
     private String id; // Long -> String
 
-    private String profileImageUrl;
+    private String email;
 
-    private Integer age;
+    private String password;
 
     private String gender;
 
     private String region;
 
-    private String religion;
+    private String profileImageUrl;
 
-    private Integer salary;
-
-    private String job;
-
-    @Column(columnDefinition = "TEXT")
-    private String psychologicalResult; // JSON 문자열 저장
-
-    private Double heightCm;
-
-    private Double weightKg;
-
-    public User(String profileImageUrl, Integer age, String gender, String region, 
-                String religion, Integer salary, String job, String psychologicalResult, 
-                Double heightCm, Double weightKg) {
-        this.profileImageUrl = profileImageUrl;
-        this.age = age;
+    public User(String id, String email, String password, String gender, String region, String profileImageUrl) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
         this.gender = gender;
         this.region = region;
-        this.religion = religion;
-        this.salary = salary;
-        this.job = job;
-        this.psychologicalResult = psychologicalResult;
-        this.heightCm = heightCm;
-        this.weightKg = weightKg;
+        this.profileImageUrl = profileImageUrl;
     }
+
 }
