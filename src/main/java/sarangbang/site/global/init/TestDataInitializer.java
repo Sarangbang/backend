@@ -15,7 +15,7 @@ public class TestDataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         userRepository.findByEmail("testuser@example.com").ifPresentOrElse(
                 user -> System.out.println("✅ 테스트 유저 이미 존재"),
                 () -> {

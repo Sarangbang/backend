@@ -9,7 +9,6 @@ import sarangbang.site.user.dto.UserRegisterRequestDto;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.exception.UserAlreadyExistsException;
 import sarangbang.site.user.exception.UserExceptionMessage;
-import sarangbang.site.user.exception.UserNotFoundException;
 import sarangbang.site.user.repository.UserRepository;
 
 @Service
