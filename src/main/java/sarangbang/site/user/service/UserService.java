@@ -32,11 +32,4 @@ public class UserService {
         return savedUser.getId();
     }
 
-    public User getUserById(String userId) throws UserNotFoundException {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.error(UserExceptionMessage.USER_NOT_FOUND.getMessage().formatted(userId));
-                    return new UserNotFoundException(UserExceptionMessage.USER_NOT_FOUND.getMessage().formatted(userId));
-                });
-    }
 }

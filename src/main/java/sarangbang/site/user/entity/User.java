@@ -14,7 +14,7 @@ import sarangbang.site.global.entity.BaseEntity;
 public class User extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) // IDENTITY -> UUID
+//    @GeneratedValue(strategy = GenerationType.UUID) // IDENTITY -> UUID
     @Column(length = 36) // UUID 문자열 길이에 맞춰 컬럼 크기 지정
     private String id; // Long -> String
 
