@@ -25,7 +25,8 @@ public class TestDataInitializer implements CommandLineRunner {
                             passwordEncoder.encode("testpass"),
                             "M",
                             "Seoul",
-                            null
+                            null,
+                            "test"
                     );
                     userRepository.save(user);
                     System.out.println("✅ 테스트 유저 삽입 완료");
