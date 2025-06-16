@@ -22,19 +22,21 @@ public class User extends BaseEntity {
 
     private String password;
 
+    private String nickname;
+
     private String gender;
 
     private String region;
 
     private String profileImageUrl;
 
-    public User(String id, String email, String password, String gender, String region, String profileImageUrl) {
+    public User(String id, String email, String password, String gender, String region, String profileImageUrl, String nickname) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.gender = gender;
         this.region = region;
         this.profileImageUrl = profileImageUrl;
+        this.nickname = nickname;
     }
-
 }

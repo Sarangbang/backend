@@ -12,8 +12,9 @@ public class UserRegisterRequestDto {
     private String gender;
     private String region;
     private String profileImageUrl;
+    private String nickname;
 
     public User toEntity() {
-        return new User(null, this.email, this.password, this.gender, this.region, this.profileImageUrl);
+        return new User(null, this.email, this.password, this.gender, this.region, this.profileImageUrl, this.nickname);
     }
 } 
