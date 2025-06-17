@@ -16,9 +16,18 @@ import java.util.List;
 public class ChatRoom {
 
     @Id
-    private String roomId;
+    private String _id; // DB 식별자
+    private String roomId; // 비즈니스 식별자
     private String roomName;
     private String creatorId;
     private List<String> participants;
     private Instant createdAt;
+
+    public ChatRoom(String roomId, String roomName, String creatorId, List<String> participants, Instant createdAt) {
+        this.roomId = roomId;
+        this.roomName = roomName;
+        this.creatorId = creatorId;
+        this.participants = participants;
+        this.createdAt = createdAt;
+    }
 }

@@ -18,7 +18,10 @@ public class ChatRoomController {
 
     @PostMapping
     public ResponseEntity<ChatRoomSummaryResponseDto> createRoom(@RequestBody ChatRoomCreateRequestDto request) {
-        return ResponseEntity.ok(chatRoomService.createRoom(request));
+        String userId = "UUID1";
+        ChatRoomSummaryResponseDto responseDto = chatRoomService.createRoom(request, userId);
+        ResponseEntity<ChatRoomSummaryResponseDto> response = ResponseEntity.ok(responseDto);
+        return response;
     }
 
     @GetMapping

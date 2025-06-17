@@ -10,6 +10,5 @@ import java.util.List;
 public class ChatRoomCreateRequestDto {
 
     private String roomName;
-    private String creatorId;
     private List<String> participants;
 }

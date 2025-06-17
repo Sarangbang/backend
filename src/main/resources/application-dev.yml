@@ -17,4 +17,4 @@ spring:
         use_sql_comments: ${DEV_DB_USE_SQL_COMMENTS:true}
   data:
     mongodb:
-      uri: mongodb://root:1234@localhost:27017/mongo?authSource=admin
+      uri: ${DEV_DB_MONGO_URI:mongodb://root:1234@localhost:27017/mongo?authSource=admin}

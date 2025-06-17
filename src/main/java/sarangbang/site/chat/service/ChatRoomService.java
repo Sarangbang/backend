@@ -19,24 +19,25 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
 
     /* 채팅방 생성 */
-    public ChatRoomSummaryResponseDto createRoom(ChatRoomCreateRequestDto request) {
+    public ChatRoomSummaryResponseDto createRoom(ChatRoomCreateRequestDto request, String userId) {
         ChatRoom chatRoom = new ChatRoom(
                 UUID.randomUUID().toString(),
                 request.getRoomName(),
-                request.getCreatorId(),
+                userId,
                 request.getParticipants(),
                 Instant.now()
         );
 
         ChatRoom saved = chatRoomRepository.save(chatRoom);
 
-        return new ChatRoomSummaryResponseDto(
+        ChatRoomSummaryResponseDto responseDto = new ChatRoomSummaryResponseDto(
                 saved.getRoomId(),
                 saved.getRoomName(),
                 saved.getCreatorId(),
                 saved.getParticipants(),
-                saved.getCreatedAt()
-        );
+                saved.getCreatedAt());
+
+        return responseDto;
     }
 
     /* 채팅방 조회 */
