@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import sarangbang.site.security.filter.JwtAuthenticationFilter;
+import sarangbang.site.security.handler.JwtAccessDeniedHandler;
+import sarangbang.site.security.handler.JwtAuthenticationEntryPoint;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.user.service.CustomUserDetailsService;
 
@@ -30,6 +32,8 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -55,12 +59,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/users/signup",
                                 "/api/users/signin",
-                                "/test/public"
+                                "/test/public",
+                                "/error"
                                 // "/actuator/health"
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -68,6 +77,9 @@ public class SecurityConfig {
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
+                .authenticationProvider(authenticationProvider())
+
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
 
@@ -91,7 +103,5 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
-
-
 }
 

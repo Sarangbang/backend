@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import sarangbang.site.auth.dto.SignInRequest;
+import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 
 @RestController
@@ -26,10 +27,15 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        String token = jwtTokenProvider.createToken(authentication.getName(),
-                authentication.getAuthorities().stream()
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+
+        String token = jwtTokenProvider.createToken(
+                user.getId(),           // UUID
+                user.getEmail(),        // email
+                user.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .toList());
+                        .toList()
+        );
 
         return ResponseEntity.ok().header("Authorization", "Bearer " + token).build();
     }
