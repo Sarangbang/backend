@@ -48,8 +48,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/users/signup",
-                                "/api/users/signin"
+                                "/**"
                                 // "/actuator/health"
                         ).permitAll()
                         .anyRequest().authenticated()
