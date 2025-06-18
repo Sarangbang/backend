@@ -68,7 +68,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/signup",
                                 "/api/users/signin",
-                                "/test/public",
                                 "/error"
                                 // "/actuator/health"
                         ).permitAll()

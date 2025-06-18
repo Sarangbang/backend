@@ -2,11 +2,13 @@ package sarangbang.site.global.init;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 
+@Profile("dev")
 @Component
 @RequiredArgsConstructor
 public class TestDataInitializer implements CommandLineRunner {
@@ -20,9 +22,9 @@ public class TestDataInitializer implements CommandLineRunner {
                 user -> System.out.println("✅ 테스트 유저 이미 존재"),
                 () -> {
                     User user = new User(
-                            "testuserUUID",
+                            "UUID01",
                             "testuser@example.com",
-                            passwordEncoder.encode("testpass"),
+                            passwordEncoder.encode("1"),
                             "M",
                             "Seoul",
                             null,
