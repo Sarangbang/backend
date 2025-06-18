@@ -15,3 +15,6 @@ spring:
       hibernate:
         format_sql: ${DEV_DB_FORMAT_SQL:true}
         use_sql_comments: ${DEV_DB_USE_SQL_COMMENTS:true}
+  data:
+    mongodb:
+      uri: ${DEV_DB_MONGO_URI:mongodb://root:1234@localhost:27017/mongo?authSource=admin}
