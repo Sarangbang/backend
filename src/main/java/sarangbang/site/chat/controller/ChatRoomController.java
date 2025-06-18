@@ -7,7 +7,6 @@ import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
 import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
 import sarangbang.site.chat.dto.UserChatRoomSummaryDto;
 import sarangbang.site.chat.service.ChatRoomService;
-
 import java.util.List;
 
 @RestController
