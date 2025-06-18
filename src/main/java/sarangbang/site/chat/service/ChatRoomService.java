@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
 import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
+import sarangbang.site.chat.dto.UserChatRoomSummaryDto;
 import sarangbang.site.chat.entity.ChatRoom;
 import sarangbang.site.chat.repository.ChatRoomRepository;
 
@@ -41,17 +42,13 @@ public class ChatRoomService {
     }
 
     /* 채팅방 조회 */
-    public List<ChatRoomSummaryResponseDto> getAllRooms(String userId) {
+    public List<UserChatRoomSummaryDto> getAllRooms(String userId) {
         List<ChatRoom> roomList = chatRoomRepository.findByParticipantsContaining(userId);
-        List<ChatRoomSummaryResponseDto> roomSummaries = new ArrayList<>();
+        List<UserChatRoomSummaryDto> roomSummaries = new ArrayList<>();
 
         for (ChatRoom room : roomList) {
-            roomSummaries.add(new ChatRoomSummaryResponseDto(
-                    room.getRoomId(),
-                    room.getRoomName(),
-                    room.getCreatorId(),
-                    room.getParticipants(),
-                    room.getCreatedAt()
+            roomSummaries.add(new UserChatRoomSummaryDto(
+                    room.getRoomName()
             ));
         }
         return roomSummaries;
