@@ -9,6 +9,7 @@ import sarangbang.site.user.dto.UserRegisterRequestDto;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.exception.UserAlreadyExistsException;
 import sarangbang.site.user.exception.UserExceptionMessage;
+import sarangbang.site.user.exception.UserNotFoundException;
 import sarangbang.site.user.repository.UserRepository;
 
 @Service
@@ -29,6 +30,14 @@ public class UserService {
         User user = requestDto.toEntity();
         User savedUser = userRepository.save(user);
         return savedUser.getId();
+    }
+
+    public User getUserById(String userId) throws UserNotFoundException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error(UserExceptionMessage.USER_NOT_FOUND.getMessage().formatted(userId));
+                    return new UserNotFoundException(UserExceptionMessage.USER_NOT_FOUND.getMessage().formatted(userId));
+                });
     }
 
 }
