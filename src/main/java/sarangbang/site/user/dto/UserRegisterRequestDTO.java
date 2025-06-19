@@ -4,9 +4,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import sarangbang.site.user.entity.User;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
-public class UserRegisterRequestDto {
+public class UserRegisterRequestDTO {
     private String email;
     private String password;
     private String gender;
@@ -15,6 +17,6 @@ public class UserRegisterRequestDto {
     private String nickname;
 
     public User toEntity() {
-        return new User(null, this.email, this.password, this.gender, this.region, this.profileImageUrl, this.nickname);
+        return new User(UUID.randomUUID().toString(), this.email, this.password, this.gender, this.region, this.profileImageUrl, this.nickname);
     }
 } 
