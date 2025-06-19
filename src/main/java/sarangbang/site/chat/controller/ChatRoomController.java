@@ -19,12 +19,6 @@ public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
 
-    /* 임시 로그인 인증 */
-    @GetMapping("/api/test/test2")
-    public void test(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        System.out.println(userDetails.getId());
-    }
-
     @PostMapping
     public ResponseEntity<ChatRoomSummaryResponseDto> createRoom(@RequestBody ChatRoomCreateRequestDto request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         ChatRoomSummaryResponseDto responseDto = chatRoomService.createRoom(request, userDetails.getId());
