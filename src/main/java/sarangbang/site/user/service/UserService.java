@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sarangbang.site.user.dto.UserRegisterRequestDto;
+import sarangbang.site.user.dto.UserRegisterRequestDTO;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.exception.UserAlreadyExistsException;
 import sarangbang.site.user.exception.UserExceptionMessage;
@@ -20,7 +20,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public String register(UserRegisterRequestDto requestDto) {
+    public String register(UserRegisterRequestDTO requestDto) {
         userRepository.findByEmail(requestDto.getEmail())
                 .ifPresent(user -> {
                     throw new UserAlreadyExistsException(
