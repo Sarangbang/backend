@@ -36,7 +36,6 @@ public class AuthController {
                         .map(GrantedAuthority::getAuthority)
                         .toList()
         );
-
         return ResponseEntity.ok().header("Authorization", "Bearer " + token).build();
     }
 }
