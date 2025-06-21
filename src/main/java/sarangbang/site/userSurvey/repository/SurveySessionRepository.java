@@ -14,6 +14,6 @@ public interface SurveySessionRepository extends JpaRepository<SurveySession, Lo
     List<SurveySession> findByUserIdOrderByCreatedAtDesc(@Param("userId") String userId);
     
     // 특정 사용자의 가장 최근 설문 세션 조회
-    @Query("SELECT s FROM SurveySession s WHERE s.user.id = :userId ORDER BY s.createdAt DESC LIMIT 1")
+    @Query("SELECT s FROM SurveySession s WHERE s.user.id = :userId  ORDER BY s.createdAt DESC LIMIT 1")
     SurveySession findLatestByUserId(@Param("userId") String userId);
 }

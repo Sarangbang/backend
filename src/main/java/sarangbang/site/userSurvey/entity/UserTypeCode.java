@@ -2,12 +2,14 @@ package sarangbang.site.userSurvey.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import sarangbang.site.global.entity.BaseEntity;
 
 @Entity
 @Table(name = "user_type_code")
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class UserTypeCode extends BaseEntity {
 
@@ -21,9 +23,4 @@ public class UserTypeCode extends BaseEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    public UserTypeCode(String typeCode, String typeName, String description) {
-        this.typeCode = typeCode;
-        this.typeName = typeName;
-        this.description = description;
-    }
 }

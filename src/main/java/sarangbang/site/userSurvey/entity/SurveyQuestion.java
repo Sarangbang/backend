@@ -2,6 +2,7 @@ package sarangbang.site.userSurvey.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import sarangbang.site.global.entity.BaseEntity;
 import sarangbang.site.userSurvey.entity.enums.Category;
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "survey_question")
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class SurveyQuestion extends BaseEntity {
 
@@ -32,10 +34,4 @@ public class SurveyQuestion extends BaseEntity {
     // UserAnswer와의 연관관계 (1:N)
     @OneToMany(mappedBy = "surveyQuestion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserAnswer> userAnswers;
-
-    public SurveyQuestion(String questionText, Category category, Integer questionNo) {
-        this.questionText = questionText;
-        this.category = category;
-        this.questionNo = questionNo;
-    }
 }

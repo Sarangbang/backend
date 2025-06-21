@@ -1,6 +1,7 @@
 package sarangbang.site.userSurvey.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.global.entity.BaseEntity;
@@ -9,6 +10,7 @@ import sarangbang.site.global.entity.BaseEntity;
 @Table(name = "user_answer")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserAnswer extends BaseEntity {
 
     @Id
@@ -29,8 +31,8 @@ public class UserAnswer extends BaseEntity {
     @JoinColumn(name = "survey_session_id", nullable = false)
     private SurveySession surveySession;
 
-    public UserAnswer(SurveySession surveySession, SurveyQuestion surveyQuestion,
-                     Integer selectedAnswer) {
+    // 부분 생성자 (Service에서 사용)
+    public UserAnswer(SurveySession surveySession, SurveyQuestion surveyQuestion, Integer selectedAnswer) {
         this.surveySession = surveySession;
         this.surveyQuestion = surveyQuestion;
         this.selectedAnswer = selectedAnswer;

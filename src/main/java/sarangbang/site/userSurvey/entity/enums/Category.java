@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Category {
-    PERSONALITY("성격"),
-    DATING("연애"),
-    LIFESTYLE("라이프스타일");
+    PERSONALITY("personality"),
+    DATING("dating"),
+    LIFESTYLE("lifestyle");
 
     private final String displayName;
 

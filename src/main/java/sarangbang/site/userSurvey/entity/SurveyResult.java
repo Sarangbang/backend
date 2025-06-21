@@ -2,12 +2,14 @@ package sarangbang.site.userSurvey.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import sarangbang.site.global.entity.BaseEntity;
 
 @Entity
 @Table(name = "survey_result")
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class SurveyResult extends BaseEntity {
 
@@ -46,18 +48,4 @@ public class SurveyResult extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_type_code", referencedColumnName = "type_code")
     private UserTypeCode userTypeCode;
-
-    public SurveyResult(SurveySession surveySession, Double personalityAvgScore, Double datingAvgScore,
-                       Double lifestyleAvgScore, Double totalAvgScore, String personalityCode,
-                       String datingCode, String lifestyleCode, UserTypeCode userTypeCode) {
-        this.surveySession = surveySession;
-        this.personalityAvgScore = personalityAvgScore;
-        this.datingAvgScore = datingAvgScore;
-        this.lifestyleAvgScore = lifestyleAvgScore;
-        this.totalAvgScore = totalAvgScore;
-        this.personalityCode = personalityCode;
-        this.datingCode = datingCode;
-        this.lifestyleCode = lifestyleCode;
-        this.userTypeCode = userTypeCode;
-    }
 }
