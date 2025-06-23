@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sarangbang.site.userSurvey.dto.SurveyAnswersDto;
+import sarangbang.site.userSurvey.entity.SurveyDocument;
 import sarangbang.site.userSurvey.service.UserSurveyService;
 
 @RestController
@@ -50,6 +51,38 @@ public class UserSurveyController {
         } catch (Exception e) {
             log.error("설문 답변 저장 실패 - userId: {}, 에러: {}", userId, e.getMessage(), e);
             return ResponseEntity.internalServerError().body("설문 답변 저장 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 설문조사 질문 조회 API
+     * MongoDB에서 설문 데이터를 가져와서 반환
+     *
+     * 응답 예시:
+     * {
+     *   "title": "사랑방 연애 유형 테스트",
+     *   "version": "1.0",
+     *   "categories": [...]
+     * }
+     */
+    @GetMapping("/questions")
+    public ResponseEntity<SurveyDocument> getSurveyQuestions() {
+        log.info("설문 질문 조회 요청");
+
+        try {
+            SurveyDocument surveyData = userSurveyService.getSurveyQuestions();
+            
+            if (surveyData == null) {
+                log.warn("설문 데이터를 찾을 수 없음");
+                return ResponseEntity.notFound().build();
+            }
+
+            log.info("설문 질문 조회 완료 - 카테고리 수: {}", surveyData.getCategories().size());
+            return ResponseEntity.ok(surveyData);
+
+        } catch (Exception e) {
+            log.error("설문 질문 조회 실패 - 에러: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 

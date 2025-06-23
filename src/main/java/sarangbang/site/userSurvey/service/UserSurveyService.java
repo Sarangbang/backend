@@ -7,8 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 import sarangbang.site.userSurvey.dto.SurveyAnswersDto;
+import sarangbang.site.userSurvey.entity.SurveyDocument;
 import sarangbang.site.userSurvey.entity.SurveySession;
 import sarangbang.site.userSurvey.entity.UserAnswer;
+import sarangbang.site.userSurvey.repository.SurveyDocumentRepository;
 import sarangbang.site.userSurvey.repository.SurveySessionRepository;
 import sarangbang.site.userSurvey.repository.UserAnswerRepository;
 
@@ -34,6 +36,7 @@ public class UserSurveyService {
     private final UserRepository userRepository;
     private final SurveySessionRepository surveySessionRepository;
     private final UserAnswerRepository userAnswerRepository;
+    private final SurveyDocumentRepository surveyDocumentRepository;
 
     /**
      * 설문조사 답변 저장
@@ -90,13 +93,36 @@ public class UserSurveyService {
                 throw new IllegalArgumentException("답변은 " + MIN_ANSWER_VALUE + "~" + MAX_ANSWER_VALUE + " 사이의 값이어야 합니다.");
             }
 
-            // SurveyQuestion 없이 답변만 저장
-            UserAnswer userAnswer = new UserAnswer(session, null, answerValue);
+            // 답변만 저장 (SurveyQuestion 제거됨)
+            UserAnswer userAnswer = new UserAnswer(session, answerValue);
             userAnswerRepository.save(userAnswer);
             log.trace("답변 저장 완료 - sessionId: {}, 답변 값: {}",
                     session.getSurveySessionId(), answerValue);
         }
         
         log.debug("모든 답변 저장 완료 - sessionId: {}", session.getSurveySessionId());
+    }
+
+    /**
+     * 설문조사 질문 조회
+     * MongoDB에서 설문 데이터를 가져와서 반환
+     */
+    public SurveyDocument getSurveyQuestions() {
+        log.debug("설문 질문 조회 시작");
+        
+        // MongoDB에서 첫 번째 설문 문서 조회
+        SurveyDocument surveyData = surveyDocumentRepository.findAll()
+                .stream()
+                .findFirst()
+                .orElse(null);
+        
+        if (surveyData != null) {
+            log.debug("설문 데이터 조회 완료 - title: {}, categories: {}", 
+                    surveyData.getTitle(), surveyData.getCategories().size());
+        } else {
+            log.warn("설문 데이터를 찾을 수 없음");
+        }
+        
+        return surveyData;
     }
 }

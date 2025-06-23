@@ -21,10 +21,6 @@ public class UserAnswer extends BaseEntity {
     @Column(name = "selected_answer", nullable = false)
     private Integer selectedAnswer;
 
-    // SurveyQuestion과의 연관관계 (N:1)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "survey_question_id")
-    private SurveyQuestion surveyQuestion;
 
     // SurveySession과의 연관관계 (N:1)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,9 +28,8 @@ public class UserAnswer extends BaseEntity {
     private SurveySession surveySession;
 
     // 부분 생성자 (Service에서 사용)
-    public UserAnswer(SurveySession surveySession, SurveyQuestion surveyQuestion, Integer selectedAnswer) {
+    public UserAnswer(SurveySession surveySession, Integer selectedAnswer) {
         this.surveySession = surveySession;
-        this.surveyQuestion = surveyQuestion;
         this.selectedAnswer = selectedAnswer;
     }
 }
