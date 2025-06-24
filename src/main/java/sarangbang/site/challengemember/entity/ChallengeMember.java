@@ -3,7 +3,6 @@ package sarangbang.site.challengemember.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.user.entity.User;
 
@@ -11,12 +10,11 @@ import sarangbang.site.user.entity.User;
 @Table(name = "ChallengeMembers")
 @NoArgsConstructor
 @Getter
-@Setter
 public class ChallengeMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int challengeMemberId;
+    private Long challengeMemberId;
     
     private String role;
 
@@ -27,4 +25,10 @@ public class ChallengeMember {
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
+
+    public ChallengeMember(String role, Challenge challenge, User user) {
+        this.role = role;
+        this.challenge = challenge;
+        this.user = user;
+    }
 }
