@@ -20,7 +20,7 @@ public class Challenge {
     private int id;
     private String location;
     private String title;
-    private String descirption;
+    private String description;
     private int participants;
     private String method;
     private LocalDate startDate;
