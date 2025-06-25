@@ -39,9 +39,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://*.sarangbang.site",
-                "https://sarangbang.site",
-                "https://www.sarangbang.site"
+                "https://*.ilsim.site",
+                "https://ilsim.site",
+                "https://www.ilsim.site"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -67,7 +67,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/signup",
                                 "/api/users/signin",
-                                "/error"
+                                "/error",
+                                "/api/challenge/categories"
                                 // "/actuator/health"
                         ).permitAll()
                         .anyRequest().authenticated()
