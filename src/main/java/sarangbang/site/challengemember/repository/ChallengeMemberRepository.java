@@ -4,4 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 
 public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember, Long> {
+
+    int countByChallengeId(int challengeId);
 }

@@ -26,8 +26,9 @@ public class ChallengeController {
     @GetMapping("/all")
     public ResponseEntity<List<ChallengeResponseDto>> getAllChallenges() {
         try {
-            List<ChallengeResponseDto> challenges = challengeService.getAllChallenges();
-            return ResponseEntity.ok(challenges);
+            List<ChallengeResponseDto> responseDto = challengeService.getAllChallenges();
+            ResponseEntity<List<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
+            return response;
 
         } catch (Exception e) {
             log.error("전체 챌린지 조회 실패 - 에러: {}", e.getMessage(), e);
@@ -41,8 +42,9 @@ public class ChallengeController {
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<List<ChallengeResponseDto>> getChallengesByCategory(@PathVariable Long categoryId) {
         try {
-            List<ChallengeResponseDto> challenges = challengeService.getChallengesByCategoryId(categoryId);
-            return ResponseEntity.ok(challenges);
+            List<ChallengeResponseDto> responseDto = challengeService.getChallengesByCategoryId(categoryId);
+            ResponseEntity<List<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
+            return response;
 
         } catch (Exception e) {
             log.error("카테고리별 챌린지 조회 실패 - categoryId: {}, 에러: {}", categoryId, e.getMessage(), e);
