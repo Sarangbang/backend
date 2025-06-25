@@ -3,6 +3,7 @@ package sarangbang.site.global.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -64,11 +65,12 @@ public class SecurityConfig {
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/users/signup",
-                                "/api/users/signin",
-                                "/error",
-                                "/api/challenge/categories"
+                        .requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/challenge/categories",
+                                "/api/challenges/**",
+                                "/api/categories/**",
+                                "/error"
                                 // "/actuator/health"
                         ).permitAll()
                         .anyRequest().authenticated()
