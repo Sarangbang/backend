@@ -25,12 +25,15 @@ public class UserService {
         log.debug("▶️ 회원가입 요청  email={}, nickname={}", requestDto.getEmail(), requestDto.getNickname());
 
         if (!requestDto.passwordMatched()) {
+            log.warn("❌ 비밀번호 불일치  email={}", requestDto.getEmail());
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         if (userRepository.existsByEmail(requestDto.getEmail())) {
+            log.warn("❌ 중복 이메일  email={}", requestDto.getEmail());
             throw new IllegalStateException("이미 가입된 이메일입니다.");
         }
         if (userRepository.existsByNickname(requestDto.getNickname())) {
+            log.warn("❌ 중복 닉네임  nickname={}", requestDto.getNickname());
             throw new IllegalStateException("이미 사용 중인 닉네임입니다.");
         }
 

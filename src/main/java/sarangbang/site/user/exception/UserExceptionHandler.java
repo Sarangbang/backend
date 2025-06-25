@@ -1,6 +1,7 @@
 package sarangbang.site.user.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,5 +48,14 @@ public class UserExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("사용자 관련 처리 중 서버 내부 오류가 발생했습니다."));
+    }
+
+    // 동시성 상황에서 발생하는 에러
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        log.warn("DataIntegrityViolationException: 데이터베이스 제약 조건 위반", ex);
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("이미 사용 중인 이메일 또는 닉네임입니다."));
     }
 }
