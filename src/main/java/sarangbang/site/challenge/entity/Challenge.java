@@ -3,7 +3,6 @@ package sarangbang.site.challenge.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.global.entity.BaseEntity;
 
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 @Table(name = "Challenges")
 @NoArgsConstructor
 @Getter
-@Setter
 public class Challenge extends BaseEntity {
 
     @Id
@@ -35,6 +33,14 @@ public class Challenge extends BaseEntity {
     @JoinColumn(name = "categoryId")
     private ChallengeCategory challengeCategory;
 
+    public Challenge(String title, String location, String image, int participants, ChallengeCategory challengeCategory) {
+        this.title = title;
+        this.location = location;
+        this.image = image;
+        this.participants = participants;
+        this.challengeCategory = challengeCategory;
+    }
+  
     public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory) {
         this.location = location;
         this.title = title;
@@ -47,4 +53,5 @@ public class Challenge extends BaseEntity {
         this.status = status;
         this.challengeCategory = challengeCategory;
     }
+
 }

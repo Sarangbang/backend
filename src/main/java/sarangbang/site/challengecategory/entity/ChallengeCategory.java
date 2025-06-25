@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import sarangbang.site.global.entity.BaseEntity;
 
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
