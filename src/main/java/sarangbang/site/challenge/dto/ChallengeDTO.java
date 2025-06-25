@@ -26,7 +26,7 @@ public class ChallengeDTO {
     @Size(max = 500, message = "내용은 500글자 미만으로 작성해주세요.")
     private String description;
 
-    @NotBlank(message = "챌린지 참여 인원을 입력해주세요.")
+    @NotNull(message = "챌린지 참여 인원을 입력해주세요.")
     private int participants;
 
     @NotBlank(message = "챌린지 인증 방법을 입력해주세요.")
@@ -41,7 +41,7 @@ public class ChallengeDTO {
 
     private String image;
 
-    private char status;
+    private boolean status;
 
     @NotNull(message = "챌린지 주제를 선택해주세요.")
     private Long categoryId;

@@ -36,7 +36,7 @@ public class ChallengeService {
                 dto.getStartDate(),
                 dto.getEndDate(),
                 dto.getImage(),
-                dto.getStatus(),
+                dto.isStatus(),
                 category
         );
 
@@ -45,7 +45,7 @@ public class ChallengeService {
 
         ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getLocation(),challenge.getTitle(), challenge.getDescription(),
                 challenge.getParticipants(), challenge.getMethod(), challenge.getStartDate(), challenge.getEndDate(),
-                challenge.getImage(), challenge.getStatus(), challenge.getChallengeCategory().getCategoryId());
+                challenge.getImage(), challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
 
         return challengeDTO;
     }
