@@ -13,7 +13,7 @@ import sarangbang.site.challengecategory.service.ChallengeCategoryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/challenge/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 @Slf4j
 public class ChallengeCategoryController {
