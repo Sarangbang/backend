@@ -13,7 +13,6 @@ import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.security.details.CustomUserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import java.util.List;
 
@@ -39,7 +38,10 @@ public class ChallengeController {
 
         } catch (Exception e) {
             log.error("챌린지 등록 실패 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
-            
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     /**
      * 전체 챌린지 목록 조회 API
      */
@@ -71,5 +73,4 @@ public class ChallengeController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
 }

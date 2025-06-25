@@ -1,12 +1,11 @@
 package sarangbang.site.challenge.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 
 import sarangbang.site.challenge.entity.Challenge;
@@ -20,7 +19,6 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
