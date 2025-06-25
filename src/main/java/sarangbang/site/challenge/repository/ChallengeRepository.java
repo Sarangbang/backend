@@ -7,4 +7,5 @@ import sarangbang.site.challenge.entity.Challenge;
 @Repository
 public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
+    Challenge findChallengeById(int challengeId);
 }

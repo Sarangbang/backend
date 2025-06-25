@@ -20,8 +20,10 @@ public class Challenge {
     private int id;
     private String location;
     private String title;
-    private String descirption;
+    @Column(length = 500)
+    private String description;
     private int participants;
+    @Column(length = 500)
     private String method;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -32,4 +34,16 @@ public class Challenge {
     @JoinColumn(name = "categoryId")
     private ChallengeCategory challengeCategory;
 
+    public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, char status, ChallengeCategory challengeCategory) {
+        this.location = location;
+        this.title = title;
+        this.description = description;
+        this.participants = participants;
+        this.method = method;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.image = image;
+        this.status = status;
+        this.challengeCategory = challengeCategory;
+    }
 }
