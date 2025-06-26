@@ -95,7 +95,7 @@ public class ChallengeService {
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
-            int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+            Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
         
@@ -110,7 +110,7 @@ public class ChallengeService {
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
-            int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+            Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
         
@@ -118,7 +118,7 @@ public class ChallengeService {
     }
 
     // id값으로 챌린지 조회
-    public Challenge getChallengeById(int challengeId) {
+    public Challenge getChallengeById(Long challengeId) {
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
         if(challenge == null) {
             throw new IllegalArgumentException("챌린지가 존재하지 않습니다.");
