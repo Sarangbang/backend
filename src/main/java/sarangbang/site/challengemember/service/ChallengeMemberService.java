@@ -8,7 +8,7 @@ import sarangbang.site.challenge.repository.ChallengeRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.user.entity.User;
-import sarangbang.site.user.repository.UserRepository;
+import sarangbang.site.user.service.UserService;
 
 @Service
 @Slf4j
@@ -17,13 +17,12 @@ public class ChallengeMemberService {
 
     private final ChallengeMemberRepository challengeMemberRepository;
     private final ChallengeRepository challengeRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     // 챌린지 멤버 저장
     public void saveChallengeOwner(String userId, int challengeId) {
 
-        // 유저 챌린지 role
-        User user = userRepository.findUserById(userId);
+        User user = userService.getUserById(userId);
         log.debug("챌린지 등록 멤버 Id : {}", user.getId());
 
         Challenge challenge = challengeRepository.findChallengeById(challengeId);

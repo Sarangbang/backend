@@ -116,4 +116,13 @@ public class ChallengeService {
         
         return responseDtos;
     }
+
+    // id값으로 챌린지 조회
+    public Challenge getChallengeById(int challengeId) {
+        Challenge challenge = challengeRepository.findChallengeById(challengeId);
+        if(challenge == null) {
+            throw new IllegalArgumentException("챌린지가 존재하지 않습니다.");
+        }
+        return challenge;
+    }
 }
