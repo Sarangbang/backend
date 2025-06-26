@@ -70,8 +70,11 @@ public class SecurityConfig {
                                 "/api/challenge/categories",
                                 "/api/challenges/**",
                                 "/api/categories/**",
-                                "/error"
+                                "/error",
                                 // "/actuator/health"
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
