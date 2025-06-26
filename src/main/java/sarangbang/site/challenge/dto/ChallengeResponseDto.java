@@ -17,9 +17,9 @@ public class ChallengeResponseDto {
     private String location;
     private String image;
     private int participants;
-    private int currentParticipants;
+    private Long currentParticipants;
 
-    public ChallengeResponseDto(Challenge challenge, int currentParticipants) {
+    public ChallengeResponseDto(Challenge challenge, Long currentParticipants) {
         this.id = challenge.getId();
         this.title = challenge.getTitle();
         this.location = challenge.getLocation();
