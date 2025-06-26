@@ -44,6 +44,6 @@ public class ChallengeDTO {
     private boolean status;
 
     @NotNull(message = "챌린지 주제를 선택해주세요.")
-    private long categoryId;
+    private Long categoryId;
 
 }

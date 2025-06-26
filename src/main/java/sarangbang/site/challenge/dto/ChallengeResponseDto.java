@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ChallengeResponseDto {
     
-    private long id;
+    private Long id;
     private String title;
     private String location;
     private String image;

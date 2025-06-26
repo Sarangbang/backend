@@ -14,7 +14,7 @@ public class ChallengeMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long challengeMemberId;
+    private Long challengeMemberId;
     
     private String role;
 

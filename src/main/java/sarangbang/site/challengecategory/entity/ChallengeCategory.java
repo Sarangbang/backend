@@ -16,7 +16,7 @@ public class ChallengeCategory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private long categoryId;
+    private Long categoryId;
 
     @Column(nullable = false, length = 50)
     private String categoryName;
