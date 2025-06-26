@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
+import sarangbang.site.global.entity.BaseEntity;
 
 import java.time.LocalDate;
 
@@ -11,26 +12,26 @@ import java.time.LocalDate;
 @Table(name = "Challenges")
 @NoArgsConstructor
 @Getter
-public class Challenge {
+public class Challenge extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String location;
     private String title;
+    @Column(length = 500)
     private String description;
     private int participants;
+    @Column(length = 500)
     private String method;
     private LocalDate startDate;
     private LocalDate endDate;
     private String image;
-    private char status;
+    private boolean status;
 
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private ChallengeCategory challengeCategory;
-
-
 
     public Challenge(String title, String location, String image, int participants, ChallengeCategory challengeCategory) {
         this.title = title;
@@ -39,8 +40,8 @@ public class Challenge {
         this.participants = participants;
         this.challengeCategory = challengeCategory;
     }
-
-    public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, char status, ChallengeCategory challengeCategory) {
+  
+    public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory) {
         this.location = location;
         this.title = title;
         this.description = description;
@@ -52,4 +53,5 @@ public class Challenge {
         this.status = status;
         this.challengeCategory = challengeCategory;
     }
+
 }

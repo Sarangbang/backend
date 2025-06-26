@@ -1,21 +1,24 @@
 package sarangbang.site.challenge.service;
 
+import org.springframework.transaction.annotation.Transactional;
+import sarangbang.site.challenge.dto.ChallengeDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
+
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.repository.ChallengeRepository;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
+import sarangbang.site.challengemember.service.ChallengeMemberService;
+
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +28,38 @@ public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final ChallengeCategoryRepository challengeCategoryRepository;
+    private final ChallengeMemberService challengeMemberService;
     private final ChallengeMemberRepository challengeMemberRepository;
+
+    // 챌린지 등록
+    @Transactional
+    public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId) {
+
+        ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
+        log.debug("챌린지 카테고리 정보 : {}", category.getCategoryName());
+
+        Challenge challenge = new Challenge(
+                dto.getLocation(),
+                dto.getTitle(),
+                dto.getDescription(),
+                dto.getParticipants(),
+                dto.getMethod(),
+                dto.getStartDate(),
+                dto.getEndDate(),
+                dto.getImage(),
+                dto.isStatus(),
+                category
+        );
+
+        challengeRepository.save(challenge);
+        challengeMemberService.saveChallengeOwner(userId, challenge.getId());
+
+        ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getLocation(),challenge.getTitle(), challenge.getDescription(),
+                challenge.getParticipants(), challenge.getMethod(), challenge.getStartDate(), challenge.getEndDate(),
+                challenge.getImage(), challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
+
+        return challengeDTO;
+    }
 
     @Transactional
     @PostConstruct
@@ -68,14 +102,6 @@ public class ChallengeService {
         return responseDtos;
     }
 
-//     return challenges.stream()
-    //                .map(challenge -> {
-    //                    int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-    //                    return new ChallengeResponseDto(challenge, currentParticipants);
-    //                })
-    //                .collect(Collectors.toList());
-//}
-    
     /**
      * 카테고리별 챌린지 목록 조회
      */
@@ -89,5 +115,14 @@ public class ChallengeService {
         }
         
         return responseDtos;
+    }
+
+    // id값으로 챌린지 조회
+    public Challenge getChallengeById(int challengeId) {
+        Challenge challenge = challengeRepository.findChallengeById(challengeId);
+        if(challenge == null) {
+            throw new IllegalArgumentException("챌린지가 존재하지 않습니다.");
+        }
+        return challenge;
     }
 }
