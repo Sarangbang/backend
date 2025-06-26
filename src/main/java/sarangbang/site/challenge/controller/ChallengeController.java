@@ -73,4 +73,5 @@ public class ChallengeController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 }
