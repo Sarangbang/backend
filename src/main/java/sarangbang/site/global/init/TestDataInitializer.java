@@ -22,13 +22,13 @@ public class TestDataInitializer implements CommandLineRunner {
                 user -> System.out.println("✅ 테스트 유저 이미 존재"),
                 () -> {
                     User user = new User(
-                            "UUID01",
+                            "TEST-UUID",
                             "testuser@example.com",
                             passwordEncoder.encode("1"),
-                            "M",
-                            "Seoul",
-                            null,
-                            "test"
+                            "TEST-NICKNAME",
+                            "MALE",
+                            "서울특별시",
+                            null
                     );
                     userRepository.save(user);
                     System.out.println("✅ 테스트 유저 삽입 완료");

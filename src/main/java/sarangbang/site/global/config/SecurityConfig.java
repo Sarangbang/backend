@@ -3,6 +3,7 @@ package sarangbang.site.global.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,9 +40,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://*.sarangbang.site",
-                "https://sarangbang.site",
-                "https://www.sarangbang.site"
+                "https://*.ilsim.site",
+                "https://ilsim.site",
+                "https://www.ilsim.site"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -64,9 +65,9 @@ public class SecurityConfig {
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/users/signup",
-                                "/api/users/signin",
+                        .requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/challenge/categories",
                                 "/api/challenges/**",
                                 "/api/categories/**",
                                 "/error"
