@@ -16,7 +16,7 @@ public class Challenge extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     private String location;
     private String title;
     @Column(length = 500)

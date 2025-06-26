@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class ChallengeMemberDTO {
 
-    private int id;
-    private int userId;
-    private int challengeId;
+    private long id;
+    private long userId;
+    private long challengeId;
     private String role;
 }
