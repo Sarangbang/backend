@@ -11,3 +11,9 @@ spring:
       max-request-size: 50MB
 jwt:
   access-secret: ${ACCESS_TOKEN_SECRET:LhVYSkvR90p9A7jPFlWWZ0uB3RPiIGnN8s3aXk2lbE4=}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
