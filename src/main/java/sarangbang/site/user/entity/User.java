@@ -11,10 +11,10 @@ import sarangbang.site.global.entity.BaseEntity;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class User extends BaseEntity {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.UUID) // IDENTITY -> UUID
     @Column(length = 36) // UUID 문자열 길이에 맞춰 컬럼 크기 지정
     private String id; // Long -> String
 
@@ -29,14 +29,4 @@ public class User extends BaseEntity {
     private String region;
 
     private String profileImageUrl;
-
-    public User(String id, String email, String password, String gender, String region, String profileImageUrl, String nickname) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.gender = gender;
-        this.region = region;
-        this.profileImageUrl = profileImageUrl;
-        this.nickname = nickname;
-    }
 }
