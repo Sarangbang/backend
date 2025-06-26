@@ -20,7 +20,7 @@ public class ChallengeMemberService {
     private final UserService userService;
 
     // 챌린지 멤버 저장
-    public void saveChallengeOwner(String userId, int challengeId) {
+    public void saveChallengeOwner(String userId, Long challengeId) {
 
         User user = userService.getUserById(userId);
         log.debug("챌린지 등록 멤버 Id : {}", user.getId());

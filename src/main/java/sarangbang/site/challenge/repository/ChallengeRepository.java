@@ -5,7 +5,7 @@ import sarangbang.site.challenge.entity.Challenge;
 
 import java.util.List;
 
-public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
+public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     List<Challenge> findByChallengeCategory_CategoryId(Long categoryId);
-    Challenge findChallengeById(int challengeId);
+    Challenge findChallengeById(Long challengeId);
 }
