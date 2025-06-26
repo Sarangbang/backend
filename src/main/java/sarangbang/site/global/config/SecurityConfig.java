@@ -3,6 +3,8 @@ package sarangbang.site.global.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -47,15 +49,15 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowCredentials(true); // 프론트에서 withCredentials: true 사용하려면 필요
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-
+    // filterChain 메소드에 Environment 파라미터 추가
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, Environment env) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -64,26 +66,35 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/challenge/categories",
-                                "/api/challenges/**",
-                                "/api/categories/**",
-                                "/error",
-                                // "/actuator/health"
+                .authorizeHttpRequests(authorize -> {
+                    // 기본적으로 허용할 POST 경로들
+                    authorize.requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll();
+
+                    // 기본적으로 허용할 GET 경로들
+                    authorize.requestMatchers(HttpMethod.GET,
+                            "/api/challenge/categories",
+                            "/api/challenges/**",
+                            "/api/categories/**",
+                            "/error"
+                    ).permitAll();
+
+                    // "dev" 프로필이 활성화되었는지 확인
+                    if (env.acceptsProfiles(Profiles.of("dev"))) {
+                        // "dev" 프로필일 때만 Swagger UI 경로를 허용
+                        authorize.requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                        ).permitAll();
+                    }
+
+                    // 위에서 정의한 경로 외 모든 요청은 인증 필요
+                    authorize.anyRequest().authenticated();
+                })
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authenticationProvider(authenticationProvider())
-
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -107,4 +118,3 @@ public class SecurityConfig {
         return provider;
     }
 }
-
