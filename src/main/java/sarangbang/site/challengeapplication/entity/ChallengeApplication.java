@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.global.entity.BaseEntity;
 import sarangbang.site.user.entity.User;
@@ -20,7 +21,9 @@ public class ChallengeApplication extends BaseEntity {
     private String introduction;
     private String reason;
     private String commitment;
+    @Setter
     private String status;
+    @Setter
     private String comment;
 
     @ManyToOne
@@ -40,4 +43,5 @@ public class ChallengeApplication extends BaseEntity {
         this.user = user;
         this.challenge = challenge;
     }
+
 }

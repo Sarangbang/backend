@@ -6,4 +6,5 @@ import sarangbang.site.challengemember.entity.ChallengeMember;
 public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember, Long> {
 
     Long countByChallengeId(Long challengeId);
+    ChallengeMember findChallengeMemberByUser_Id(String ownerId);
 }

@@ -19,7 +19,7 @@ public class ChallengeMemberService {
     private final ChallengeRepository challengeRepository;
     private final UserService userService;
 
-    // 챌린지 멤버 저장
+    // 챌린지 오너 저장
     public void saveChallengeOwner(String userId, Long challengeId) {
 
         User user = userService.getUserById(userId);
@@ -29,6 +29,19 @@ public class ChallengeMemberService {
         log.debug("챌린지 등록 챌린지 Id : {}", challenge.getId());
 
         ChallengeMember challengeMember = new ChallengeMember("owner", challenge, user);
+
+        challengeMemberRepository.save(challengeMember);
+    }
+
+    // 챌린지 멤버 저장
+    public void saveChallengeMember(String userId, Long challengeId) {
+        User user = userService.getUserById(userId);
+        log.debug("챌린지 등록 멤버 Id : {}", user.getId());
+
+        Challenge challenge = challengeRepository.findChallengeById(challengeId);
+        log.debug("챌린지 등록 챌린지 Id : {}", challenge.getId());
+
+        ChallengeMember challengeMember = new ChallengeMember("member", challenge, user);
 
         challengeMemberRepository.save(challengeMember);
     }

@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ChallengeMemberDTO {
 
     private Long id;
-    private Long userId;
+    private String userId;
     private Long challengeId;
     private String role;
 }

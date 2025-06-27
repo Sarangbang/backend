@@ -6,4 +6,5 @@ import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 
 @Repository
 public interface ChallengeApplicationRepository extends JpaRepository<ChallengeApplication, Long> {
+    ChallengeApplication findChallengeApplicationById(Long id);
 }
