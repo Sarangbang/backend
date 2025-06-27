@@ -24,7 +24,7 @@ public class ChallengeMemberController {
     /**
      * 챌린지 멤버 목록 조회 API
      */
-    @GetMapping("/{challengeId}/members")
+    @GetMapping("/{challengeId}")
     public ResponseEntity<List<ChallengeMemberDTO>> getMembersByChallengeId(@PathVariable Long challengeId) {
         try {
             List<ChallengeMemberDTO> responseDto = challengeMemberService.getMembersByChallengeId(challengeId);
@@ -38,6 +38,10 @@ public class ChallengeMemberController {
         } catch (EntityNotFoundException e) {
             log.error("챌린지를 찾을 수 없음 - challengeId: {}, 에러: {}", challengeId, e.getMessage());
             return ResponseEntity.notFound().build();
+            
+        } catch (Exception e) {
+            log.error("서버 오류 - challengeId: {}, 에러: {}", challengeId, e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
