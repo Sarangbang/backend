@@ -26,9 +26,8 @@ public class ChallengeVerification extends BaseEntity {
 
     private String content;
 
-    @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private VerificationStatus status;
+    private String status;
 
     @Column(nullable = false)
     private String rejectionReason;
@@ -41,7 +40,7 @@ public class ChallengeVerification extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, VerificationStatus status, String rejectionReason, Challenge challenge, User user) {
+    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, String status, String rejectionReason, Challenge challenge, User user) {
         this.verifiedAt = verifiedAt;
         this.imgUrl = imgUrl;
         this.content = content;
@@ -51,8 +50,5 @@ public class ChallengeVerification extends BaseEntity {
         this.user = user;
     }
 
-    public enum VerificationStatus {
-        APPROVED, REJECTED
-    }
 }
 
