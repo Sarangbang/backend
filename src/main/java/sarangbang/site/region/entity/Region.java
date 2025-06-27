@@ -3,7 +3,6 @@ package sarangbang.site.region.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sarangbang.site.challengecategory.entity.RegionType;
 import sarangbang.site.global.entity.BaseEntity;
 
 @Entity

@@ -1,4 +1,4 @@
-package sarangbang.site.challengecategory.entity;
+package sarangbang.site.region.entity;
 
 public enum RegionType {
     SIDO,
