@@ -1,0 +1,52 @@
+package sarangbang.site.challengeverification.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import sarangbang.site.challenge.entity.Challenge;
+import sarangbang.site.user.entity.User;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "challenge_verifications")
+@NoArgsConstructor
+@Getter
+public class ChallengeVerification {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDateTime verifiedAt;
+
+    @Column(length = 500, nullable = false)
+    private String imgUrl;
+
+    private String content;
+
+    @Column(length = 20, nullable = false)
+    private String status;
+
+    @Column(nullable = false)
+    private String rejectionReason;
+
+    @ManyToOne
+    @JoinColumn(name = "challenge_id", nullable = false)
+    private Challenge challenge;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, String status, String rejectionReason, Challenge challenge, User user) {
+        this.verifiedAt = verifiedAt;
+        this.imgUrl = imgUrl;
+        this.content = content;
+        this.status = status;
+        this.rejectionReason = rejectionReason;
+        this.challenge = challenge;
+        this.user = user;
+    }
+}
+
