@@ -19,15 +19,21 @@ public class ChallengeApplicationService {
     private final ChallengeMemberRepository challengeMemberRepository;
 
     // 챌린지 신청 수락/거부
-    public ChangeChallengeAppDTO changeApplicationStatus(Long appId, ChangeChallengeAppDTO dto, String ownerId) throws EntityNotFoundException {
+    public ChangeChallengeAppDTO changeApplicationStatus(Long appId, ChangeChallengeAppDTO dto, String ownerId) {
 
         ChallengeApplication app = challengeApplicationRepository.findChallengeApplicationById(appId);
+        if(app==null){
+            throw new EntityNotFoundException("챌린지 "+appId+"를 찾을 수 없습니다.");
+        }
         ChallengeMember member = challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(ownerId, app.getChallenge().getId()); // 특정 챌린지의 id 에서 member 조회
+        if(member==null){
+            throw new EntityNotFoundException("챌린지 멤버 "+member+"를 찾을 수 없습니다.");
+        }
 
         if(app.getStatus().equals("approved") || app.getStatus().equals("rejected")){
             throw new IllegalStateException("이미 처리된 신청입니다.");
-
         }
+
         if(member.getRole().equals("owner")) {
 
             if(dto.getStatus().equals("거부")) {
