@@ -1,5 +1,6 @@
 package sarangbang.site.challengeapplication.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sarangbang.site.challengeapplication.dto.ChangeChallengeAppDTO;
@@ -18,11 +19,15 @@ public class ChallengeApplicationService {
     private final ChallengeMemberRepository challengeMemberRepository;
 
     // 챌린지 신청 수락/거부
-    public ChangeChallengeAppDTO changeApplicationStatus(Long appId, ChangeChallengeAppDTO dto, String ownerId) {
+    public ChangeChallengeAppDTO changeApplicationStatus(Long appId, ChangeChallengeAppDTO dto, String ownerId) throws EntityNotFoundException {
 
         ChallengeApplication app = challengeApplicationRepository.findChallengeApplicationById(appId);
-        ChallengeMember member = challengeMemberRepository.findChallengeMemberByUser_Id(ownerId);
+        ChallengeMember member = challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(ownerId, app.getChallenge().getId()); // 특정 챌린지의 id 에서 member 조회
 
+        if(app.getStatus().equals("approved") || app.getStatus().equals("rejected")){
+            throw new IllegalStateException("이미 처리된 신청입니다.");
+
+        }
         if(member.getRole().equals("owner")) {
 
             if(dto.getStatus().equals("거부")) {
