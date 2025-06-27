@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "sarangbang.site.user")
+@RestControllerAdvice(basePackages = "sarangbang.site.auth")
 public class UserExceptionHandler {
 
     // 클라이언트에게 반환할 에러 응답 DTO
