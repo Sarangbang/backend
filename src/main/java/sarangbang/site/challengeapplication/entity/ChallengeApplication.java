@@ -21,9 +21,7 @@ public class ChallengeApplication extends BaseEntity {
     private String introduction;
     private String reason;
     private String commitment;
-    @Setter
     private String status;
-    @Setter
     private String comment;
 
     @ManyToOne
@@ -44,4 +42,11 @@ public class ChallengeApplication extends BaseEntity {
         this.challenge = challenge;
     }
 
+    public void updateAppStatus(String status) {
+        this.status = status;
+    }
+
+    public void updateAppComment(String comment) {
+        this.comment = comment;
+    }
 }

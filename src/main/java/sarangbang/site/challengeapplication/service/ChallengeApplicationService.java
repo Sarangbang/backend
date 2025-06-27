@@ -26,11 +26,11 @@ public class ChallengeApplicationService {
         if(member.getRole().equals("owner")) {
 
             if(dto.getStatus().equals("거부")) {
-                app.setStatus("rejected");
-                app.setComment(dto.getComment());
+                app.updateAppStatus("rejected");
+                app.updateAppComment(dto.getComment());
             } else {
-                app.setStatus("approved");
-                app.setComment(dto.getComment());
+                app.updateAppStatus("approved");
+                app.updateAppComment(dto.getComment());
                 challengeMemberService.saveChallengeMember(app.getUser().getId(), appId);
             }
             challengeApplicationRepository.save(app);
