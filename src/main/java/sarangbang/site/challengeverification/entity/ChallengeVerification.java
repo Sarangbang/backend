@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challenge.entity.Challenge;
+import sarangbang.site.global.entity.BaseEntity;
 import sarangbang.site.user.entity.User;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "challenge_verifications")
 @NoArgsConstructor
 @Getter
-public class ChallengeVerification {
+public class ChallengeVerification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,13 +21,14 @@ public class ChallengeVerification {
 
     private LocalDateTime verifiedAt;
 
-    @Column(length = 500, nullable = false)
+    @Column(nullable = false)
     private String imgUrl;
 
     private String content;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private String status;
+    private VerificationStatus status;
 
     @Column(nullable = false)
     private String rejectionReason;
@@ -39,7 +41,7 @@ public class ChallengeVerification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, String status, String rejectionReason, Challenge challenge, User user) {
+    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, VerificationStatus status, String rejectionReason, Challenge challenge, User user) {
         this.verifiedAt = verifiedAt;
         this.imgUrl = imgUrl;
         this.content = content;
@@ -47,6 +49,10 @@ public class ChallengeVerification {
         this.rejectionReason = rejectionReason;
         this.challenge = challenge;
         this.user = user;
+    }
+
+    public enum VerificationStatus {
+        APPROVED, REJECTED
     }
 }
 
