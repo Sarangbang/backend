@@ -70,8 +70,8 @@ public class SecurityConfig {
                                 "/api/challenge/categories",
                                 "/api/challenges/**",
                                 "/api/categories/**",
-                                "/error"
-                                // "/actuator/health"
+                                "/error",
+                                "/actuator/health"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
