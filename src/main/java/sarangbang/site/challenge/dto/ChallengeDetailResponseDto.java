@@ -36,17 +36,12 @@ public class ChallengeDetailResponseDto {
         this.endDate = challenge.getEndDate();
         this.location = challenge.getLocation();
 
-        // 추가적인 계산이나 변환이 필요한 값들을 처리합니다.
-        this.currentParticipants = currentParticipants; // 서비스 레이어에서 계산한 현재 참여자 수를 할당합니다.
-        this.challengeStatus = challenge.isStatus() ? "ACTIVE" : "INACTIVE"; // boolean 타입의 status를 클라이언트가 이해하기 쉬운 문자열로 변환합니다.
+        this.currentParticipants = currentParticipants;
+        this.challengeStatus = challenge.isStatus() ? "ACTIVE" : "INACTIVE";
 
-        // 연관된 엔티티(ChallengeCategory)의 정보를 DTO(CategoryDTO)로 변환합니다.
-        // 이것이 엔티티를 직접 노출하지 않고 필요한 데이터만 전달하는 핵심적인 부분입니다.
-        this.category = new ChallengeCategoryDTO( // 새로 만든 외부 CategoryDTO 객체를 생성합니다.
-                challenge.getChallengeCategory().getCategoryId(), // 카테고리 엔티티에서 ID를 가져옵니다.
-                challenge.getChallengeCategory().getCategoryName() // 카테고리 엔티티에서 이름을 가져옵니다.
+        this.category = new ChallengeCategoryDTO(
+                challenge.getChallengeCategory().getCategoryId(),
+                challenge.getChallengeCategory().getCategoryName()
         );
     }
-
-
 }
