@@ -22,8 +22,8 @@ public class RegionService {
         log.info("자식 지역 조회 요청. parentRegionId = {}", parentRegionId);
 
         if (parentRegionId != null) {
-            boolean exists = regionRepository.existsById(parentRegionId);
-            if (!exists) {
+            boolean parentExists = regionRepository.existsById(parentRegionId);
+            if (!parentExists) {
                 log.warn("존재하지 않는 parentRegionId: {}", parentRegionId);
                 throw new RegionNotFoundException("해당 ID의 지역을 찾을 수 없습니다");
             }

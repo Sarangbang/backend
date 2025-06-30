@@ -11,12 +11,14 @@ public class RegionResponseDTO {
     private Long regionId;
     private String regionName;
     private String regionType;
+    private String fullAddress;
 
     public static RegionResponseDTO from(Region region) {
         return new RegionResponseDTO(
             region.getRegionId(),
             region.getRegionName(),
-            region.getRegionType().name()
+            region.getRegionType().name(),
+            region.getFullAddress()
         );
     }
 }

@@ -18,7 +18,9 @@ public class RegionExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRegionNotFoundException(RegionNotFoundException e) {
         log.warn("!! 지역을 찾을 수 없습니다: {}", e.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                "존재하지 않는 지역 요청입니다."
+        );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
