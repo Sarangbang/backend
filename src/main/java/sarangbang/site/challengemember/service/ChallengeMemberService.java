@@ -7,8 +7,12 @@ import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.repository.ChallengeRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
+import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.Optional;
 
@@ -33,6 +37,26 @@ public class ChallengeMemberService {
         ChallengeMember challengeMember = new ChallengeMember("owner", challenge, user);
 
         challengeMemberRepository.save(challengeMember);
+    }
+
+    // 챌린지 멤버 목록 조회
+    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId) {
+        List<ChallengeMember> members = challengeMemberRepository.findByChallengeId(challengeId);
+        List<ChallengeMemberDTO> memberDTOs = new ArrayList<>();
+
+        for (ChallengeMember member : members) {
+            ChallengeMemberDTO dto = new ChallengeMemberDTO();
+
+            dto.setId(member.getChallengeMemberId());
+            dto.setUserId(member.getUser().getId());
+            dto.setChallengeId(challengeId);
+            dto.setRole(member.getRole());
+            dto.setNickname(member.getUser().getNickname());
+
+            memberDTOs.add(dto);
+        }
+
+        return memberDTOs;
     }
 
     // 챌린지 멤버 저장

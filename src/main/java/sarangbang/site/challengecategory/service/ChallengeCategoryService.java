@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sarangbang.site.challengecategory.dto.ChallengeCategoryDTO;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
 
@@ -52,14 +53,18 @@ public class ChallengeCategoryService {
     /**
      * 모든 카테고리 조회 (이름순 정렬)
      */
-    public List<ChallengeCategory> getAllCategories() {
-        return challengeCategoryRepository.findAllByOrderByCategoryName();
+    public List<ChallengeCategoryDTO> getAllCategories() {
+        List<ChallengeCategory> categories = challengeCategoryRepository.findAllByOrderByCategoryName();
+        return categories.stream()
+                .map(ChallengeCategoryDTO::fromEntity)
+                .toList();
     }
 
     /**
      * ID로 개별 카테고리 조회
      */
-    public ChallengeCategory getCategoryById(Long categoryId) {
-        return challengeCategoryRepository.findById(categoryId).orElse(null);
+    public ChallengeCategoryDTO getCategoryById(Long categoryId) {
+        ChallengeCategory category = challengeCategoryRepository.findById(categoryId).orElse(null);
+        return category != null ? ChallengeCategoryDTO.fromEntity(category) : null;
     }
 }

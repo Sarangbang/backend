@@ -15,4 +15,5 @@ public class ChallengeMemberDTO {
     private String userId;
     private Long challengeId;
     private String role;
+    private String nickname;
 }
