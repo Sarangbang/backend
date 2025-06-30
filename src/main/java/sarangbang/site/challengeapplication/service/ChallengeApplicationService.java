@@ -25,15 +25,15 @@ public class ChallengeApplicationService {
 
         ChallengeApplication app = challengeApplicationRepository.findChallengeApplicationById(appId);
         if(app==null){
-            throw new EntityNotFoundException("챌린지 "+appId+"를 찾을 수 없습니다.");
+            throw new IllegalArgumentException("챌린지 "+appId+"를 찾을 수 없습니다.");
         }
         Optional<ChallengeMember> member = challengeMemberService.getMemberByChallengeId(ownerId, app.getChallenge().getId()); // 특정 챌린지의 id 에서 member 조회
         if(member.isEmpty()){
-            throw new EntityNotFoundException("챌린지 멤버 "+member+"를 찾을 수 없습니다.");
+            throw new IllegalArgumentException("챌린지 멤버 "+member+"를 찾을 수 없습니다.");
         }
 
         if(!app.getStatus().equals("PENDING")){
-            throw new IllegalStateException("이미 처리된 신청입니다.");
+            throw new IllegalArgumentException("이미 처리된 신청입니다.");
         }
 
         if(member.get().getRole().equals("owner")) {
