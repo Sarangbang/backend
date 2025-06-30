@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sarangbang.site.challengeapplication.enums.Status;
+import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 
 @Getter
 @Setter
@@ -26,7 +26,7 @@ public class ChallengeJoinDTO {
     @Size(max = 500, message = "다짐은 500자 미만으로 작성해주세요.")
     private String commitment;
 
-    private Status status;
+    private ChallengeApplyStatus challengeApplyStatus;
 
     private String comment;
 

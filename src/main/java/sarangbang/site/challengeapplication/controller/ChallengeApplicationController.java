@@ -1,5 +1,6 @@
 package sarangbang.site.challengeapplication.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ChallengeApplicationController {
     private final ChallengeApplicationService challengeApplicationService;
 
     @PostMapping
-    public ResponseEntity<ChallengeJoinDTO> joinChallenge(@RequestBody ChallengeJoinDTO challengeJoinDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ChallengeJoinDTO> joinChallenge(@RequestBody @Valid ChallengeJoinDTO challengeJoinDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         String userId = userDetails.getId();
         log.info("=> 챌린지 참여 요청. challengeId: {}, userId: {}", challengeJoinDTO.getChallengeId(), userId);

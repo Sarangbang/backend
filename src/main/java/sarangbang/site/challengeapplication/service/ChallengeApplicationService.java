@@ -7,7 +7,7 @@ import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengeapplication.dto.ChallengeJoinDTO;
 import sarangbang.site.challengeapplication.entity.ChallengeApplication;
-import sarangbang.site.challengeapplication.enums.Status;
+import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 import sarangbang.site.challengeapplication.exception.DuplicateApplicationException;
 import sarangbang.site.challengeapplication.repository.ChallengeApplicationRepository;
 import sarangbang.site.user.entity.User;
@@ -40,7 +40,7 @@ public class ChallengeApplicationService {
                 challengeJoinDTO.getIntroduction(),
                 challengeJoinDTO.getReason(),
                 challengeJoinDTO.getCommitment(),
-                Status.PENDING,
+                ChallengeApplyStatus.PENDING,
                 challengeJoinDTO.getComment(),
                 user,
                 challenge
@@ -54,7 +54,7 @@ public class ChallengeApplicationService {
                 challengeApplication.getIntroduction(),
                 challengeApplication.getReason(),
                 challengeApplication.getCommitment(),
-                challengeApplication.getStatus(),
+                challengeApplication.getChallengeApplyStatus(),
                 challengeApplication.getComment(),
                 challengeApplication.getChallenge().getId()
         );
