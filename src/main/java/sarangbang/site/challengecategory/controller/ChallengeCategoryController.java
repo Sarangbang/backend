@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sarangbang.site.challengecategory.entity.ChallengeCategory;
+import sarangbang.site.challengecategory.dto.ChallengeCategoryDTO;
 import sarangbang.site.challengecategory.service.ChallengeCategoryService;
 
 import java.util.List;
@@ -24,9 +24,9 @@ public class ChallengeCategoryController {
      * 카테고리 목록 조회 API
      */
     @GetMapping
-    public ResponseEntity<List<ChallengeCategory>> getCategories() {
+    public ResponseEntity<List<ChallengeCategoryDTO>> getCategories() {
         try {
-            List<ChallengeCategory> categories = challengeCategoryService.getAllCategories();
+            List<ChallengeCategoryDTO> categories = challengeCategoryService.getAllCategories();
             return ResponseEntity.ok(categories);
 
         } catch (Exception e) {
@@ -39,9 +39,9 @@ public class ChallengeCategoryController {
      * 개별 카테고리 조회 API
      */
     @GetMapping("/{categoryId}")
-    public ResponseEntity<ChallengeCategory> getCategoryById(@PathVariable Long categoryId) {
+    public ResponseEntity<ChallengeCategoryDTO> getCategoryById(@PathVariable Long categoryId) {
         try {
-            ChallengeCategory challengeCategory = challengeCategoryService.getCategoryById(categoryId);
+            ChallengeCategoryDTO challengeCategory = challengeCategoryService.getCategoryById(categoryId);
             
             if (challengeCategory == null) {
                 log.warn("카테고리를 찾을 수 없음 - ID: {}", categoryId);
