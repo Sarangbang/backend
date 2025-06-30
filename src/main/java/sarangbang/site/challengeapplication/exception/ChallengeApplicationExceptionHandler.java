@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(basePackages = "sarangbang.site.challengeapplication")
 public class ChallengeApplicationExceptionHandler {
 
+    @Schema(description = "챌린지 중복 신청 에러 핸들러")
     public record ErrorResponse(
             @Schema(description = "에러 상세 메시지", example = "이미 신청한 챌린지입니다.")
             String message
