@@ -3,12 +3,14 @@ package sarangbang.site.challengeapplication.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challengeapplication.dto.ChangeChallengeAppDTO;
 import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 import sarangbang.site.challengeapplication.repository.ChallengeApplicationRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
-import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,14 +20,15 @@ public class ChallengeApplicationService {
     private final ChallengeMemberService challengeMemberService;
 
     // 챌린지 신청 수락/거부
+    @Transactional
     public ChangeChallengeAppDTO changeApplicationStatus(Long appId, ChangeChallengeAppDTO dto, String ownerId) {
 
         ChallengeApplication app = challengeApplicationRepository.findChallengeApplicationById(appId);
         if(app==null){
             throw new EntityNotFoundException("챌린지 "+appId+"를 찾을 수 없습니다.");
         }
-        ChallengeMember member = challengeMemberService.getMemberByChallengeId(ownerId, app.getChallenge().getId()); // 특정 챌린지의 id 에서 member 조회
-        if(member==null){
+        Optional<ChallengeMember> member = challengeMemberService.getMemberByChallengeId(ownerId, app.getChallenge().getId()); // 특정 챌린지의 id 에서 member 조회
+        if(member.isEmpty()){
             throw new EntityNotFoundException("챌린지 멤버 "+member+"를 찾을 수 없습니다.");
         }
 
@@ -33,7 +36,7 @@ public class ChallengeApplicationService {
             throw new IllegalStateException("이미 처리된 신청입니다.");
         }
 
-        if(member.getRole().equals("owner")) {
+        if(member.get().getRole().equals("owner")) {
 
             if(dto.getStatus().equals("거부")) {
                 app.updateAppStatus("rejected");
@@ -41,8 +44,8 @@ public class ChallengeApplicationService {
             } else {
                 app.updateAppStatus("approved");
                 app.updateAppComment(dto.getComment());
-                ChallengeMember findMember = challengeMemberService.getMemberByChallengeId(app.getUser().getId(), app.getChallenge().getId());
-                if(findMember!=null){
+                Optional<ChallengeMember> findMember = challengeMemberService.getMemberByChallengeId(app.getUser().getId(), app.getChallenge().getId());
+                if(findMember.isPresent()){
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
                 }
                 challengeMemberService.saveChallengeMember(app.getUser().getId(), app.getChallenge().getId());

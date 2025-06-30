@@ -11,6 +11,8 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class ChallengeMemberService {
     }
 
     // 특정 챌린지 id 의 member 조회
-    public ChallengeMember getMemberByChallengeId(String userId, Long challengeId) {
+    public Optional<ChallengeMember> getMemberByChallengeId(String userId, Long challengeId) {
         return challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(userId, challengeId);
     }
 }
