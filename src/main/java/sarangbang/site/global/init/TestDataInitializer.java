@@ -24,7 +24,7 @@ public class TestDataInitializer implements CommandLineRunner {
                     User user = new User(
                             "TEST-UUID",
                             "testuser@example.com",
-                            passwordEncoder.encode("1"),
+                            passwordEncoder.encode("12345678"),
                             "TEST-NICKNAME",
                             "MALE",
                             "서울특별시",
