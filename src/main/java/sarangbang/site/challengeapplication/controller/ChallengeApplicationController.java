@@ -1,5 +1,6 @@
 package sarangbang.site.challengeapplication.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ChallengeApplicationController {
     // 챌린지 신청 수락/거부
     @PostMapping("/{appId}")
     public ResponseEntity<ChangeChallengeAppDTO> changeApplicationStatus(
-            @PathVariable Long appId, @RequestBody ChangeChallengeAppDTO changeChallengeAppDTO,
+            @PathVariable Long appId, @RequestBody @Valid ChangeChallengeAppDTO changeChallengeAppDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try{
@@ -32,11 +33,8 @@ public class ChallengeApplicationController {
             log.error("챌린지 요청 수락/거부 입력값 오류 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
             return ResponseEntity.badRequest().build();
 
-        } catch (Exception e){
-            log.error("챌린지 요청 수락/거부 실패 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
-            return  ResponseEntity.internalServerError().build();
-        }
+        } /*catch (Exception e){
+
+        }*/
     }
-
-
 }
