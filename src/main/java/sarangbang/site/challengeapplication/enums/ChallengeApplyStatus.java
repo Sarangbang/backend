@@ -5,7 +5,7 @@ public enum ChallengeApplyStatus {
     APPROVED("승인"),
     REJECTED("거절");
 
-    private String displayName;
+    private final String displayName;
 
     ChallengeApplyStatus(String displayName) {
         this.displayName = displayName;

@@ -41,7 +41,7 @@ public class ChallengeApplicationService {
                 challengeJoinDTO.getReason(),
                 challengeJoinDTO.getCommitment(),
                 ChallengeApplyStatus.PENDING,
-                challengeJoinDTO.getComment(),
+                null,
                 user,
                 challenge
         );
@@ -55,7 +55,6 @@ public class ChallengeApplicationService {
                 challengeApplication.getReason(),
                 challengeApplication.getCommitment(),
                 challengeApplication.getChallengeApplyStatus(),
-                challengeApplication.getComment(),
                 challengeApplication.getChallenge().getId()
         );
         log.info("<= 챌린지 신청서 저장 로직 종료. applicationId: {}", challengeApplication.getId());
