@@ -32,7 +32,7 @@ public class ChallengeApplicationService {
             throw new EntityNotFoundException("챌린지 멤버 "+member+"를 찾을 수 없습니다.");
         }
 
-        if(app.getStatus().equals("approved") || app.getStatus().equals("rejected")){
+        if(!app.getStatus().equals("PENDING")){
             throw new IllegalStateException("이미 처리된 신청입니다.");
         }
 
