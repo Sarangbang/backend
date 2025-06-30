@@ -8,7 +8,7 @@ import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengeapplication.dto.ChallengeJoinDTO;
 import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 import sarangbang.site.challengeapplication.enums.Status;
-import sarangbang.site.challengeapplication.exception.ChallengeAlreadyAppliedException;
+import sarangbang.site.challengeapplication.exception.DuplicateApplicationException;
 import sarangbang.site.challengeapplication.repository.ChallengeApplicationRepository;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
@@ -30,10 +30,11 @@ public class ChallengeApplicationService {
         Challenge challenge = challengeService.getChallengeById(challengeJoinDTO.getChallengeId());
         log.debug("... 사용자 및 챌린지 엔티티 조회 완료");
 
-            if (challengeApplicationRepository.existsByUserAndChallenge(user, challenge)) {
-                log.warn("!! 이미 참여 신청한 챌린지. userId: {}, challengeId: {}", userId, challenge.getId());
-                throw new ChallengeAlreadyAppliedException("이미 참여 신청한 챌린지입니다.");
-            }
+        // DuplicateApplicationException 예외 처리
+        if (challengeApplicationRepository.existsByUserAndChallenge(user, challenge)) {
+            log.warn("!! 이미 참여 신청한 챌린지. userId: {}, challengeId: {}", userId, challenge.getId());
+            throw new DuplicateApplicationException("이미 참여 신청한 챌린지입니다.");
+        }
 
         ChallengeApplication challengeApplication = new ChallengeApplication(
                 challengeJoinDTO.getIntroduction(),

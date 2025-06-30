@@ -26,7 +26,7 @@ public class ChallengeApplicationController {
         String userId = userDetails.getId();
         log.info("=> 챌린지 참여 요청. challengeId: {}, userId: {}", challengeJoinDTO.getChallengeId(), userId);
 
-        ChallengeJoinDTO requestDTO = challengeApplicationService.saveChallengeApplication(challengeJoinDTO, userDetails.getId());
+        ChallengeJoinDTO requestDTO = challengeApplicationService.saveChallengeApplication(challengeJoinDTO, userId);
         log.info("<= 챌린지 참여 처리 성공. challengeId: {}, userId: {}", challengeJoinDTO.getChallengeId(), userId);
 
         ResponseEntity<ChallengeJoinDTO> response = ResponseEntity.ok(requestDTO);
