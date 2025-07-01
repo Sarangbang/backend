@@ -75,6 +75,8 @@ public class SecurityConfig {
                             "/api/challenge/categories",
                             "/api/challenges/**",
                             "/api/categories/**",
+                            "/api/region**",
+                            "/api/regions/sido",
                             "/error"
                     ).permitAll();
 

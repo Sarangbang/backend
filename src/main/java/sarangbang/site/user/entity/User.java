@@ -6,7 +6,6 @@ import lombok.Getter;
 import jakarta.persistence.*;
 import lombok.*;
 import sarangbang.site.global.entity.BaseEntity;
-import sarangbang.site.region.entity.Region;
 
 @Entity
 @Table(name = "users")
@@ -27,9 +26,7 @@ public class User extends BaseEntity {
 
     private String gender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id", nullable = false)
-    private Region region;
+    private String region;
 
     private String profileImageUrl;
 }
