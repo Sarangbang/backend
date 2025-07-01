@@ -1,5 +1,12 @@
 package sarangbang.site.challengeverification.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +20,33 @@ import sarangbang.site.security.details.CustomUserDetails;
 @RequestMapping("/api/challenge-verifications")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Challenge Verification", description = "챌린지 인증 관련 API")
 public class ChallengeVerificationController {
 
     private final ChallengeVerificationService challengeVerificationService;
 
     @PostMapping
+    @Operation(summary = "챌린지 인증", description = "챌린지 참가자가 인증을 진행합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", 
+                    description = "인증 등록 성공",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation =
+                            ChallengeVerificationDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400", 
+                    description = "잘못된 요청 (유효하지 않은 챌린지 ID, 참가하지 않은 챌린지) ",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    
     public ResponseEntity<ChallengeVerificationDTO> createVerification(
-            @RequestBody ChallengeVerificationDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @RequestBody @Valid ChallengeVerificationDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
             String userId = userDetails.getId();
             log.info("챌린지 인증 등록 요청 - 사용자: {}, 챌린지ID: {}", userId, dto.getChallengeId());
-
             ChallengeVerificationDTO result = challengeVerificationService.createVerification(userId, dto);
 
             return ResponseEntity.ok(result);
@@ -32,10 +54,6 @@ public class ChallengeVerificationController {
         } catch (IllegalArgumentException e) {
             log.error("챌린지 인증 등록 실패: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
-
-        } catch (Exception e) {
-            log.error("챌린지 인증 등록 중 오류 발생", e);
-            return ResponseEntity.internalServerError().build();
         }
     }
 }
