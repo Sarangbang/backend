@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challenge.entity.Challenge;
+import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 import sarangbang.site.global.entity.BaseEntity;
 import sarangbang.site.user.entity.User;
 
@@ -20,7 +21,10 @@ public class ChallengeApplication extends BaseEntity {
     private String introduction;
     private String reason;
     private String commitment;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private ChallengeApplyStatus challengeApplyStatus;
+
     private String comment;
 
     @ManyToOne
@@ -31,13 +35,21 @@ public class ChallengeApplication extends BaseEntity {
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;
 
-    public ChallengeApplication(String introduction, String reason, String commitment, String status, String comment, User user, Challenge challenge) {
+    public ChallengeApplication(String introduction, String reason, String commitment, ChallengeApplyStatus challengeApplyStatus, String comment, User user, Challenge challenge) {
         this.introduction = introduction;
         this.reason = reason;
         this.commitment = commitment;
-        this.status = status;
+        this.challengeApplyStatus = challengeApplyStatus;
         this.comment = comment;
         this.user = user;
         this.challenge = challenge;
+    }
+
+    public void updateAppStatus(ChallengeApplyStatus status) {
+        this.challengeApplyStatus = status;
+    }
+
+    public void updateAppComment(String comment) {
+        this.comment = comment;
     }
 }
