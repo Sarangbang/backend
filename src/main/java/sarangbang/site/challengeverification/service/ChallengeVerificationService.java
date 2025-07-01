@@ -64,12 +64,21 @@ public class ChallengeVerificationService {
     // 하루 인증 여부 확인
     public void validateDailyVerification(Challenge challenge, User user) {
         LocalDate today = LocalDate.now();
+        log.debug("일일 인증 중복 검사 시작 - 사용자: {}, 챌린지명: {}, 날짜: {}",
+                user.getId(), challenge.getId(), today);
+        
         boolean alreadyVerified = challengeVerificationRepository
                 .existsByChallengeAndUserAndCreatedAtBetween(
                         challenge, user, today.atStartOfDay(), today.atTime(23, 59, 59)
                 );
+        
         if (alreadyVerified) {
+            log.warn("일일 인증 중복 시도 차단 - 사용자: {}, 챌린지명: {}, 날짜: {}",
+                    user.getId(), challenge.getId(), today);
             throw new IllegalArgumentException("오늘 이미 인증을 완료했습니다.");
         }
+        
+        log.debug("일일 인증 중복 검사 통과 - 사용자: {}, 챌린지: {}", 
+                user.getId(), challenge.getId());
     }
 }
