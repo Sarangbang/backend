@@ -133,8 +133,7 @@ public class ChallengeService {
      * @return 챌린지 상세 정보를 담은 DTO
      */
     public ChallengeDetailResponseDto getChallengeDetails(Long challengeId) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 챌린지를 찾을 수 없습니다. id=" + challengeId));
+        Challenge challenge = getChallengeById(challengeId);
 
         //현재 참여자 수를 조회
         Long currentParticipants = challengeMemberRepository.countByChallengeId(challengeId);

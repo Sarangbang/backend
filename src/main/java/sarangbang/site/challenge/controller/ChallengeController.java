@@ -93,7 +93,7 @@ public class ChallengeController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
     })
     @GetMapping("/{challengeId}")
-    public ResponseEntity<?> getChallengeDetails(@PathVariable Long challengeId) {
+    public ResponseEntity<ChallengeDetailResponseDto> getChallengeDetails(@PathVariable Long challengeId) {
         try {
             ChallengeDetailResponseDto responseDto = challengeService.getChallengeDetails(challengeId);
             return ResponseEntity.ok(responseDto);
