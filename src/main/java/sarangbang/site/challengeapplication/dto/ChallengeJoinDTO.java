@@ -6,10 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 
-@Data
 @Schema(description = "챌린지 신청 DTO")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChallengeJoinDTO {
