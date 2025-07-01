@@ -26,8 +26,8 @@ public class RegionController {
 
     /* 부모 지역 기준 자식 지역 조회 */
     @GetMapping("/region")
-    public ResponseEntity<List<RegionResponseDTO>> getChildren(@RequestParam(required = false) Long parentRegionId) {
-        List<RegionResponseDTO> response = regionService.findChildren(parentRegionId);
+    public ResponseEntity<List<RegionResponseDTO>> getChildren(@RequestParam Long regionId) {
+        List<RegionResponseDTO> response = regionService.findChildren(regionId);
         return ResponseEntity.ok(response);
     }
 
