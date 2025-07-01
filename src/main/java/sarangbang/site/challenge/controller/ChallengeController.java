@@ -8,17 +8,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sarangbang.site.challenge.dto.ChallengeDTO;
+import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.security.details.CustomUserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import sarangbang.site.challenge.dto.ChallengeResponseDto;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/challenges")
