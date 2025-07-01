@@ -36,8 +36,14 @@ public class ChallengeVerificationController {
             ),
             @ApiResponse(
                     responseCode = "400", 
-                    description = "잘못된 요청 (유효하지 않은 챌린지 ID, 참가하지 않은 챌린지) ",
-                    content = @Content(mediaType = "application/json")
+                    description = "잘못된 요청 (필수 필드 누락, 형식 오류)",
+                    content = @Content
+            ),
+
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "충돌 (중복 인증)",
+                    content = @Content
             )
     })
     

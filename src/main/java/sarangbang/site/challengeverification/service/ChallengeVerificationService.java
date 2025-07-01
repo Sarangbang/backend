@@ -49,13 +49,15 @@ public class ChallengeVerificationService {
         ChallengeVerification savedVerification = challengeVerificationRepository.save(verification);
 
         // 6. 응답 DTO 생성
-        return new ChallengeVerificationDTO(
+        ChallengeVerificationDTO responseDTO = new ChallengeVerificationDTO(
                 savedVerification.getChallenge().getId(),
                 savedVerification.getImgUrl(),
                 savedVerification.getContent(),
                 savedVerification.getStatus(),
                 savedVerification.getUser().getId()
         );
+
+        return responseDTO;
     }
 
     // 하루 인증 여부 확인
