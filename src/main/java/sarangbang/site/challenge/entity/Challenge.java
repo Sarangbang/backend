@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.global.entity.BaseEntity;
+import sarangbang.site.region.entity.Region;
 
 import java.time.LocalDate;
 
@@ -17,7 +18,6 @@ public class Challenge extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String location;
     private String title;
     @Column(length = 500)
     private String description;
@@ -30,19 +30,22 @@ public class Challenge extends BaseEntity {
     private boolean status;
 
     @ManyToOne
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_id")
     private ChallengeCategory challengeCategory;
 
-    public Challenge(String title, String location, String image, int participants, ChallengeCategory challengeCategory) {
+    @ManyToOne
+    @JoinColumn(name = "region_id")
+    private Region region;
+
+    public Challenge(String title, String image, int participants, ChallengeCategory challengeCategory, Region region) {
         this.title = title;
-        this.location = location;
         this.image = image;
         this.participants = participants;
         this.challengeCategory = challengeCategory;
+        this.region = region;
     }
   
-    public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory) {
-        this.location = location;
+    public Challenge(String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory, Region region) {
         this.title = title;
         this.description = description;
         this.participants = participants;
@@ -52,6 +55,7 @@ public class Challenge extends BaseEntity {
         this.image = image;
         this.status = status;
         this.challengeCategory = challengeCategory;
+        this.region = region;
     }
 
 }
