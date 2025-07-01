@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationDTO;
+import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
+import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
@@ -26,7 +27,7 @@ public class ChallengeVerificationService {
     private final ChallengeMemberService challengeMemberService;
     private final UserService userService;
 
-    public ChallengeVerificationDTO createVerification(String userId, ChallengeVerificationDTO dto) {
+    public ChallengeVerificationResponseDTO createVerification(String userId, ChallengeVerificationRequestDTO dto) {
 
         // 1. 챌린지 존재 확인
         Challenge challenge = challengeService.getChallengeById(dto.getChallengeId());
@@ -49,7 +50,7 @@ public class ChallengeVerificationService {
         ChallengeVerification savedVerification = challengeVerificationRepository.save(verification);
 
         // 6. 응답 DTO 생성
-        ChallengeVerificationDTO responseDTO = new ChallengeVerificationDTO(
+        ChallengeVerificationResponseDTO responseDTO = new ChallengeVerificationResponseDTO(
                 savedVerification.getChallenge().getId(),
                 savedVerification.getImgUrl(),
                 savedVerification.getContent(),

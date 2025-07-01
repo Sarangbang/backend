@@ -12,7 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationDTO;
+import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
+import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
 import sarangbang.site.challengeverification.service.ChallengeVerificationService;
 import sarangbang.site.security.details.CustomUserDetails;
 
@@ -32,7 +33,7 @@ public class ChallengeVerificationController {
                     responseCode = "200", 
                     description = "인증 등록 성공",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation =
-                            ChallengeVerificationDTO.class))
+                            ChallengeVerificationResponseDTO.class))
             ),
             @ApiResponse(
                     responseCode = "400", 
@@ -47,13 +48,13 @@ public class ChallengeVerificationController {
             )
     })
     
-    public ResponseEntity<ChallengeVerificationDTO> createVerification(
-            @RequestBody @Valid ChallengeVerificationDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ChallengeVerificationResponseDTO> createVerification(
+            @RequestBody @Valid ChallengeVerificationRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
             String userId = userDetails.getId();
             log.info("챌린지 인증 등록 요청 - 사용자: {}, 챌린지ID: {}", userId, dto.getChallengeId());
-            ChallengeVerificationDTO result = challengeVerificationService.createVerification(userId, dto);
+            ChallengeVerificationResponseDTO result = challengeVerificationService.createVerification(userId, dto);
 
             return ResponseEntity.ok(result);
 
