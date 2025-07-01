@@ -76,7 +76,6 @@ public class ChallengeApplicationService {
         User user = userService.getUserById(userId);
 
         Challenge challenge = challengeService.getChallengeById(challengeJoinDTO.getChallengeId());
-        log.debug("... 사용자 및 챌린지 엔티티 조회 완료");
 
         // DuplicateApplicationException 예외 처리
         if (challengeApplicationRepository.existsByUserAndChallenge(user, challenge)) {
@@ -89,13 +88,13 @@ public class ChallengeApplicationService {
                 challengeJoinDTO.getReason(),
                 challengeJoinDTO.getCommitment(),
                 ChallengeApplyStatus.PENDING,
-                challengeJoinDTO.getComment(),
+                null,
                 user,
                 challenge
         );
-        log.debug("... 신청서 엔티티 생성 완료. 상태를 PENDING으로 설정.");
 
-        log.info("... 챌린지 신청서 DB 저장 완료. applicationId: {}", challengeApplication.getId());
+        log.info("... 챌린지 신청서 DB 저장 완료. userId: {}, applicationId: {}", userId, challengeApplication.getId());
+
         challengeApplicationRepository.save(challengeApplication);
 
         ChallengeJoinDTO responseDTO = new ChallengeJoinDTO(
@@ -103,11 +102,10 @@ public class ChallengeApplicationService {
                 challengeApplication.getReason(),
                 challengeApplication.getCommitment(),
                 challengeApplication.getChallengeApplyStatus(),
-                challengeApplication.getComment(),
                 challengeApplication.getChallenge().getId()
         );
-        log.info("<= 챌린지 신청서 저장 로직 종료. applicationId: {}", challengeApplication.getId());
 
+        log.info("<= 챌린지 신청서 저장 로직 종료. userId: {}, applicationId: {}", userId, challengeApplication.getId());
         return responseDTO;
     }
 }
