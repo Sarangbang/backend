@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "sarangbang.site.region.controller")
+@RestControllerAdvice(basePackages = "sarangbang.site.region")
 public class RegionExceptionHandler {
 
     public record ErrorResponse(String message) {
@@ -16,7 +16,7 @@ public class RegionExceptionHandler {
 
     @ExceptionHandler(RegionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleRegionNotFoundException(RegionNotFoundException e) {
-        log.warn("!! 지역을 찾을 수 없습니다: {}", e.getMessage());
+        log.error("!! 지역을 찾을 수 없습니다: {}", e.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
             e.getMessage()

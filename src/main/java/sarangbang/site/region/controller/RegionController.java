@@ -42,7 +42,7 @@ public class RegionController {
     })
     @GetMapping("/region")
     public ResponseEntity<List<RegionResponseDTO>> getChildren(
-            @Parameter(name = "regionId", description = "부모 지역의 ID", required = true)
+            @Parameter(name = "regionId", description = "선택한 지역 ID", required = true)
             @RequestParam Long regionId
     ) {
         List<RegionResponseDTO> response = regionService.findChildren(regionId);
