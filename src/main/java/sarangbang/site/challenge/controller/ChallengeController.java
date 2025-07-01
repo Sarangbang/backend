@@ -1,5 +1,11 @@
 package sarangbang.site.challenge.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import java.util.List;
 
+@Tag(name = "Challenge", description = "챌린지 관련 API")
 @RestController
 @RequestMapping("/api/challenges")
 @RequiredArgsConstructor
@@ -78,17 +85,21 @@ public class ChallengeController {
     /**
      * 챌린지 상세 정보 조회 API
      */
+    @Operation(summary = "챌린지 상세 정보 조회", description = "챌린지 ID를 이용하여 특정 챌린지의 모든 상세 정보 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "챌린지 상세 정보 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ChallengeDetailResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 챌린지를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
+    })
     @GetMapping("/{challengeId}")
     public ResponseEntity<?> getChallengeDetails(@PathVariable Long challengeId) {
         try {
             ChallengeDetailResponseDto responseDto = challengeService.getChallengeDetails(challengeId);
             return ResponseEntity.ok(responseDto);
         } catch (IllegalArgumentException e) {
-            log.warn("챌린지 조회 실패 - ID: {}, 에러: {}", challengeId, e.getMessage());
-            return ResponseEntity.notFound().build(); // 404 Not Found
-        } catch (Exception e) {
-            log.error("챌린지 상세 조회 중 서버 오류 발생 - ID: {}, 에러: {}", challengeId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().build(); // 500 Internal Server Error
+            log.error("챌린지 조회 실패 - ID: {}, 에러: {}", challengeId, e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }
