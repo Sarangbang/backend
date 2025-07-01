@@ -2,6 +2,10 @@ package sarangbang.site.challenge.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,10 +50,10 @@ public class ChallengeController {
      * 전체 챌린지 목록 조회 API
      */
     @GetMapping("/all")
-    public ResponseEntity<List<ChallengeResponseDto>> getAllChallenges() {
+    public ResponseEntity<Page<ChallengeResponseDto>> getAllChallenges(@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         try {
-            List<ChallengeResponseDto> responseDto = challengeService.getAllChallenges();
-            ResponseEntity<List<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
+            Page<ChallengeResponseDto> responseDto = challengeService.getAllChallenges(pageable);
+            ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
             return response;
 
         } catch (Exception e) {
@@ -62,10 +66,12 @@ public class ChallengeController {
      * 카테고리별 챌린지 목록 조회 API
      */
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<List<ChallengeResponseDto>> getChallengesByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<Page<ChallengeResponseDto>> getChallengesByCategory(
+            @PathVariable Long categoryId,
+            @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         try {
-            List<ChallengeResponseDto> responseDto = challengeService.getChallengesByCategoryId(categoryId);
-            ResponseEntity<List<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
+            Page<ChallengeResponseDto> responseDto = challengeService.getChallengesByCategoryId(categoryId, pageable);
+            ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
             return response;
 
         } catch (Exception e) {
