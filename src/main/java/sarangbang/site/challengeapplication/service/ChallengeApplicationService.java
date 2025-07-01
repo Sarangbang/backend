@@ -43,7 +43,7 @@ public class ChallengeApplicationService {
         }
 
         if(!app.getChallengeApplyStatus().equals(ChallengeApplyStatus.PENDING)){
-            throw new IllegalArgumentException("이미 처리된 신청입니다.");
+            throw new IllegalStateException("이미 처리된 신청입니다.");
         }
 
         if(member.get().getRole().equals("owner")) {
@@ -65,7 +65,7 @@ public class ChallengeApplicationService {
             ChangeChallengeAppDTO changeApp = new ChangeChallengeAppDTO(app.getChallengeApplyStatus(), app.getComment());
             return changeApp;
 
-        } else throw new IllegalArgumentException("챌린지 방장의 권한이 없습니다.");
+        } else throw new SecurityException("챌린지 방장의 권한이 없습니다.");
 
     }
 

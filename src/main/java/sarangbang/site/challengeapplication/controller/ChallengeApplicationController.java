@@ -47,19 +47,15 @@ public class ChallengeApplicationController {
             log.debug("수락/거부 타겟 챌린지 Id : {}, 승인자 : {}", appId, userDetails.getId());
             ChangeChallengeAppDTO changeApp = challengeApplicationService.changeApplicationStatus(appId, changeChallengeAppDTO, userDetails.getId());
             return ResponseEntity.ok(changeApp);
-
-        } catch (IllegalArgumentException e){
-            String message = e.getMessage();
-            log.error("챌린지 요청 수락/거부 실패 - 요청자 : {}, 오류 : {}", userDetails.getId(), message);
-
-            if(message.contains("방장")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } else if(message.contains("이미")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
-
+        } catch (IllegalStateException e){
+            log.error("챌린지 요청 수락/거부 실패. 신청서 Id: {}, 오류 : {}", appId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (IllegalArgumentException e) {
+            log.error("챌린지 요청 수락/거부 실패. 신청서 Id: {}, 오류 : {}", appId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (SecurityException e){
+            log.error("챌린지 요청 수락/거부 실패. 신청서 Id: {}, 오류 : {}", appId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
