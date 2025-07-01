@@ -14,6 +14,8 @@ import sarangbang.site.user.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class ChallengeMemberService {
     private final ChallengeRepository challengeRepository;
     private final UserService userService;
 
-    // 챌린지 멤버 저장
+    // 챌린지 오너 저장
     public void saveChallengeOwner(String userId, Long challengeId) {
 
         User user = userService.getUserById(userId);
@@ -50,10 +52,28 @@ public class ChallengeMemberService {
             dto.setChallengeId(challengeId);
             dto.setRole(member.getRole());
             dto.setNickname(member.getUser().getNickname());
-            
+
             memberDTOs.add(dto);
         }
-        
+
         return memberDTOs;
+    }
+
+    // 챌린지 멤버 저장
+    public void saveChallengeMember(String userId, Long challengeId) {
+        User user = userService.getUserById(userId);
+        log.debug("챌린지 등록 멤버 Id : {}", user.getId());
+
+        Challenge challenge = challengeRepository.findChallengeById(challengeId);
+        log.debug("챌린지 등록 챌린지 Id : {}", challenge.getId());
+
+        ChallengeMember challengeMember = new ChallengeMember("member", challenge, user);
+
+        challengeMemberRepository.save(challengeMember);
+    }
+
+    // 특정 챌린지 id 의 member 조회
+    public Optional<ChallengeMember> getMemberByChallengeId(String userId, Long challengeId) {
+        return challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(userId, challengeId);
     }
 }
