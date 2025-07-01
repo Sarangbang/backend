@@ -1,5 +1,8 @@
 package sarangbang.site.challengeapplication.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ChallengeApplyStatus {
     PENDING("승인대기"),
     APPROVED("승인"),

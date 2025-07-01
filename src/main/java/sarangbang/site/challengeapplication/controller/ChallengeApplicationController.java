@@ -36,7 +36,7 @@ public class ChallengeApplicationController {
             @ApiResponse(
                     responseCode = "200",
                     description = "챌린지 신청 성공",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeApplication.class))
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeJoinDTO.class))
             ),
             @ApiResponse(
                     responseCode = "409",
