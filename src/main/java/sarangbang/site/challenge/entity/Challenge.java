@@ -40,7 +40,7 @@ public class Challenge extends BaseEntity {
         this.participants = participants;
         this.challengeCategory = challengeCategory;
     }
-  
+
     public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory) {
         this.location = location;
         this.title = title;
