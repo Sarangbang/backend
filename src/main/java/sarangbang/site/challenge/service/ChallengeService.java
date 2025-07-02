@@ -1,11 +1,15 @@
 package sarangbang.site.challenge.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 
 import sarangbang.site.challenge.entity.Challenge;
@@ -90,31 +94,33 @@ public class ChallengeService {
     /**
      * 전체 챌린지 목록 조회
      */
-    public List<ChallengeResponseDto> getAllChallenges() {
-        List<Challenge> challenges = challengeRepository.findAll();
+    public Page<ChallengeResponseDto> getAllChallenges(Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findAll(pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
             Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
-        
-        return responseDtos;
+
+        PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
+        return responseDtoPage;
     }
 
     /**
      * 카테고리별 챌린지 목록 조회
      */
-    public List<ChallengeResponseDto> getChallengesByCategoryId(Long categoryId) {
-        List<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryId(categoryId);
+    public Page<ChallengeResponseDto> getChallengesByCategoryId(Long categoryId, Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryId(categoryId, pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
             Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
-        
-        return responseDtos;
+
+        PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, pageable, challenges.getTotalElements());
+        return responseDtoPage;
     }
 
     // id값으로 챌린지 조회
@@ -124,5 +130,20 @@ public class ChallengeService {
             throw new IllegalArgumentException("챌린지가 존재하지 않습니다.");
         }
         return challenge;
+    }
+
+    /**
+     * 챌린지 상세 정보 조회
+     * @param challengeId 조회할 챌린지의 ID
+     * @return 챌린지 상세 정보를 담은 DTO
+     */
+    public ChallengeDetailResponseDto getChallengeDetails(Long challengeId) {
+        Challenge challenge = getChallengeById(challengeId);
+
+        //현재 참여자 수를 조회
+        Long currentParticipants = challengeMemberRepository.countByChallengeId(challengeId);
+
+        //엔티티와 참여자 수를 DTO 생성자에 넘겨 변환 후 반환
+        return new ChallengeDetailResponseDto(challenge, currentParticipants);
     }
 }

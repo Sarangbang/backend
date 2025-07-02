@@ -4,11 +4,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.user.entity.User;
 
+import java.util.Optional;
+
 import java.util.List;
 
 public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember, Long> {
 
     Long countByChallengeId(Long challengeId);
+
+    Optional<ChallengeMember> findChallengeMemberByUser_IdAndChallenge_Id(String userId, Long challengeId);
     List<ChallengeMember> findByChallengeId(Long challengeId);
     boolean existsByChallengeIdAndUser(Long challengeId, User user);
 }
