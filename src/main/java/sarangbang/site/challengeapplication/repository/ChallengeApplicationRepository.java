@@ -8,5 +8,6 @@ import sarangbang.site.user.entity.User;
 
 @Repository
 public interface ChallengeApplicationRepository extends JpaRepository<ChallengeApplication, Long> {
+    ChallengeApplication findChallengeApplicationById(Long id);
     boolean existsByUserAndChallenge(User user, Challenge challenge);
 }

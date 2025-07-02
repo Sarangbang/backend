@@ -44,4 +44,12 @@ public class ChallengeApplication extends BaseEntity {
         this.user = user;
         this.challenge = challenge;
     }
+
+    public void updateAppStatus(ChallengeApplyStatus status) {
+        this.challengeApplyStatus = status;
+    }
+
+    public void updateAppComment(String comment) {
+        this.comment = comment;
+    }
 }
