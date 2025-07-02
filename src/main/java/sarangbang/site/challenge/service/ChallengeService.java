@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 
 import sarangbang.site.challenge.entity.Challenge;
@@ -129,5 +130,20 @@ public class ChallengeService {
             throw new IllegalArgumentException("챌린지가 존재하지 않습니다.");
         }
         return challenge;
+    }
+
+    /**
+     * 챌린지 상세 정보 조회
+     * @param challengeId 조회할 챌린지의 ID
+     * @return 챌린지 상세 정보를 담은 DTO
+     */
+    public ChallengeDetailResponseDto getChallengeDetails(Long challengeId) {
+        Challenge challenge = getChallengeById(challengeId);
+
+        //현재 참여자 수를 조회
+        Long currentParticipants = challengeMemberRepository.countByChallengeId(challengeId);
+
+        //엔티티와 참여자 수를 DTO 생성자에 넘겨 변환 후 반환
+        return new ChallengeDetailResponseDto(challenge, currentParticipants);
     }
 }

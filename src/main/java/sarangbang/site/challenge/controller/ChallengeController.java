@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sarangbang.site.challenge.dto.ChallengeDTO;
+import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.security.details.CustomUserDetails;
@@ -84,4 +85,24 @@ public class ChallengeController {
         }
     }
 
+    /**
+     * 챌린지 상세 정보 조회 API
+     */
+    @Operation(summary = "챌린지 상세 정보 조회", description = "챌린지 ID를 이용하여 특정 챌린지의 모든 상세 정보 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "챌린지 상세 정보 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ChallengeDetailResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 챌린지를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
+    })
+    @GetMapping("/{challengeId}")
+    public ResponseEntity<ChallengeDetailResponseDto> getChallengeDetails(@PathVariable Long challengeId) {
+        try {
+            ChallengeDetailResponseDto responseDto = challengeService.getChallengeDetails(challengeId);
+            return ResponseEntity.ok(responseDto);
+        } catch (IllegalArgumentException e) {
+            log.error("챌린지 조회 실패 - ID: {}, 에러: {}", challengeId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
