@@ -1,5 +1,11 @@
 package sarangbang.site.challenge.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +20,7 @@ import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.security.details.CustomUserDetails;
 
+@Tag(name = "Challenge", description = "챌린지 관련 API")
 @RestController
 @RequestMapping("/api/challenges")
 @RequiredArgsConstructor
@@ -23,6 +30,12 @@ public class ChallengeController {
     private final ChallengeService challengeService;
 
     // 신규 챌린지 등록
+    @Operation(summary = "신규 챌린지 등록", description = "사용자가 신규 챌린지를 등록합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "챌린지 정상 등록", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeDTO.class))),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
+    })
     @PostMapping
     public ResponseEntity<ChallengeDTO> saveChallenge(@RequestBody ChallengeDTO challengeDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
@@ -34,9 +47,6 @@ public class ChallengeController {
             log.error("챌린지 등록 입력값 오류 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
             return ResponseEntity.badRequest().build();
 
-        } catch (Exception e) {
-            log.error("챌린지 등록 실패 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
-            return ResponseEntity.internalServerError().build();
         }
     }
 
