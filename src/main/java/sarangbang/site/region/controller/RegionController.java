@@ -14,7 +14,7 @@ import java.util.List;
 
 @Tag(name = "Region", description = "지역 조회 API")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/regions")
 public class RegionController {
 
     private final RegionService regionService;
@@ -28,7 +28,7 @@ public class RegionController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    @GetMapping("/regions/sido")
+    @GetMapping("/sido")
     public ResponseEntity<List<RegionResponseDTO>> getSidoList() {
         List<RegionResponseDTO> response = regionService.findChildren(null);
         return ResponseEntity.ok(response);
@@ -40,7 +40,7 @@ public class RegionController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 지역 ID")
     })
-    @GetMapping("/region/{regionId}")
+    @GetMapping("/{regionId}")
     public ResponseEntity<List<RegionResponseDTO>> getChildren(
             @Parameter(name = "regionId", description = "선택한 지역 ID", required = true)
             @PathVariable long regionId
