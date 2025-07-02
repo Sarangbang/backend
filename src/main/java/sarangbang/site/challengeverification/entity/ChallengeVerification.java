@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challenge.entity.Challenge;
+import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.global.entity.BaseEntity;
 import sarangbang.site.user.entity.User;
 
@@ -26,10 +27,11 @@ public class ChallengeVerification extends BaseEntity {
 
     private String content;
 
-    @Column(length = 20, nullable = false)
-    private String status;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private ChallengeVerificationStatus status;
+
+    @Column
     private String rejectionReason;
 
     @ManyToOne
@@ -40,7 +42,7 @@ public class ChallengeVerification extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, String status, String rejectionReason, Challenge challenge, User user) {
+    public ChallengeVerification(LocalDateTime verifiedAt, String imgUrl, String content, ChallengeVerificationStatus status, String rejectionReason, Challenge challenge, User user) {
         this.verifiedAt = verifiedAt;
         this.imgUrl = imgUrl;
         this.content = content;

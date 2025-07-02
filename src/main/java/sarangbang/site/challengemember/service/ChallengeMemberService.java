@@ -62,6 +62,15 @@ public class ChallengeMemberService {
         return memberDTOs;
     }
 
+    // 챌린지 멤버인지 확인
+    public void validateMember(Long challengeId, String userId) {
+        User user = userService.getUserById(userId);
+        boolean isMember = challengeMemberRepository.existsByChallengeIdAndUser(challengeId, user);
+        if (!isMember) {
+            throw new IllegalArgumentException("해당 챌린지에 참가하지 않은 사용자입니다.");
+        }
+    }
+
     // 챌린지 멤버 저장
     public void saveChallengeMember(String userId, Long challengeId) {
         User user = userService.getUserById(userId);
