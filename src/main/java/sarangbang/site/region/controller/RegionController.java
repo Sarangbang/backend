@@ -40,10 +40,10 @@ public class RegionController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 지역 ID")
     })
-    @GetMapping("/region")
+    @GetMapping("/region/{regionId}")
     public ResponseEntity<List<RegionResponseDTO>> getChildren(
             @Parameter(name = "regionId", description = "선택한 지역 ID", required = true)
-            @RequestParam Long regionId
+            @PathVariable long regionId
     ) {
         List<RegionResponseDTO> response = regionService.findChildren(regionId);
         return ResponseEntity.ok(response);
