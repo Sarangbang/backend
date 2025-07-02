@@ -16,10 +16,10 @@ public class ChallengeMemberResponseDTO {
     private String location;
     private String image;
     private int participants;
-    private Long currentParticipants;
+    private int currentParticipants;
     private String role;
 
-    public ChallengeMemberResponseDTO(Challenge challenge, Long currentParticipants, String role) {
+    public ChallengeMemberResponseDTO(Challenge challenge, int currentParticipants, String role) {
         this.title = challenge.getTitle();
         this.location = challenge.getLocation();
         this.image = challenge.getImage();

@@ -89,10 +89,10 @@ public class ChallengeMemberService {
             throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
         }
         List<Long> challengeIds = challengeMember.stream().map(cm -> cm.getChallenge().getId()).collect(Collectors.toList());
-        List<Challenge> challenges = challengeRepository.findChallengesById(challengeIds);
+        List<Challenge> challenges = challengeRepository.findChallengesByIdIn(challengeIds);
 
         for(Challenge challenge : challenges) {
-            Long currentParticipant = challengeMemberRepository.countByChallengeId(challenge.getId());
+            int currentParticipant = challengeMemberRepository.countByChallengeId(challenge.getId());
             Optional<ChallengeMember> mem = getMemberByChallengeId(userId, challenge.getId());
             dto.add(new ChallengeMemberResponseDTO(
                     challenge,

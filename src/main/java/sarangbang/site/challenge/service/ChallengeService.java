@@ -95,7 +95,7 @@ public class ChallengeService {
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
-            Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+            int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
         
@@ -110,7 +110,7 @@ public class ChallengeService {
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
-            Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+            int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
         
