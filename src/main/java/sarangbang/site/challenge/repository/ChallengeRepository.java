@@ -8,4 +8,6 @@ import java.util.List;
 public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     List<Challenge> findByChallengeCategory_CategoryId(Long categoryId);
     Challenge findChallengeById(Long challengeId);
+
+    List<Challenge> findChallengesById(List<Long> challengeIds);
 }

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.repository.ChallengeRepository;
+import sarangbang.site.challenge.service.ChallengeService;
+import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -75,5 +78,29 @@ public class ChallengeMemberService {
     // 특정 챌린지 id 의 member 조회
     public Optional<ChallengeMember> getMemberByChallengeId(String userId, Long challengeId) {
         return challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(userId, challengeId);
+    }
+
+    // 내가 가입한 챌린지 목록 조회
+    public List<ChallengeMemberResponseDTO> getChallengesByUserId(String userId) {
+
+        List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
+        List<ChallengeMember> challengeMember = challengeMemberRepository.findByUser_Id(userId);
+        if(challengeMember.isEmpty()) {
+            throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
+        }
+        List<Long> challengeIds = challengeMember.stream().map(cm -> cm.getChallenge().getId()).collect(Collectors.toList());
+        List<Challenge> challenges = challengeRepository.findChallengesById(challengeIds);
+
+        for(Challenge challenge : challenges) {
+            Long currentParticipant = challengeMemberRepository.countByChallengeId(challenge.getId());
+            Optional<ChallengeMember> mem = getMemberByChallengeId(userId, challenge.getId());
+            dto.add(new ChallengeMemberResponseDTO(
+                    challenge,
+                    currentParticipant,
+                    mem.get().getRole()
+            ));
+        }
+
+        return dto;
     }
 }

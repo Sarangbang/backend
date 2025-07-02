@@ -3,13 +3,16 @@ package sarangbang.site.challengemember.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.persistence.EntityNotFoundException;
 import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
+import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
+import sarangbang.site.security.details.CustomUserDetails;
 
 import java.util.List;
 
@@ -42,6 +45,19 @@ public class ChallengeMemberController {
         } catch (Exception e) {
             log.error("서버 오류 - challengeId: {}, 에러: {}", challengeId, e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 내가 가입한 챌린지 목록 조회
+    @GetMapping()
+    public ResponseEntity<List<ChallengeMemberResponseDTO>> getChallengesByUserId(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            String userId = userDetails.getId();
+            List<ChallengeMemberResponseDTO> dto = challengeMemberService.getChallengesByUserId(userId);
+            return  ResponseEntity.ok(dto);
+        } catch(IllegalArgumentException e) {
+            log.error("가입한 챌린지 목록을 찾을 수 없음 - userId : {}, 에러 : {}", userDetails.getId(), e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }
