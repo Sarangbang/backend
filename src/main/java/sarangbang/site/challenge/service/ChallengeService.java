@@ -1,5 +1,8 @@
 package sarangbang.site.challenge.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import jakarta.annotation.PostConstruct;
@@ -90,31 +93,33 @@ public class ChallengeService {
     /**
      * 전체 챌린지 목록 조회
      */
-    public List<ChallengeResponseDto> getAllChallenges() {
-        List<Challenge> challenges = challengeRepository.findAll();
+    public Page<ChallengeResponseDto> getAllChallenges(Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findAll(pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
             Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
-        
-        return responseDtos;
+
+        PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
+        return responseDtoPage;
     }
 
     /**
      * 카테고리별 챌린지 목록 조회
      */
-    public List<ChallengeResponseDto> getChallengesByCategoryId(Long categoryId) {
-        List<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryId(categoryId);
+    public Page<ChallengeResponseDto> getChallengesByCategoryId(Long categoryId, Pageable pageable) {
+        Page<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryId(categoryId, pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
             Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
-        
-        return responseDtos;
+
+        PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, pageable, challenges.getTotalElements());
+        return responseDtoPage;
     }
 
     // id값으로 챌린지 조회
