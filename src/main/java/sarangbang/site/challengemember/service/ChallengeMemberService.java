@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.repository.ChallengeRepository;
-import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
@@ -81,10 +80,10 @@ public class ChallengeMemberService {
     }
 
     // 내가 가입한 챌린지 목록 조회
-    public List<ChallengeMemberResponseDTO> getChallengesByUserId(String userId) {
+    public List<ChallengeMemberResponseDTO> getChallengesByUserId(String userId, String role) {
 
         List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
-        List<ChallengeMember> challengeMember = challengeMemberRepository.findByUser_Id(userId);
+        List<ChallengeMember> challengeMember = challengeMemberRepository.findByUser_IdAndRole(userId, role);
         if(challengeMember.isEmpty()) {
             throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
         }
