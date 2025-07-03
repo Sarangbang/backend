@@ -21,7 +21,7 @@ public class ChallengeCategory extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String categoryName;
 
-    @Column
+    @Column(nullable = false)
     private String imageUrl;
 
     public ChallengeCategory(String categoryName, String imageUrl) {
