@@ -10,9 +10,10 @@ import java.util.List;
 
 public interface ChallengeMemberRepository extends JpaRepository<ChallengeMember, Long> {
 
-    Long countByChallengeId(Long challengeId);
+    int countByChallengeId(Long challengeId);
 
     Optional<ChallengeMember> findChallengeMemberByUser_IdAndChallenge_Id(String userId, Long challengeId);
     List<ChallengeMember> findByChallengeId(Long challengeId);
     boolean existsByChallengeIdAndUser(Long challengeId, User user);
+    List<ChallengeMember> findByUser_IdAndRole(String userId, String role);
 }

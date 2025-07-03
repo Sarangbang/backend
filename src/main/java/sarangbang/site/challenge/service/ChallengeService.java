@@ -99,7 +99,7 @@ public class ChallengeService {
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
-            Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+            int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
 
@@ -115,7 +115,7 @@ public class ChallengeService {
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
-            Long currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+            int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
         }
 
@@ -132,6 +132,7 @@ public class ChallengeService {
         return challenge;
     }
 
+
     /**
      * 챌린지 상세 정보 조회
      * @param challengeId 조회할 챌린지의 ID
@@ -141,7 +142,7 @@ public class ChallengeService {
         Challenge challenge = getChallengeById(challengeId);
 
         //현재 참여자 수를 조회
-        Long currentParticipants = challengeMemberRepository.countByChallengeId(challengeId);
+        int currentParticipants = challengeMemberRepository.countByChallengeId(challengeId);
 
         //엔티티와 참여자 수를 DTO 생성자에 넘겨 변환 후 반환
         return new ChallengeDetailResponseDto(challenge, currentParticipants);

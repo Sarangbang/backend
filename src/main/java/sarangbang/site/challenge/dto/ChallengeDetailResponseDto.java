@@ -21,7 +21,7 @@ public class ChallengeDetailResponseDto {
     @Schema(description = "최대 참여 가능 인원", example = "10")
     private final int maxParticipants;
     @Schema(description = "현재 참여 인원", example = "5")
-    private final Long currentParticipants;
+    private final int currentParticipants;
     @Schema(description = "챌린지 시작일", example = "2025-07-01")
     private final LocalDate startDate;
     @Schema(description = "챌린지 종료일", example = "2025-07-31")
@@ -38,7 +38,7 @@ public class ChallengeDetailResponseDto {
     * @param challenge 데이터베이스에서 조회한 Challenge 엔티티 객체
     * @param currentParticipants ChallengeMemberRepository에서 계산한 현재 참여자 수
     * */
-    public ChallengeDetailResponseDto(Challenge challenge, Long currentParticipants) {
+    public ChallengeDetailResponseDto(Challenge challenge, int currentParticipants) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
         this.description = challenge.getDescription();

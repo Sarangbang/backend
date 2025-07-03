@@ -1,18 +1,25 @@
 package sarangbang.site.challengemember.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import jakarta.persistence.EntityNotFoundException;
 import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
+import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
+import sarangbang.site.security.details.CustomUserDetails;
 
 import java.util.List;
 
+@Tag(name = "Challenge-Member", description = "챌린지 참여 멤버 관련 API")
 @RestController
 @RequestMapping("/api/challenge-members")
 @RequiredArgsConstructor
@@ -42,6 +49,24 @@ public class ChallengeMemberController {
         } catch (Exception e) {
             log.error("서버 오류 - challengeId: {}, 에러: {}", challengeId, e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 내가 가입한 챌린지 목록 조회
+    @Operation(summary = "가입한 챌린지 목록 조회", description = "내가 가입한 챌린지의 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "챌린지 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeMemberResponseDTO.class))),
+            @ApiResponse(responseCode = "500", description = "서버오류", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping()
+    public ResponseEntity<List<ChallengeMemberResponseDTO>> getChallengesByUserId(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String role) {
+        try {
+            String userId = userDetails.getId();
+            List<ChallengeMemberResponseDTO> dto = challengeMemberService.getChallengesByUserId(userId, role);
+            return  ResponseEntity.ok(dto);
+        } catch(IllegalArgumentException e) {
+            log.error("가입한 챌린지 목록을 찾을 수 없음 - userId : {}, 에러 : {}", userDetails.getId(), e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }
