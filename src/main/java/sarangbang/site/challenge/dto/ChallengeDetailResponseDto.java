@@ -54,7 +54,8 @@ public class ChallengeDetailResponseDto {
 
         this.category = new ChallengeCategoryDTO(
                 challenge.getChallengeCategory().getCategoryId(),
-                challenge.getChallengeCategory().getCategoryName()
+                challenge.getChallengeCategory().getCategoryName(),
+                challenge.getChallengeCategory().getImageUrl()
         );
     }
 }

@@ -37,14 +37,14 @@ public class ChallengeCategoryService {
      */
     private void insertDefaultCategories() {
         List<ChallengeCategory> defaultCategories = Arrays.asList(
-            new ChallengeCategory(null, "기상/루틴"),
-            new ChallengeCategory(null, "학습/도서"),
-            new ChallengeCategory(null, "생활/정리"),
-            new ChallengeCategory(null, "마음/감정"),
-            new ChallengeCategory(null, "취미/자기계발"),
-            new ChallengeCategory(null, "관계/소통"),
-            new ChallengeCategory(null, "재테크/자산"),
-            new ChallengeCategory(null, "그 외")
+            new ChallengeCategory("기상/루틴", "/images/charactors/image 23.png"),
+            new ChallengeCategory("학습/도서", "/images/charactors/image 24.png"),
+            new ChallengeCategory("생활/정리", "/images/charactors/image 25.png"),
+            new ChallengeCategory("마음/감정", "/images/charactors/image 27.png"),
+            new ChallengeCategory("취미/자기계발", "/images/charactors/image 26.png"),
+            new ChallengeCategory("관계/소통", "/images/charactors/image 28.png"),
+            new ChallengeCategory("재테크/자산", "/images/charactors/image 29.png"),
+            new ChallengeCategory("그 외", "/images/charactors/image 30.png")
         );
         
         challengeCategoryRepository.saveAll(defaultCategories);
@@ -54,7 +54,7 @@ public class ChallengeCategoryService {
      * 모든 카테고리 조회 (이름순 정렬)
      */
     public List<ChallengeCategoryDTO> getAllCategories() {
-        List<ChallengeCategory> categories = challengeCategoryRepository.findAllByOrderByCategoryName();
+        List<ChallengeCategory> categories = challengeCategoryRepository.findAll();
         return categories.stream()
                 .map(ChallengeCategoryDTO::fromEntity)
                 .toList();

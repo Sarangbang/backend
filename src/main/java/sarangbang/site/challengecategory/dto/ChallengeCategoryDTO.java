@@ -12,11 +12,14 @@ public class ChallengeCategoryDTO {
     private Long categoryId;
     @Schema(description = "챌린지 카테고리 이름", example = "학습/도서")
     private String categoryName;
+    @Schema(description = "챌린지 카테고리 이미지", example = "/images/categories/learning.png")
+    private String categoryImageUrl;
 
     public static ChallengeCategoryDTO fromEntity(ChallengeCategory category) {
         return new ChallengeCategoryDTO(
             category.getCategoryId(),
-            category.getCategoryName()
+            category.getCategoryName(),
+            category.getImageUrl()
         );
     }
 }
