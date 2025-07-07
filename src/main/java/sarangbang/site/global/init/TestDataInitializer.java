@@ -10,6 +10,8 @@ import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.repository.ChallengeRepository;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
+import sarangbang.site.region.entity.Region;
+import sarangbang.site.region.repository.RegionRepository;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 
@@ -29,19 +31,22 @@ public class TestDataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final ChallengeRepository challengeRepository;
     private final ChallengeCategoryRepository challengeCategoryRepository;
+    private final RegionRepository regionRepository;
 
     @Override
     public void run(String... args){
         userRepository.findByEmail("testuser@example.com").ifPresentOrElse(
                 user -> System.out.println("✅ 테스트 유저 이미 존재"),
                 () -> {
+                    Region testRegion = regionRepository.findById(9L)
+                            .orElseThrow(() -> new RuntimeException("테스트용 지역 데이터(ID: 9)가 없습니다."));
                     User user = new User(
                             "TEST-UUID",
                             "testuser@example.com",
                             passwordEncoder.encode("12345678"),
                             "TEST-NICKNAME",
                             "MALE",
-                            "서울특별시",
+                            testRegion,
                             null
                     );
                     userRepository.save(user);
