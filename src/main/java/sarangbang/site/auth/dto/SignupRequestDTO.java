@@ -1,4 +1,4 @@
-package sarangbang.site.user.dto;
+package sarangbang.site.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
