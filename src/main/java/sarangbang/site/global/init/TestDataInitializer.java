@@ -69,9 +69,12 @@ public class TestDataInitializer implements CommandLineRunner {
                     .findFirst()
                     .orElse(categories.get(0)); // 없으면 그냥 첫번째꺼 사용
 
+            Region challengeRegion = regionRepository.findById(9L)
+                    .orElseThrow(() -> new RuntimeException("테스트용 지역 데이터(ID: 9)가 없습니다."));
+
             // 상세조회용 Challenge 객체를 생성합니다. 모든 필드를 채워줍니다.
             Challenge detailTestChallenge = new Challenge(
-                    "서울특별시", // location
+                    challengeRegion, // location
                     "JPA 정복 스터디", // title
                     "김영한님의 '자바 ORM 표준 JPA 프로그래밍' 책을 함께 완독하는 스터디입니다. 매주 정해진 분량을 읽고, 학습 내용을 공유하고, 토론합니다.", // description
                     10, // participants (최대 참여 인원)
