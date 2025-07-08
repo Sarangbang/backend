@@ -31,7 +31,7 @@ public class ChallengeMemberResponseDTO {
     public ChallengeMemberResponseDTO(Challenge challenge, int currentParticipants, String role) {
         this.id = challenge.getId();
         this.title = challenge.getTitle();
-        this.location = challenge.getLocation();
+        this.location = challenge.getRegion().getFullAddress();
         this.image = challenge.getImage();
         this.participants = challenge.getParticipants();
         this.currentParticipants = currentParticipants;

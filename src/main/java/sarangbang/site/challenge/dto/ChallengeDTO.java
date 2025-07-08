@@ -19,8 +19,8 @@ import java.time.LocalDate;
 public class ChallengeDTO {
 
     @NotBlank(message = "챌린지 지역을 입력해주세요.")
-    @Schema(description = "지역", example = "서울특별시")
-    private String location;
+    @Schema(description = "지역 ID", example = "183")
+    private Long regionId;
 
     @NotBlank(message = "챌린지 제목을 입력해주세요.")
     @Size(max = 50, message = "제목은 50자 미만입니다.")
