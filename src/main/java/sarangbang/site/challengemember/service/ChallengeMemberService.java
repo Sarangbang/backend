@@ -91,12 +91,20 @@ public class ChallengeMemberService {
     // 내가 가입한 챌린지 목록 조회
     public List<ChallengeMemberResponseDTO> getChallengesByUserId(String userId, String role) {
 
-        List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
-        List<ChallengeMember> challengeMember = challengeMemberRepository.findByUser_IdAndRole(userId, role);
-        if(challengeMember.isEmpty()) {
+        List<ChallengeMember> challengeMembers;
+
+        if(role == null || role.isBlank()) {
+            challengeMembers = challengeMemberRepository.findByUser_Id(userId);
+        } else {
+            challengeMembers = challengeMemberRepository.findByUser_IdAndRole(userId, role);
+        }
+
+        if(challengeMembers.isEmpty()) {
             throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
         }
-        List<Long> challengeIds = challengeMember.stream().map(cm -> cm.getChallenge().getId()).collect(Collectors.toList());
+
+        List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
+        List<Long> challengeIds = challengeMembers.stream().map(cm -> cm.getChallenge().getId()).collect(Collectors.toList());
         List<Challenge> challenges = challengeRepository.findChallengesByIdIn(challengeIds);
 
         for(Challenge challenge : challenges) {

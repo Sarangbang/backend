@@ -14,8 +14,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
+import sarangbang.site.challengeverification.dto.TodayVerificationStatusResponseDTO;
 import sarangbang.site.challengeverification.service.ChallengeVerificationService;
 import sarangbang.site.security.details.CustomUserDetails;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/challenge-verifications")
@@ -63,4 +67,13 @@ public class ChallengeVerificationController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    // 금일 챌린지 인증 내역
+    @GetMapping("/status")
+    public ResponseEntity<List<TodayVerificationStatusResponseDTO>> getTodayVerifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String userId = userDetails.getId();
+        List<TodayVerificationStatusResponseDTO> dto = challengeVerificationService.getTodayVerifications(userId);
+        return ResponseEntity.ok(dto);
+    }
+
 }

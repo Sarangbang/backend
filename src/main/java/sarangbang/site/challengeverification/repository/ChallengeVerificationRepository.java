@@ -4,12 +4,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.user.entity.User;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ChallengeVerificationRepository extends JpaRepository<ChallengeVerification, Long> {
     
     boolean existsByChallengeAndUserAndCreatedAtBetween(
             Challenge challenge, User user, LocalDateTime start, LocalDateTime end
     );
+
+    List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
+
+    String user(User user);
 }
