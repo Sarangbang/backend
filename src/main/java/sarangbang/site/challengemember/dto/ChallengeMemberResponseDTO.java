@@ -13,6 +13,8 @@ import sarangbang.site.challenge.entity.Challenge;
 @AllArgsConstructor
 public class ChallengeMemberResponseDTO {
 
+    @Schema(description = "챌린지 id", example = "1")
+    private Long id;
     @Schema(description = "챌린지 제목", example = "JPA 정복 스터디")
     private String title;
     @Schema(description = "챌린지 지역", example = "서울특별시")
@@ -27,6 +29,7 @@ public class ChallengeMemberResponseDTO {
     private String role;
 
     public ChallengeMemberResponseDTO(Challenge challenge, int currentParticipants, String role) {
+        this.id = challenge.getId();
         this.title = challenge.getTitle();
         this.location = challenge.getLocation();
         this.image = challenge.getImage();

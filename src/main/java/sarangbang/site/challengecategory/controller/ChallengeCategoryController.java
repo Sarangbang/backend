@@ -25,14 +25,8 @@ public class ChallengeCategoryController {
      */
     @GetMapping
     public ResponseEntity<List<ChallengeCategoryDTO>> getCategories() {
-        try {
-            List<ChallengeCategoryDTO> categories = challengeCategoryService.getAllCategories();
-            return ResponseEntity.ok(categories);
-
-        } catch (Exception e) {
-            log.error("카테고리 목록 조회 실패 - 에러: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        }
+        List<ChallengeCategoryDTO> categories = challengeCategoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
 
     /**
@@ -40,19 +34,15 @@ public class ChallengeCategoryController {
      */
     @GetMapping("/{categoryId}")
     public ResponseEntity<ChallengeCategoryDTO> getCategoryById(@PathVariable Long categoryId) {
-        try {
-            ChallengeCategoryDTO challengeCategory = challengeCategoryService.getCategoryById(categoryId);
-            
-            if (challengeCategory == null) {
-                log.warn("카테고리를 찾을 수 없음 - ID: {}", categoryId);
-                return ResponseEntity.notFound().build();
-            }
 
-            return ResponseEntity.ok(challengeCategory);
-
-        } catch (Exception e) {
-            log.error("카테고리 조회 실패 - ID: {}, 에러: {}", categoryId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
+        ChallengeCategoryDTO challengeCategory = challengeCategoryService.getCategoryById(categoryId);
+        
+        if (challengeCategory == null) {
+            log.warn("카테고리를 찾을 수 없음 - ID: {}", categoryId);
+            return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok(challengeCategory);
+
     }
 }
