@@ -19,6 +19,7 @@ import sarangbang.site.challenge.dto.ChallengeDTO;
 import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import sarangbang.site.challenge.service.ChallengeService;
+import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 
 @Tag(name = "Challenge", description = "챌린지 관련 API")
@@ -44,10 +45,9 @@ public class ChallengeController {
             ChallengeDTO saveChallenge = challengeService.saveChallenge(challengeDTO, userDetails.getId());
             return ResponseEntity.ok(saveChallenge);
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | RegionNotFoundException e) {
             log.error("챌린지 등록 입력값 오류 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
             return ResponseEntity.badRequest().build();
-
         }
     }
 
