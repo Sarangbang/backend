@@ -38,4 +38,15 @@ public class RegionService {
                 .toList();
     }
 
+    /**
+     * ID로 Region 엔티티를 조회합니다. (내부 서비스용)
+     * @param regionId 찾고자 하는 지역의 ID
+     * @return Region 엔티티
+     * @throws RegionNotFoundException 해당 ID의 지역이 없을 경우 발생
+     */
+    public Region findRegionById(Long regionId) {
+        return regionRepository.findById(regionId)
+                .orElseThrow(() -> new RegionNotFoundException("유효하지 않은 지역 ID입니다: " + regionId));
+    }
+
 }
