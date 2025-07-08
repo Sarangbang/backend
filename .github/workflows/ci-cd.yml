@@ -1,4 +1,4 @@
-name: Nextjs CI/CD (Dev)
+name: Spring Boot CI/CD (Dev)
 
 on:
   push:
@@ -17,17 +17,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up latest Node.js LTS version
-        uses: actions/setup-node@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          node-version: 'latest'
-          cache: 'npm'
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Next.js application
-        run: npm run build
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build -x test -Pprofile=dev
 
       - name: Configure AWS Credentials for OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -40,4 +39,4 @@ jobs:
           echo "${{ secrets.DEV_EC2_SSH_PRIVATE_KEY_DEV }}" > private_key.pem
           chmod 400 private_key.pem
           
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.DEV_EC2_PUBLIC_IP }} "cd /home/ec2-user/backend && bash deploy.sh"
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.DEV_EC2_PUBLIC_IP }} "cd /home/ec2-user/backend && bash deploy.sh"
