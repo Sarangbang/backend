@@ -13,7 +13,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
