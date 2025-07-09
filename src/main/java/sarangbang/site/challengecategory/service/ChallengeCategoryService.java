@@ -24,7 +24,7 @@ public class ChallengeCategoryService {
     @Transactional
     public void initCategories() {
         long count = challengeCategoryRepository.count();
-        
+
         if (count == 0) {
             insertDefaultCategories();
         } else {
@@ -37,14 +37,15 @@ public class ChallengeCategoryService {
      */
     private void insertDefaultCategories() {
         List<ChallengeCategory> defaultCategories = Arrays.asList(
-            new ChallengeCategory("기상/루틴", "/images/charactors/image 23.png"),
-            new ChallengeCategory("학습/도서", "/images/charactors/image 24.png"),
-            new ChallengeCategory("생활/정리", "/images/charactors/image 25.png"),
-            new ChallengeCategory("마음/감정", "/images/charactors/image 27.png"),
-            new ChallengeCategory("취미/자기계발", "/images/charactors/image 26.png"),
-            new ChallengeCategory("관계/소통", "/images/charactors/image 28.png"),
-            new ChallengeCategory("재테크/자산", "/images/charactors/image 29.png"),
-            new ChallengeCategory("그 외", "/images/charactors/image 30.png")
+            new ChallengeCategory("기상/루틴", "/images/charactors/default_wakeup.png"),
+            new ChallengeCategory("학습/도서", "/images/charactors/default_study.png"),
+            new ChallengeCategory("운동/건강", "/images/charactors/default_health.png"),
+            new ChallengeCategory("생활/정리", "/images/charactors/default_life.png"),
+            new ChallengeCategory("마음/감정", "/images/charactors/default_mind.png"),
+            new ChallengeCategory("취미/자기계발", "/images/charactors/default_hobby.png"),
+            new ChallengeCategory("관계/소통", "/images/charactors/default_communication.png"),
+            new ChallengeCategory("재테크/자산", "/images/charactors/default_money.png"),
+            new ChallengeCategory("그 외", "/images/charactors/default_general.png")
         );
         
         challengeCategoryRepository.saveAll(defaultCategories);
