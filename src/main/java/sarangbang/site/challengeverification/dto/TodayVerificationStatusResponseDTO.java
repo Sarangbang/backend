@@ -31,7 +31,7 @@ public class TodayVerificationStatusResponseDTO {
     public TodayVerificationStatusResponseDTO(Challenge challege, int currentParticipants, boolean verifyStatus) {
         this.challengeId = challege.getId();
         this.title = challege.getTitle();
-        this.location = challege.getLocation();
+        this.location = challege.getRegion().getFullAddress();
         this.image = challege.getImage();
         this.participants = challege.getParticipants();
         this.currentParticipants = currentParticipants;
