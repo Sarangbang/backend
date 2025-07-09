@@ -37,6 +37,7 @@ public class ChallengeCategoryService {
      */
     private void insertDefaultCategories() {
         List<ChallengeCategory> defaultCategories = Arrays.asList(
+            new ChallengeCategory("전체", "/images/charactors/category_all.png"),
             new ChallengeCategory("기상/루틴", "/images/charactors/default_wakeup.png"),
             new ChallengeCategory("학습/도서", "/images/charactors/default_study.png"),
             new ChallengeCategory("운동/건강", "/images/charactors/default_health.png"),
