@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sarangbang.site.challenge.entity.Challenge;
+import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.user.entity.User;
 
@@ -17,10 +18,18 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
     );
 
     /* 특정 챌린지 날짜별 인증 조회 */
-    @Query("SELECT cv FROM ChallengeVerification cv " +
-            "WHERE cv.challenge.id = :challengeId " +
-            "AND cv.verifiedAt BETWEEN :startDate AND :endDate")
-    List<ChallengeVerification> findByChallengeAndVerifiedAt(
+    @Query("SELECT NEW sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO(" +
+            "    cv.id, " +
+            "    cm.user.id, " +
+            "    cv.imgUrl," +
+            "    CASE WHEN cv.status IS NOT NULL THEN cv.status ELSE 'PENDING' END," +
+            "    cm.user.nickname) " +
+            "FROM ChallengeMember cm " +
+            "LEFT JOIN ChallengeVerification cv ON cm.challenge = cv.challenge AND cm.user = cv.user " +
+            "AND cv.verifiedAt BETWEEN :startDate AND :endDate " +
+            "WHERE cm.challenge.id = :challengeId "
+            )
+    List<ChallengeVerificationByDateDTO> findByChallengeAndVerifiedAt(
             @Param("challengeId") Long challengeId,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate

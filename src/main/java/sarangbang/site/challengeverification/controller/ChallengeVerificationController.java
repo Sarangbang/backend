@@ -73,10 +73,10 @@ public class ChallengeVerificationController {
     @Operation(summary = "특정 챌린지 날짜별 인증 조회", description = "특정 챌린지를 날짜별로 인증을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "특정 챌린지 날짜별 인증 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeVerificationByDateDTO.class))),
-            @ApiResponse(responseCode = "400", description = "해당 ID의 챌린지를 찾을 수 없음", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "해당 챌린지 인증을 찾을 수 없음", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생", content = @Content(mediaType = "application/json"))
     })
-    @GetMapping("/{challengeId}/")
+    @GetMapping("/{challengeId}")
     public ResponseEntity<List<ChallengeVerificationByDateDTO>> getVerificationByDate(
             @PathVariable Long challengeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,

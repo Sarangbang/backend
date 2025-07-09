@@ -98,18 +98,9 @@ public class ChallengeVerificationService {
         LocalDateTime startDate = selectedDate.atStartOfDay();
         LocalDateTime endDate = selectedDate.atTime(23, 59, 59);
 
-        List<ChallengeVerification> challengeVerificationList =
+        List<ChallengeVerificationByDateDTO> challengeVerificationList =
                 challengeVerificationRepository.findByChallengeAndVerifiedAt(challenge.getId(), startDate, endDate);
 
-        List<ChallengeVerificationByDateDTO> responseDTOList = new ArrayList<>();
-        for (ChallengeVerification challengeVerification : challengeVerificationList) {
-            responseDTOList.add(new ChallengeVerificationByDateDTO(
-                    challengeVerification.getId(),
-                    challengeVerification.getImgUrl(),
-                    challengeVerification.getStatus().name(),
-                    challengeVerification.getUser().getNickname()
-            ));
-        }
-        return responseDTOList;
+        return challengeVerificationList;
     }
 }
