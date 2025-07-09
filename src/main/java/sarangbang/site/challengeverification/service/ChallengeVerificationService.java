@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
+import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
+import sarangbang.site.challengeverification.dto.TodayVerificationStatusResponseDTO;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
@@ -16,6 +18,9 @@ import sarangbang.site.user.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -80,5 +85,34 @@ public class ChallengeVerificationService {
         
         log.debug("일일 인증 중복 검사 통과 - 사용자: {}, 챌린지: {}", 
                 user.getId(), challenge.getId());
+    }
+
+    // 금일 챌린지 인증 내역 확인
+    public List<TodayVerificationStatusResponseDTO> getTodayVerifications(String userId) {
+
+        LocalDate today = LocalDate.now();
+        List<ChallengeMemberResponseDTO> challengeLists = challengeMemberService.getChallengesByUserId(userId, null); // 참여한 모든 챌린지
+        if(challengeLists.isEmpty()){
+            throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
+        }
+        List<ChallengeVerification> verifications = challengeVerificationRepository.findChallengeVerificationsByUser_IdAndVerifiedAt(
+                userId, today.atTime(23, 59, 59)); // 오늘 인증한 모든 챌린지
+
+        Set<Long> todayVerificationIds =
+                verifications.stream().map(v -> v.getChallenge().getId()).collect(Collectors.toSet());
+
+        List<TodayVerificationStatusResponseDTO> dtos = challengeLists.stream()
+                .map(challenge -> new TodayVerificationStatusResponseDTO(
+                        challenge.getId(),
+                        challenge.getTitle(),
+                        challenge.getLocation(),
+                        challenge.getImage(),
+                        challenge.getParticipants(),
+                        challenge.getCurrentParticipants(),
+                        todayVerificationIds.contains(challenge.getId())
+                ))
+                .collect(Collectors.toList());
+
+        return dtos;
     }
 }
