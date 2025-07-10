@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challenge.entity.Challenge;
 
+import java.time.LocalDate;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,6 +18,8 @@ public class ChallengeResponseDto {
     private String image;
     private int participants;
     private int currentParticipants;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public ChallengeResponseDto(Challenge challenge, int currentParticipants) {
         this.id = challenge.getId();
@@ -24,5 +28,8 @@ public class ChallengeResponseDto {
         this.image = challenge.getImage();
         this.participants = challenge.getParticipants();
         this.currentParticipants = currentParticipants;
+        this.startDate = challenge.getStartDate();
+        this.endDate = challenge.getEndDate();
+
     }
 }
