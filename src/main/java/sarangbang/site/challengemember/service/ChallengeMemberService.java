@@ -13,6 +13,7 @@ import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.util.Optional;
@@ -100,7 +101,7 @@ public class ChallengeMemberService {
         }
 
         if(challengeMembers.isEmpty()) {
-            throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
+            return Collections.emptyList();
         }
 
         List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
