@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sarangbang.site.challenge.entity.Challenge;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +23,10 @@ public class ChallengeMemberResponseDTO {
     private String location;
     @Schema(description = "챌린지 대표 이미지 URL", example = "https://example.com/images/jpa_study.jpg")
     private String image;
+    @Schema(description = "챌린지 시작일", example = "2025-07-10")
+    private LocalDate startDate;
+    @Schema(description = "챌린지 마감일", example = "2025-08-10")
+    private LocalDate endDate;
     @Schema(description = "최대 참여 가능 인원", example = "10")
     private int participants;
     @Schema(description = "현재 참여 인원", example = "5")
@@ -33,6 +39,8 @@ public class ChallengeMemberResponseDTO {
         this.title = challenge.getTitle();
         this.location = challenge.getRegion().getFullAddress();
         this.image = challenge.getImage();
+        this.startDate = challenge.getStartDate();
+        this.endDate = challenge.getEndDate();
         this.participants = challenge.getParticipants();
         this.currentParticipants = currentParticipants;
         this.role = role;
