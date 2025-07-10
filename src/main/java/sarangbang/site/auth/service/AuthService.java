@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.auth.dto.SignupRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
+import sarangbang.site.region.entity.Region;
+import sarangbang.site.region.service.RegionService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 
@@ -20,6 +22,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RegionService regionService;
 
     @Transactional
     public String register(SignupRequestDTO requestDto) {
@@ -39,8 +42,10 @@ public class AuthService {
         }
 
         String hash = passwordEncoder.encode(requestDto.getPassword());
-
         String newUserId = UUID.randomUUID().toString();
+
+        Region region = regionService.findRegionById(requestDto.getRegionId());
+
 
         User user = new User(
                 newUserId,
@@ -48,7 +53,7 @@ public class AuthService {
                 hash,
                 requestDto.getNickname(),
                 requestDto.getGender(),
-                requestDto.getRegion(),
+                region,
                 null
         );
 

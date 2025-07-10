@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
+import sarangbang.site.challengeverification.dto.TodayVerificationStatusResponseDTO;
 import sarangbang.site.challengeverification.service.ChallengeVerificationService;
 import sarangbang.site.security.details.CustomUserDetails;
 
@@ -87,4 +88,24 @@ public class ChallengeVerificationController {
         ResponseEntity<List<ChallengeVerificationByDateDTO>> response = ResponseEntity.ok(responseDTOList);
         return response;
     }
+
+    // 금일 챌린지 인증 내역
+    @Operation(summary = "금일 챌린지 인증 여부", description = "내가 참여한 모든 챌린지의 금일 인증 여부를 확인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "금일 챌린지 인증 내역 확인 완료", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodayVerificationStatusResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "금일 챌린지 인증 내역 확인 실패", content = @Content)
+
+    })
+    @GetMapping("/status")
+    public ResponseEntity<List<TodayVerificationStatusResponseDTO>> getTodayVerifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        try {
+            String userId = userDetails.getId();
+            List<TodayVerificationStatusResponseDTO> dto = challengeVerificationService.getTodayVerifications(userId);
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

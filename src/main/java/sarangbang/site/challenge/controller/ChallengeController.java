@@ -19,6 +19,7 @@ import sarangbang.site.challenge.dto.ChallengeDTO;
 import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import sarangbang.site.challenge.service.ChallengeService;
+import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 
 @Tag(name = "Challenge", description = "챌린지 관련 API")
@@ -44,10 +45,9 @@ public class ChallengeController {
             ChallengeDTO saveChallenge = challengeService.saveChallenge(challengeDTO, userDetails.getId());
             return ResponseEntity.ok(saveChallenge);
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | RegionNotFoundException e) {
             log.error("챌린지 등록 입력값 오류 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
             return ResponseEntity.badRequest().build();
-
         }
     }
 
@@ -56,15 +56,9 @@ public class ChallengeController {
      */
     @GetMapping("/all")
     public ResponseEntity<Page<ChallengeResponseDto>> getAllChallenges(@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        try {
-            Page<ChallengeResponseDto> responseDto = challengeService.getAllChallenges(pageable);
-            ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
-            return response;
-
-        } catch (Exception e) {
-            log.error("전체 챌린지 조회 실패 - 에러: {}", e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        }
+        Page<ChallengeResponseDto> responseDto = challengeService.getAllChallenges(pageable);
+        ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
+        return response;
     }
 
     /**
@@ -74,15 +68,9 @@ public class ChallengeController {
     public ResponseEntity<Page<ChallengeResponseDto>> getChallengesByCategory(
             @PathVariable Long categoryId,
             @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        try {
-            Page<ChallengeResponseDto> responseDto = challengeService.getChallengesByCategoryId(categoryId, pageable);
-            ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
-            return response;
-
-        } catch (Exception e) {
-            log.error("카테고리별 챌린지 조회 실패 - categoryId: {}, 에러: {}", categoryId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
-        }
+        Page<ChallengeResponseDto> responseDto = challengeService.getChallengesByCategoryId(categoryId, pageable);
+        ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
+        return response;
     }
 
     /**

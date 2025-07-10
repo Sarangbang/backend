@@ -46,9 +46,6 @@ public class ChallengeMemberController {
             log.error("챌린지를 찾을 수 없음 - challengeId: {}, 에러: {}", challengeId, e.getMessage());
             return ResponseEntity.notFound().build();
             
-        } catch (Exception e) {
-            log.error("서버 오류 - challengeId: {}, 에러: {}", challengeId, e.getMessage(), e);
-            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -59,7 +56,7 @@ public class ChallengeMemberController {
             @ApiResponse(responseCode = "500", description = "서버오류", content = @Content(mediaType = "application/json"))
     })
     @GetMapping()
-    public ResponseEntity<List<ChallengeMemberResponseDTO>> getChallengesByUserId(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String role) {
+    public ResponseEntity<List<ChallengeMemberResponseDTO>> getChallengesByUserId(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam(required = false) String role) {
         try {
             String userId = userDetails.getId();
             List<ChallengeMemberResponseDTO> dto = challengeMemberService.getChallengesByUserId(userId, role);

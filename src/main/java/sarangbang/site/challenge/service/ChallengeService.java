@@ -19,6 +19,8 @@ import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
+import sarangbang.site.region.entity.Region;
+import sarangbang.site.region.service.RegionService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,7 @@ public class ChallengeService {
     private final ChallengeCategoryRepository challengeCategoryRepository;
     private final ChallengeMemberService challengeMemberService;
     private final ChallengeMemberRepository challengeMemberRepository;
+    private final RegionService regionService;
 
     // 챌린지 등록
     @Transactional
@@ -42,8 +45,10 @@ public class ChallengeService {
         ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
         log.debug("챌린지 카테고리 정보 : {}", category.getCategoryName());
 
+        Region region = regionService.findRegionById(dto.getRegionId());
+
         Challenge challenge = new Challenge(
-                dto.getLocation(),
+                region,
                 dto.getTitle(),
                 dto.getDescription(),
                 dto.getParticipants(),
@@ -58,7 +63,7 @@ public class ChallengeService {
         challengeRepository.save(challenge);
         challengeMemberService.saveChallengeOwner(userId, challenge.getId());
 
-        ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getLocation(),challenge.getTitle(), challenge.getDescription(),
+        ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getRegion().getRegionId(), challenge.getTitle(), challenge.getDescription(),
                 challenge.getParticipants(), challenge.getMethod(), challenge.getStartDate(), challenge.getEndDate(),
                 challenge.getImage(), challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
 
@@ -71,20 +76,22 @@ public class ChallengeService {
         if (challengeRepository.count() == 0) {
             List<ChallengeCategory> categories = challengeCategoryRepository.findAll();
 
+            Region testRegion = regionService.findRegionById(9L);
+
             if (!categories.isEmpty()) {
                 ChallengeCategory category1 = categories.get(0);
                 ChallengeCategory category2 = categories.get(1);
 
                 Challenge challenge1 = new Challenge(
-                    "7시 기상 챌린지", "집", "morning.jpg", 10, category1
+                    "7시 기상 챌린지", testRegion, "morning.jpg", 10, category1
                 );
 
                 Challenge challenge2 = new Challenge(
-                    "홈트 30분", "집", "workout.jpg", 5, category1
+                    "홈트 30분", testRegion, "workout.jpg", 5, category1
                 );
 
                 Challenge challenge3 = new Challenge(
-                    "방 정리하기", "집", "cleaning.jpg", 20, category2
+                    "방 정리하기", testRegion, "cleaning.jpg", 20, category2
                 );
 
                 challengeRepository.saveAll(Arrays.asList(challenge1, challenge2, challenge3));

@@ -47,7 +47,7 @@ public class ChallengeDetailResponseDto {
         this.maxParticipants = challenge.getParticipants();
         this.startDate = challenge.getStartDate();
         this.endDate = challenge.getEndDate();
-        this.location = challenge.getLocation();
+        this.location = challenge.getRegion().getFullAddress();
 
         this.currentParticipants = currentParticipants;
         this.challengeStatus = challenge.isStatus() ? "ACTIVE" : "INACTIVE";

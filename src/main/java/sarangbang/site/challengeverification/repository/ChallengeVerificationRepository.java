@@ -7,7 +7,6 @@ import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.user.entity.User;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,4 +33,8 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
+
+    String user(User user);
 }
