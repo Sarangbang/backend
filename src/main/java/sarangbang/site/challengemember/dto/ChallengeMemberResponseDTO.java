@@ -23,6 +23,8 @@ public class ChallengeMemberResponseDTO {
     private String location;
     @Schema(description = "챌린지 대표 이미지 URL", example = "https://example.com/images/jpa_study.jpg")
     private String image;
+    @Schema(description = "챌린지 카테고리", example = "운동/건강")
+    private String category;
     @Schema(description = "챌린지 시작일", example = "2025-07-10")
     private LocalDate startDate;
     @Schema(description = "챌린지 마감일", example = "2025-08-10")
@@ -39,6 +41,7 @@ public class ChallengeMemberResponseDTO {
         this.title = challenge.getTitle();
         this.location = challenge.getRegion().getFullAddress();
         this.image = challenge.getImage();
+        this.category = challenge.getChallengeCategory().getCategoryName();
         this.startDate = challenge.getStartDate();
         this.endDate = challenge.getEndDate();
         this.participants = challenge.getParticipants();
