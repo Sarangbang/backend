@@ -7,6 +7,7 @@ import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
+import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
 import sarangbang.site.challengeverification.dto.TodayVerificationStatusResponseDTO;
@@ -85,6 +86,25 @@ public class ChallengeVerificationService {
         
         log.debug("일일 인증 중복 검사 통과 - 사용자: {}, 챌린지: {}", 
                 user.getId(), challenge.getId());
+    }
+
+    // 특정 챌린지 날짜별 인증 조회
+    public List<ChallengeVerificationByDateDTO> getChallengeVerificationByDate(Long challengeId, LocalDate selectedDate, String userId) {
+
+        /* 챌린지가 존재하는지 확인 */
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+
+        /* 챌린지 멤버인지 확인 */
+        challengeMemberService.validateMember(challenge.getId(), userId);
+
+        /* LocalDate를 LocalDateTime 범위로 변환 */
+        LocalDateTime startDate = selectedDate.atStartOfDay();
+        LocalDateTime endDate = selectedDate.atTime(23, 59, 59);
+
+        List<ChallengeVerificationByDateDTO> challengeVerificationList =
+                challengeVerificationRepository.findByChallengeAndVerifiedAt(challenge.getId(), startDate, endDate);
+
+        return challengeVerificationList;
     }
 
     // 금일 챌린지 인증 내역 확인
