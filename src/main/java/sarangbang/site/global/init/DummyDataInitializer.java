@@ -29,6 +29,7 @@ import sarangbang.site.user.repository.UserRepository;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,16 +94,14 @@ public class DummyDataInitializer implements CommandLineRunner {
     private void createUsers() {
         Region region = regions.get(1); // 강남구
 
-        User user1 = new User("user01", "user01@test.com", passwordEncoder.encode("12345678"), "성실한챌린저", "MALE", region, null);
-        User user2 = new User("user02", "user02@test.com", passwordEncoder.encode("12345678"), "열심챌린저", "FEMALE", region, null);
-        User user3 = new User("user03", "user03@test.com", passwordEncoder.encode("12345678"), "가끔챌린저", "MALE", region, null);
-        User user4 = new User("user04", "user04@test.com", passwordEncoder.encode("12345678"), "구경꾼", "FEMALE", region, null);
-        User user5 = new User("user05", "user05@test.com", passwordEncoder.encode("12345678"), "탈퇴한사용자", "MALE", region, null);
-        User user6 = new User("user06", "user06@test.com", passwordEncoder.encode("12345678"), "탈퇴한사용자", "MALE", region, null);
-        User user7 = new User("testuser", "testuser@example.com@test.com", passwordEncoder.encode("12345678"), "탈퇴한사용자", "MALE", region, null);
+        User user1 = new User("user01", "testuser@example.com", passwordEncoder.encode("12345678"), "성실한챌린저", "MALE", region, null);
+        User user2 = new User("user02", "testuser2@example.com", passwordEncoder.encode("12345678"), "열심챌린저", "FEMALE", region, null);
+        User user3 = new User("user03", "testuser3@example.com", passwordEncoder.encode("12345678"), "가끔챌린저", "MALE", region, null);
+        User user4 = new User("user04", "testuser4@example.com", passwordEncoder.encode("12345678"), "구경꾼", "FEMALE", region, null);
+        User user5 = new User("user05", "testuser5@example.com", passwordEncoder.encode("12345678"), "탈퇴한사용자", "MALE", region, null);
         user5.inactive(); // 탈퇴 처리
 
-        users.addAll(userRepository.saveAll(Arrays.asList(user1, user2, user3, user4, user5, user6, user7)));
+        users.addAll(userRepository.saveAll(Arrays.asList(user1, user2, user3, user4, user5)));
     }
 
     private void createChallengeCategories() {
@@ -117,36 +116,63 @@ public class DummyDataInitializer implements CommandLineRunner {
     private void createChallenges() {
         Region region = regions.get(1); // 강남구
 
-        // 1. 종료된 챌린지
+        // 1. 종료된 챌린지 - user1이 방장
         Challenge finishedChallenge = new Challenge(region, "매일 30분 달리기 (종료)", "건강을 위해 매일 함께 달려요!", 10,
                 "매일 달리기 인증샷 업로드", LocalDate.now().minusDays(30), LocalDate.now().minusDays(1),
                 "https://picsum.photos/200/300", false, categories.get(0));
         challenges.add(challengeRepository.save(finishedChallenge));
-        chatRoomRepository.save(new ChatRoom(finishedChallenge.getId().toString(), finishedChallenge.getTitle(),
-                users.get(0).getId(), Arrays.asList(users.get(0).getId()), Instant.now()));
+        challengeMemberRepository.save(new ChallengeMember("OWNER", finishedChallenge, users.get(0)));
+        // chatRoomRepository.save(new ChatRoom(finishedChallenge.getId().toString(), finishedChallenge.getTitle(),
+        //         users.get(0).getId(), Arrays.asList(users.get(0).getId()), Instant.now()));
 
 
-        // 2. 진행 중인 챌린지
+        // 2. 진행 중인 챌린지 - user2(testuser2)가 방장
         Challenge ongoingChallenge = new Challenge(region, "코딩테스트 매일 1문제 풀기 (진행중)", "알고리즘 마스터가 되기 위한 여정", 20,
                 "매일 문제풀이 인증샷 업로드", LocalDate.now().minusDays(15), LocalDate.now().plusDays(15),
                 "https://picsum.photos/200/300", true, categories.get(1));
         challenges.add(challengeRepository.save(ongoingChallenge));
-        chatRoomRepository.save(new ChatRoom(ongoingChallenge.getId().toString(), ongoingChallenge.getTitle(),
-                users.get(1).getId(), Arrays.asList(users.get(1).getId()), Instant.now()));
+        challengeMemberRepository.save(new ChallengeMember("OWNER", ongoingChallenge, users.get(1)));
+        // chatRoomRepository.save(new ChatRoom(ongoingChallenge.getId().toString(), ongoingChallenge.getTitle(),
+        //         users.get(1).getId(), Arrays.asList(users.get(1).getId()), Instant.now()));
 
 
-        // 3. 시작 전 챌린지
+        // 3. 시작 전 챌린지 - user3이 방장
         Challenge upcomingChallenge = new Challenge(region, "미라클 모닝 오전 6시 기상 (시작전)", "아침 시간을 지배하는 자가 하루를 지배한다!", 15,
                 "매일 기상시간 인증샷 업로드", LocalDate.now().plusDays(7), LocalDate.now().plusDays(37),
                 "https://picsum.photos/200/300", true, categories.get(2));
         challenges.add(challengeRepository.save(upcomingChallenge));
-        chatRoomRepository.save(new ChatRoom(upcomingChallenge.getId().toString(), upcomingChallenge.getTitle(),
-                users.get(2).getId(), Arrays.asList(users.get(2).getId()), Instant.now()));
+        challengeMemberRepository.save(new ChallengeMember("OWNER", upcomingChallenge, users.get(2)));
+        
+        // --- testuser2를 위한 추가 챌린지 ---
+        // 4. user2가 방장인 챌린지 2
+        Challenge ownerChallenge2 = new Challenge(region, "매일 책 20페이지 읽기", "지식의 샘을 넓히자", 10,
+                "읽은 책 페이지 인증", LocalDate.now(), LocalDate.now().plusDays(30),
+                "https://picsum.photos/200/300", true, categories.get(3));
+        challenges.add(challengeRepository.save(ownerChallenge2));
+        challengeMemberRepository.save(new ChallengeMember("OWNER", ownerChallenge2, users.get(1)));
+
+        // 5. user2가 방장인 챌린지 3
+        Challenge ownerChallenge3 = new Challenge(region, "매일 물 2리터 마시기", "건강한 습관 만들기", 15,
+                "물 마시는 사진 인증", LocalDate.now().minusDays(5), LocalDate.now().plusDays(25),
+                "https://picsum.photos/200/300", true, categories.get(2));
+        challenges.add(challengeRepository.save(ownerChallenge3));
+        challengeMemberRepository.save(new ChallengeMember("OWNER", ownerChallenge3, users.get(1)));
+        
+        // 6. user4가 방장인 챌린지 (user2가 멤버로 참여할 챌린지)
+        Challenge memberChallenge3 = new Challenge(region, "주 3회 요가하기", "몸과 마음의 평화", 12,
+                "요가 매트 위에서 인증", LocalDate.now(), LocalDate.now().plusDays(60),
+                "https://picsum.photos/200/300", true, categories.get(0));
+        challenges.add(challengeRepository.save(memberChallenge3));
+        challengeMemberRepository.save(new ChallengeMember("OWNER", memberChallenge3, users.get(3)));
     }
 
     private void createChallengeApplicationsAndMembers() {
-        Challenge ongoingChallenge = challenges.get(1); // 진행 중인 챌린지
+        Challenge finishedChallenge = challenges.get(0); // user1 방장
+        Challenge ongoingChallenge = challenges.get(1); // user2 방장
+        Challenge upcomingChallenge = challenges.get(2); // user3 방장
+        Challenge memberChallenge3 = challenges.get(5); // user4 방장
 
+        // --- 진행중인 챌린지 멤버/신청자 (user2가 방장) ---
         // 신청자 1: 성실한챌린저 (user1) - 승인
         User applicant1 = users.get(0);
         ChallengeApplication app1 = new ChallengeApplication("안녕하세요!", "열심히 참여하겠습니다.", "매일 인증!",
@@ -161,12 +187,26 @@ public class DummyDataInitializer implements CommandLineRunner {
         challengeApplicationRepository.save(app2);
         challengeMemberRepository.save(new ChallengeMember("MEMBER", ongoingChallenge, applicant2));
 
+        // --- testuser2가 멤버로 참여하는 챌린지들 ---
+        User testUser2 = users.get(1);
 
-        // 신청자 3: 구경꾼 (user4) - 대기
-        User applicant3 = users.get(3);
-        ChallengeApplication app3 = new ChallengeApplication("저도 참여하고 싶습니다.", "잘 부탁드립니다.", "꾸준히 해볼게요.",
-                ChallengeApplyStatus.PENDING, null, applicant3, ongoingChallenge);
-        challengeApplicationRepository.save(app3);
+        // 멤버 참여 1: 종료된 챌린지 (user1 방장)
+        ChallengeApplication app_mem1 = new ChallengeApplication("지난 챌린지지만 참여합니다.", "데이터용", "화이팅",
+                ChallengeApplyStatus.APPROVED, "환영합니다.", testUser2, finishedChallenge);
+        challengeApplicationRepository.save(app_mem1);
+        challengeMemberRepository.save(new ChallengeMember("MEMBER", finishedChallenge, testUser2));
+
+        // 멤버 참여 2: 시작 전 챌린지 (user3 방장)
+        ChallengeApplication app_mem2 = new ChallengeApplication("미리 신청합니다!", "데이터용", "기대됩니다.",
+                ChallengeApplyStatus.APPROVED, "미리 환영합니다.", testUser2, upcomingChallenge);
+        challengeApplicationRepository.save(app_mem2);
+        challengeMemberRepository.save(new ChallengeMember("MEMBER", upcomingChallenge, testUser2));
+
+        // 멤버 참여 3: user4가 방장인 챌린지
+        ChallengeApplication app_mem3 = new ChallengeApplication("요가 챌린지 참여!", "데이터용", "나마스테",
+                ChallengeApplyStatus.APPROVED, "환영합니다.", testUser2, memberChallenge3);
+        challengeApplicationRepository.save(app_mem3);
+        challengeMemberRepository.save(new ChallengeMember("MEMBER", memberChallenge3, testUser2));
     }
 
     private void createChallengeVerifications() {
