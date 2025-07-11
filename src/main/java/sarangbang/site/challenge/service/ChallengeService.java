@@ -70,34 +70,6 @@ public class ChallengeService {
         return challengeDTO;
     }
 
-    @Transactional
-    @PostConstruct
-    public void initChallengeData() {
-        if (challengeRepository.count() == 0) {
-            List<ChallengeCategory> categories = challengeCategoryRepository.findAll();
-
-            Region testRegion = regionService.findRegionById(9L);
-
-            if (!categories.isEmpty()) {
-                ChallengeCategory category1 = categories.get(0);
-                ChallengeCategory category2 = categories.get(1);
-
-                Challenge challenge1 = new Challenge(
-                    "7시 기상 챌린지", testRegion, "morning.jpg", 10, category1
-                );
-
-                Challenge challenge2 = new Challenge(
-                    "홈트 30분", testRegion, "workout.jpg", 5, category1
-                );
-
-                Challenge challenge3 = new Challenge(
-                    "방 정리하기", testRegion, "cleaning.jpg", 20, category2
-                );
-
-                challengeRepository.saveAll(Arrays.asList(challenge1, challenge2, challenge3));
-            }
-        }
-    }
     /**
      * 전체 챌린지 목록 조회
      */

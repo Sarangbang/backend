@@ -1,6 +1,7 @@
 package sarangbang.site.region.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.global.entity.BaseEntity;
@@ -8,6 +9,8 @@ import sarangbang.site.global.entity.BaseEntity;
 @Entity
 @Table(name = "regions")
 @NoArgsConstructor
+// NOTE: 개발용
+@AllArgsConstructor
 @Getter
 public class Region extends BaseEntity {
 
