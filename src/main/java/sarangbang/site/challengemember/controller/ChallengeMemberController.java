@@ -31,9 +31,11 @@ public class ChallengeMemberController {
      * 챌린지 멤버 목록 조회 API
      */
     @GetMapping("/{challengeId}")
-    public ResponseEntity<List<ChallengeMemberDTO>> getMembersByChallengeId(@PathVariable Long challengeId) {
+    public ResponseEntity<List<ChallengeMemberDTO>> getMembersByChallengeId(@PathVariable Long challengeId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String userId = customUserDetails.getUsername();
+
         try {
-            List<ChallengeMemberDTO> responseDto = challengeMemberService.getMembersByChallengeId(challengeId);
+            List<ChallengeMemberDTO> responseDto = challengeMemberService.getMembersByChallengeId(challengeId, userId);
             ResponseEntity<List<ChallengeMemberDTO>> response = ResponseEntity.ok(responseDto);
             return response;
 
