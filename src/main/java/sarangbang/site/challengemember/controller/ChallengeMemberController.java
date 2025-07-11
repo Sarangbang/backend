@@ -2,7 +2,6 @@ package sarangbang.site.challengemember.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,7 +51,7 @@ public class ChallengeMemberController {
     // 내가 가입한 챌린지 목록 조회
     @Operation(summary = "가입한 챌린지 목록 조회", description = "내가 가입한 챌린지의 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "챌린지 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeMemberResponseDTO.class))),
+            @ApiResponse(responseCode = "200", description = "챌린지 조회 성공"),
             @ApiResponse(responseCode = "500", description = "서버오류", content = @Content(mediaType = "application/json"))
     })
     @GetMapping()
@@ -60,7 +59,7 @@ public class ChallengeMemberController {
         try {
             String userId = userDetails.getId();
             List<ChallengeMemberResponseDTO> dto = challengeMemberService.getChallengesByUserId(userId, role);
-            return  ResponseEntity.ok(dto);
+            return ResponseEntity.ok(dto);
         } catch(IllegalArgumentException e) {
             log.error("가입한 챌린지 목록을 찾을 수 없음 - userId : {}, 에러 : {}", userDetails.getId(), e.getMessage());
             return ResponseEntity.badRequest().build();
