@@ -3,6 +3,7 @@ package sarangbang.site.global.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -56,8 +59,40 @@ public class SecurityConfig {
         return source;
     }
 
-    // filterChain 메소드에 Environment 파라미터 추가
+    /**
+     * 공개적으로 접근 가능한 경로에 대한 보안 설정을 정의합니다.
+     * Order(1)을  통해 다른 보안 필터 체인보다 먼저 실행됩니다.
+     * 이 필터 체인은 JWT 토큰 검증 없이 특정 GET 요청을 허용하기 위해 사용됩니다.
+     * securityMatcher에 정의된 경로 외의 요청은 이 필터 체인에서 처리되지 않습니다.
+     */
     @Bean
+    @Order(1)
+    public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher(new OrRequestMatcher(
+                        new AntPathRequestMatcher("/api/regions/**", HttpMethod.GET.name()),
+                        new AntPathRequestMatcher("/api/challenge/categories", HttpMethod.GET.name()),
+                        new AntPathRequestMatcher("/api/challenges/**", HttpMethod.GET.name()),
+                        new AntPathRequestMatcher("/api/categories/**", HttpMethod.GET.name()),
+                        new AntPathRequestMatcher("/error")
+                ))
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement((sessionManagement) ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+        return http.build();
+    }
+
+    /**
+     * JWT 인증이 필요한 경로에 대한 보안 설정을 정의합니다.
+     * Order(2)를  통해 publicFilterChain 이후에 실행됩니다.
+     * publicFilterChain에서 처리되지 않은 모든 요청은 이 필터 체인을 통과하며,
+     * JwtAuthenticationFilter를 통해 토큰 기반 인증을 수행합니다.
+     */
+    @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http, Environment env) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -70,15 +105,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> {
                     // 기본적으로 허용할 POST 경로들
                     authorize.requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll();
-
-                    // 기본적으로 허용할 GET 경로들
-                    authorize.requestMatchers(HttpMethod.GET,
-                            "/api/challenge/categories",
-                            "/api/challenges/**",
-                            "/api/categories/**",
-                            "/api/regions/**",
-                            "/error"
-                    ).permitAll();
 
                     // "dev" 프로필이 활성화되었는지 확인
                     if (env.acceptsProfiles(Profiles.of("dev"))) {
