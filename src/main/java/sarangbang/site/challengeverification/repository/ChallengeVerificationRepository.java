@@ -9,6 +9,7 @@ import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ChallengeVerificationRepository extends JpaRepository<ChallengeVerification, Long> {
     
@@ -34,6 +35,7 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
             @Param("endDate") LocalDateTime endDate
     );
 
+    Optional<ChallengeVerification> findByChallenge_IdAndUser_IdAndVerifiedAtBetween(Long challengeId, String userId, LocalDateTime start, LocalDateTime end);
     List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
 
     String user(User user);
