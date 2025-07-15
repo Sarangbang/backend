@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeDTO;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -56,7 +54,7 @@ public class ChallengeService {
                 dto.getStartDate(),
                 dto.getEndDate(),
                 dto.getImage(),
-                dto.isStatus(),
+                true,
                 category
         );
 
@@ -70,44 +68,17 @@ public class ChallengeService {
         return challengeDTO;
     }
 
-    @Transactional
-    @PostConstruct
-    public void initChallengeData() {
-        if (challengeRepository.count() == 0) {
-            List<ChallengeCategory> categories = challengeCategoryRepository.findAll();
-
-            Region testRegion = regionService.findRegionById(9L);
-
-            if (!categories.isEmpty()) {
-                ChallengeCategory category1 = categories.get(0);
-                ChallengeCategory category2 = categories.get(1);
-
-                Challenge challenge1 = new Challenge(
-                    "7시 기상 챌린지", testRegion, "morning.jpg", 10, category1
-                );
-
-                Challenge challenge2 = new Challenge(
-                    "홈트 30분", testRegion, "workout.jpg", 5, category1
-                );
-
-                Challenge challenge3 = new Challenge(
-                    "방 정리하기", testRegion, "cleaning.jpg", 20, category2
-                );
-
-                challengeRepository.saveAll(Arrays.asList(challenge1, challenge2, challenge3));
-            }
-        }
-    }
     /**
      * 전체 챌린지 목록 조회
      */
     public Page<ChallengeResponseDto> getAllChallenges(Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAll(pageable);
+        Page<Challenge> challenges = challengeRepository.findAllByStatus(true, pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
+
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
@@ -118,7 +89,7 @@ public class ChallengeService {
      * 카테고리별 챌린지 목록 조회
      */
     public Page<ChallengeResponseDto> getChallengesByCategoryId(Long categoryId, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryId(categoryId, pageable);
+        Page<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryIdAndStatus(categoryId, true, pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
