@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -54,8 +55,15 @@ public class ChallengeController {
     /**
      * 전체 챌린지 목록 조회 API
      */
+    @Operation(summary = "전체 챌린지 목록 조회", description = "페이지네이션을 적용하여 전체 챌린지 목록을 조회합니다.")
     @GetMapping("/all")
-    public ResponseEntity<Page<ChallengeResponseDto>> getAllChallenges(@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "챌린지 목록 조회 성공 (페이지 형식으로 반환)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
+    })
+    public ResponseEntity<Page<ChallengeResponseDto>> getAllChallenges(
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         Page<ChallengeResponseDto> responseDto = challengeService.getAllChallenges(pageable);
         ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
         return response;
@@ -65,9 +73,16 @@ public class ChallengeController {
      * 카테고리별 챌린지 목록 조회 API
      */
     @GetMapping("/categories/{categoryId}")
+    @Operation(summary = "카테고리별 챌린지 목록 조회", description = "카테고리 ID를 이용하여 해당 카테고리에 속한 챌린지 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "카테고리별 챌린지 목록 조회 성공 (페이지 형식으로 반환)"),
+            @ApiResponse(responseCode = "404", description = "해당 카테고리를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생")
+    })
     public ResponseEntity<Page<ChallengeResponseDto>> getChallengesByCategory(
             @PathVariable Long categoryId,
-            @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ChallengeResponseDto> responseDto = challengeService.getChallengesByCategoryId(categoryId, pageable);
         ResponseEntity<Page<ChallengeResponseDto>> response = ResponseEntity.ok(responseDto);
         return response;
