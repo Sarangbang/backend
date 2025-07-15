@@ -76,8 +76,12 @@ public class SecurityConfig {
                             "/api/challenges/**",
                             "/api/categories/**",
                             "/api/regions/**",
+                            "/api/files/**",  // 파일 다운로드 허용
                             "/error"
                     ).permitAll();
+
+                    // 테스트를 위한 이미지 업로드 임시 허용 (나중에 제거 필요)
+                    authorize.requestMatchers(HttpMethod.POST, "/api/upload/**").permitAll();
 
                     // "dev" 프로필이 활성화되었는지 확인
                     if (env.acceptsProfiles(Profiles.of("dev"))) {

@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8082}
 
 spring:
   datasource:
@@ -36,13 +36,8 @@ minio:
 # 애플리케이션 설정
 app:
   upload:
-    max-file-size: 10MB        # 허용 최대 파일 크기
-    allowed-types:             # 허용할 파일 타입들
-      - image/jpeg
-      - image/jpg  
-      - image/png
-      - image/gif
-      - image/webp
+    max-file-size: 5242880  # 5MB in bytes
+    allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
   
   storage:
     type: minio                # 저장소 타입 (local/minio/s3)
@@ -51,4 +46,7 @@ app:
 logging:
   level:
     sarangbang.site.file: DEBUG
+    sarangbang.site.file.service: DEBUG
+    sarangbang.site.file.controller: DEBUG
     io.minio: DEBUG
+    org.springframework.web.multipart: DEBUG
