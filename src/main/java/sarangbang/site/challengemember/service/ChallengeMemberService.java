@@ -67,7 +67,6 @@ public class ChallengeMemberService {
 
             ChallengeMemberDTO dto = new ChallengeMemberDTO(
                     member.getChallengeMemberId(),
-                    member.getUser().getId(),
                     member.getUser().getNickname(),
                     member.getRole(),
                     member.getChallenge().getTitle(),

@@ -14,8 +14,6 @@ public class ChallengeMemberDTO {
 
     @Schema(description = "챌린지 멤버 id", example = "1")
     private Long id;
-    @Schema(description = "사용자 id", example = "TEST-UUID")
-    private String userId;
     @Schema(description = "사용자 닉네임", example = "TEST-NICKNAME")
     private String nickname;
     @Schema(description = "사용자 role", example = "owner")
