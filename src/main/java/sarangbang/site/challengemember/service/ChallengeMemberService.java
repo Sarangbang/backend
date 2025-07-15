@@ -9,9 +9,13 @@ import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
+import sarangbang.site.challengeverification.entity.ChallengeVerification;
+import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +31,7 @@ public class ChallengeMemberService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final ChallengeRepository challengeRepository;
     private final UserService userService;
+    private final ChallengeVerificationRepository challengeVerificationRepository;
 
     // 챌린지 오너 저장
     public void saveChallengeOwner(String userId, Long challengeId) {
@@ -43,26 +48,36 @@ public class ChallengeMemberService {
     }
 
     // 챌린지 멤버 목록 조회
-    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId, String userId) {
 
+    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId, LocalDate date, String userId) {
+        
         boolean exist = challengeRepository.existsById(challengeId);
         if(!exist) {
             throw new IllegalArgumentException("해당 id 의 챌린지가 존재하지 않습니다.");
         }
-
         validateMember(challengeId, userId);
 
         List<ChallengeMember> members = challengeMemberRepository.findByChallengeId(challengeId);
         List<ChallengeMemberDTO> memberDTOs = new ArrayList<>();
 
-        for (ChallengeMember member : members) {
-            ChallengeMemberDTO dto = new ChallengeMemberDTO();
+        LocalDateTime startDate = date.atStartOfDay();
+        LocalDateTime endDate = date.atTime(23, 59, 59);
 
-            dto.setId(member.getChallengeMemberId());
-            dto.setUserId(member.getUser().getId());
-            dto.setChallengeId(challengeId);
-            dto.setRole(member.getRole());
-            dto.setNickname(member.getUser().getNickname());
+        for (ChallengeMember member : members) {
+
+            Optional<ChallengeVerification> verification =
+                    challengeVerificationRepository.findByChallenge_IdAndUser_IdAndVerifiedAtBetween(challengeId, member.getUser().getId(), startDate, endDate);
+
+            boolean isVerified = verification.isPresent();
+
+            ChallengeMemberDTO dto = new ChallengeMemberDTO(
+                    member.getChallengeMemberId(),
+                    member.getUser().getNickname(),
+                    member.getRole(),
+                    member.getChallenge().getTitle(),
+                    member.getChallenge().getMethod(),
+                    isVerified
+            );
 
             memberDTOs.add(dto);
         }
