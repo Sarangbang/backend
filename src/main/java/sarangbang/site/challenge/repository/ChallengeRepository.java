@@ -19,4 +19,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     Page<Challenge> findAll(Pageable pageable);
 
     Page<Challenge> findByChallengeCategory_CategoryId(Long categoryId, Pageable pageable);
+
+    Page<Challenge> findAllByStatus(boolean status, Pageable pageable);
+
+    Page<Challenge> findByChallengeCategory_CategoryIdAndStatus(Long challengeCategoryCategoryId, boolean status, Pageable pageable);
 }

@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.dto.ChallengeDTO;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -56,7 +54,7 @@ public class ChallengeService {
                 dto.getStartDate(),
                 dto.getEndDate(),
                 dto.getImage(),
-                dto.isStatus(),
+                true,
                 category
         );
 
@@ -74,12 +72,13 @@ public class ChallengeService {
      * 전체 챌린지 목록 조회
      */
     public Page<ChallengeResponseDto> getAllChallenges(Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findAll(pageable);
+        Page<Challenge> challenges = challengeRepository.findAllByStatus(true, pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
             responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
+
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
@@ -90,7 +89,7 @@ public class ChallengeService {
      * 카테고리별 챌린지 목록 조회
      */
     public Page<ChallengeResponseDto> getChallengesByCategoryId(Long categoryId, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryId(categoryId, pageable);
+        Page<Challenge> challenges = challengeRepository.findByChallengeCategory_CategoryIdAndStatus(categoryId, true, pageable);
         List<ChallengeResponseDto> responseDtos = new ArrayList<>();
 
         for (Challenge challenge : challenges) {
