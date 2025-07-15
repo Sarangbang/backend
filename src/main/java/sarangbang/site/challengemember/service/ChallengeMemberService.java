@@ -48,8 +48,13 @@ public class ChallengeMemberService {
     }
 
     // 챌린지 멤버 목록 조회
-    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId, LocalDate date, String userId) {
 
+    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId, LocalDate date, String userId) {
+        
+        boolean exist = challengeRepository.existsById(challengeId);
+        if(!exist) {
+            throw new IllegalArgumentException("해당 id 의 챌린지가 존재하지 않습니다.");
+        }
         validateMember(challengeId, userId);
 
         List<ChallengeMember> members = challengeMemberRepository.findByChallengeId(challengeId);
