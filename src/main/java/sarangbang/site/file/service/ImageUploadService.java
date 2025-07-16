@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 // 이미지 업로드 서비스
 @Slf4j
@@ -51,6 +55,54 @@ public class ImageUploadService {
         } catch (Exception e) {
             log.error("프로필 이미지 업로드 실패: userId={}", userId, e);
             throw new FileStorageException("프로필 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    // 챌린지 대표 이미지 저장
+    public String storeChallengeImage(MultipartFile file, Long challengeId) {
+        try {
+            log.info("챌린지 이미지 업로드 시작: challengeId={}, filename={}, size={}bytes",
+                    challengeId, file.getOriginalFilename(), file.getSize());
+
+            validateImageFile(file);
+            String extension = getExtension(file.getOriginalFilename());
+            String filePath = String.format("challenges/%d/thumbnail%s", challengeId, extension);
+            fileStorageService.uploadFile(file, filePath);
+            String imageUrl = "/api/files/" + filePath;
+            log.info("챌린지 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
+            return imageUrl;
+        } catch (Exception e) {
+            log.error("챌린지 이미지 업로드 실패: challengeId={}", challengeId, e);
+            throw new FileStorageException("챌린지 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    // 챌린지 인증 이미지 저장
+    public String storeProofImage(MultipartFile file, Long challengeId) {
+        try {
+            log.info("인증 이미지 업로드 시작: challengeId={}, filename={}, size={}bytes",
+                    challengeId, file.getOriginalFilename(), file.getSize());
+            validateImageFile(file);
+
+            // 오늘 날짜 (yyyyMMdd)
+            String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+            // UUID 기반 고유 파일명
+            String uuid = UUID.randomUUID().toString();
+
+            // 저장 경로: challenges/{챌린지ID}/{날짜}/{UUID}.jpg
+            String filePath = String.format("challenges/%d/%s/%s%s",
+                                    challengeId, date, uuid, file.getOriginalFilename());
+
+            fileStorageService.uploadFile(file, filePath);
+
+            String imageUrl = "/api/files/" + filePath;
+
+            log.info("인증 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
+            return imageUrl;
+        } catch (Exception e) {
+            log.error("인증 이미지 업로드 실패: challengeId={}", challengeId, e);
+            throw new FileStorageException("인증 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
         }
     }
 
