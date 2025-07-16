@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface ChallengeVerificationRepository extends JpaRepository<ChallengeVerification, Long> {
     
-    boolean existsByChallengeAndUserAndCreatedAtBetween(
+    boolean existsByChallengeAndUserAndVerifiedAtBetween(
             Challenge challenge, User user, LocalDateTime start, LocalDateTime end
     );
 
@@ -34,7 +34,7 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
             @Param("endDate") LocalDateTime endDate
     );
 
-    List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
+    List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
 
     String user(User user);
 }

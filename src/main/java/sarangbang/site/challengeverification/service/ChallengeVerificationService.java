@@ -58,6 +58,7 @@ public class ChallengeVerificationService {
         // 6. 응답 DTO 생성
         ChallengeVerificationResponseDTO responseDTO = new ChallengeVerificationResponseDTO(
                 savedVerification.getChallenge().getId(),
+                LocalDateTime.now(),
                 savedVerification.getImgUrl(),
                 savedVerification.getContent(),
                 savedVerification.getStatus(),
@@ -74,7 +75,7 @@ public class ChallengeVerificationService {
                 user.getId(), challenge.getId(), today);
         
         boolean alreadyVerified = challengeVerificationRepository
-                .existsByChallengeAndUserAndCreatedAtBetween(
+                .existsByChallengeAndUserAndVerifiedAtBetween(
                         challenge, user, today.atStartOfDay(), today.atTime(23, 59, 59)
                 );
         
@@ -111,15 +112,19 @@ public class ChallengeVerificationService {
     public List<TodayVerificationStatusResponseDTO> getTodayVerifications(String userId) {
 
         LocalDate today = LocalDate.now();
+        LocalDateTime startDate = today.atStartOfDay();
+        LocalDateTime endDate = today.atTime(23, 59, 59);
         List<ChallengeMemberResponseDTO> challengeLists = challengeMemberService.getChallengesByUserId(userId, null); // 참여한 모든 챌린지
         if(challengeLists.isEmpty()){
             throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
         }
-        List<ChallengeVerification> verifications = challengeVerificationRepository.findChallengeVerificationsByUser_IdAndVerifiedAt(
-                userId, today.atTime(23, 59, 59)); // 오늘 인증한 모든 챌린지
+        List<ChallengeVerification> verifications = challengeVerificationRepository.findChallengeVerificationsByUser_IdAndVerifiedAtBetween(
+                userId, startDate, endDate); // 오늘 인증한 모든 챌린지
 
         Set<Long> todayVerificationIds =
                 verifications.stream().map(v -> v.getChallenge().getId()).collect(Collectors.toSet());
+
+        System.out.println("오늘 인증한 챌린지 아이디요~~" +userId + todayVerificationIds.size());
 
         List<TodayVerificationStatusResponseDTO> dtos = challengeLists.stream()
                 .map(challenge -> new TodayVerificationStatusResponseDTO(
@@ -129,7 +134,9 @@ public class ChallengeVerificationService {
                         challenge.getImage(),
                         challenge.getParticipants(),
                         challenge.getCurrentParticipants(),
-                        todayVerificationIds.contains(challenge.getId())
+                        todayVerificationIds.contains(challenge.getId()),
+                        challenge.getStartDate(),
+                        challenge.getEndDate()
                 ))
                 .collect(Collectors.toList());
 

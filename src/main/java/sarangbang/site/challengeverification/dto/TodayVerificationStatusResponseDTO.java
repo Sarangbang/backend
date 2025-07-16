@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sarangbang.site.challenge.entity.Challenge;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,15 +29,8 @@ public class TodayVerificationStatusResponseDTO {
     private int currentParticipants;
     @Schema(description = "챌린지 인증 여부", example = "true")
     private boolean verifyStatus;
-
-    public TodayVerificationStatusResponseDTO(Challenge challege, int currentParticipants, boolean verifyStatus) {
-        this.challengeId = challege.getId();
-        this.title = challege.getTitle();
-        this.location = challege.getRegion().getFullAddress();
-        this.image = challege.getImage();
-        this.participants = challege.getParticipants();
-        this.currentParticipants = currentParticipants;
-        this.verifyStatus = verifyStatus;
-    }
-
+    @Schema(description = "시작일", example = "2025-07-15 00:00:00.000000")
+    private LocalDate startDate;
+    @Schema(description = "종료일", example = "2025-08-15 00:00:00.000000")
+    private LocalDate endDate;
 }

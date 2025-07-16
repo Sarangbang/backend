@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,6 +18,9 @@ public class ChallengeVerificationResponseDTO {
     
     @Schema(description = "챌린지 ID", example = "1")
     private Long challengeId;
+
+    @Schema(description = "인증일", example = "2025-07-15 00:00:00.000000")
+    private LocalDateTime verifiedAt;
 
     @Schema(description = "인증 이미지 URL", example = "https://example.com/image.jpg")
     private String imgUrl;
