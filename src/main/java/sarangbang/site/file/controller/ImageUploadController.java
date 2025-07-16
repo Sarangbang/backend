@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.dto.ImageUploadResponseDTO;
@@ -29,6 +31,10 @@ public class ImageUploadController {
 
     /**
      *  이미지 업로드
+     *  
+     *  🔐 인증 정책:
+     *  - PROFILE: 로그인 불필요 (회원가입 시 사용)
+     *  - CHALLENGE, VERIFICATION: 로그인 필수
      */
     @Operation(summary = "이미지 업로드", description = "이미지를 업로드합니다.")
     @ApiResponses(value = {
@@ -53,6 +59,18 @@ public class ImageUploadController {
                 usage, file.getOriginalFilename(), file.getSize());
 
         try {
+            // 🔐 인증 확인: PROFILE 외에는 로그인 필수
+            if (!isProfileUpload(usage)) {
+                if (!isAuthenticated()) {
+                    log.warn("인증되지 않은 사용자의 {} 이미지 업로드 시도", usage);
+                    ImageUploadResponseDTO errorResponse = ImageUploadResponseDTO.failure(
+                            "UNAUTHORIZED",
+                            "로그인이 필요합니다."
+                    );
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+                }
+            }
+
             // 이미지 업로드 서비스 호출
             ImageUploadResponseDTO response = imageUploadService.uploadImage(file, usage);
 
@@ -80,6 +98,23 @@ public class ImageUploadController {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
+    }
+
+    /**
+     * 🔍 프로필 이미지 업로드인지 확인
+     */
+    private boolean isProfileUpload(ImageUsage usage) {
+        return usage == ImageUsage.PROFILE;
+    }
+
+    /**
+     * 🔐 사용자 인증 상태 확인
+     */
+    private boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null 
+                && authentication.isAuthenticated() 
+                && !"anonymousUser".equals(authentication.getPrincipal());
     }
 
     /**

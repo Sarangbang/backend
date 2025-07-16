@@ -70,6 +70,9 @@ public class SecurityConfig {
                     // 기본적으로 허용할 POST 경로들
                     authorize.requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll();
 
+                    // 이미지 업로드 경로 허용 (컨트롤러에서 용도별 인증 체크)
+                    authorize.requestMatchers(HttpMethod.POST, "/api/upload/**").permitAll();
+
                     // 기본적으로 허용할 GET 경로들
                     authorize.requestMatchers(HttpMethod.GET,
                             "/api/challenge/categories",
@@ -79,9 +82,6 @@ public class SecurityConfig {
                             "/api/files/**",  // 파일 다운로드 허용
                             "/error"
                     ).permitAll();
-
-                    // 테스트를 위한 이미지 업로드 임시 허용 (나중에 제거 필요)
-                    authorize.requestMatchers(HttpMethod.POST, "/api/upload/**").permitAll();
 
                     // "dev" 프로필이 활성화되었는지 확인
                     if (env.acceptsProfiles(Profiles.of("dev"))) {

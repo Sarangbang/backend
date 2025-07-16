@@ -9,27 +9,31 @@ package sarangbang.site.file.enums;
  * - PROFILE → profiles/ 폴더
  * - CHALLENGE → challenges/ 폴더  
  * - VERIFICATION → verifications/ 폴더
+ * 
+ * 🔐 인증 정책:
+ * - PROFILE: 로그인 불필요 (회원가입 시 사용)
+ * - CHALLENGE, VERIFICATION: 로그인 필수
  */
 public enum ImageUsage {
     
     /**
      * 👤 프로필 이미지
      * - 회원가입 시 업로드
-     * - 인증 불필요
+     * - 🔓 인증 불필요
      */
     PROFILE("프로필 이미지"),
     
     /**
      * 🏆 챌린지 대표 이미지
      * - 챌린지 생성 시 업로드
-     * - 인증 필요
+     * - 🔐 인증 필요
      */
     CHALLENGE("챌린지 대표 이미지"),
     
     /**
      * ✅ 인증 사진
      * - 챌린지 인증 시 업로드
-     * - 인증 필요
+     * - 🔐 인증 필요
      */
     VERIFICATION("인증 사진");
     
