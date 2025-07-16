@@ -33,4 +33,16 @@ public class TodayVerificationStatusResponseDTO {
     private LocalDate startDate;
     @Schema(description = "종료일", example = "2025-08-15 00:00:00.000000")
     private LocalDate endDate;
+
+    public TodayVerificationStatusResponseDTO(Challenge challenge, int currentParticipants, boolean verifyStatus) {
+        this.challengeId = challenge.getId();
+        this.title = challenge.getTitle();
+        this.location = challenge.getRegion().getFullAddress();
+        this.image = challenge.getImage();
+        this.participants = challenge.getParticipants();
+        this.currentParticipants = currentParticipants;
+        this.verifyStatus = verifyStatus;
+        this.startDate = challenge.getStartDate();
+        this.endDate = challenge.getEndDate();
+    }
 }
