@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
+import sarangbang.site.challengeverification.dto.MyChallengeVerificationResponseDto;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
+import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,4 +41,18 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
     List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
 
     String user(User user);
+
+    // 내 인증 목록 조회
+    @Query("SELECT new sarangbang.site.challengeverification.dto.MyChallengeVerificationResponseDto(" +
+            "    cv.imgUrl, " +
+            "    cv.challenge.title, " +
+            "    cv.verifiedAt) " +
+            "FROM ChallengeVerification cv " +
+            "WHERE cv.user.id = :userId " +
+            "  AND cv.status = :status " + // <<-- 승인 상태를 필터링하는 조건 추가
+            "ORDER BY cv.verifiedAt DESC")
+    List<MyChallengeVerificationResponseDto> findMyVerifications(
+            @Param("userId") String userId,
+            @Param("status") ChallengeVerificationStatus status // <<-- status 파라미터 추가
+    );
 }

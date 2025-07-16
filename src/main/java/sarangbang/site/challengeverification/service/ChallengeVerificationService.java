@@ -3,14 +3,12 @@ package sarangbang.site.challengeverification.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
-import sarangbang.site.challengeverification.dto.TodayVerificationStatusResponseDTO;
+import sarangbang.site.challengeverification.dto.*;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
@@ -134,5 +132,16 @@ public class ChallengeVerificationService {
                 .collect(Collectors.toList());
 
         return dtos;
+    }
+
+    /**
+     * 내 챌린지 인증 내역 전체 조회
+     * @return List<MyChallengeVerificationResponseDto>
+     */
+    @Transactional(readOnly = true) // 데이터를 조회만 하므로 성능 최적화를 위해 readOnly 설정
+    public List<MyChallengeVerificationResponseDto> getMyVerifications(String userId) {
+
+        // Repository에 사용자 ID를 전달하여 데이터를 요청합니다.
+        return challengeVerificationRepository.findMyVerifications(userId, ChallengeVerificationStatus.APPROVED);
     }
 }
