@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
  * - 저장소 변경 시 최소한의 코드 수정으로 대응 가능
  * 
  * 📋 구현체들:
- * - LocalFileStorageService: 로컬 파일시스템 저장
  * - MinIOFileStorageService: MinIO 저장 (개발/테스트)
  * - S3FileStorageService: AWS S3 저장 (운영)
  * 

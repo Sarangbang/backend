@@ -1,19 +1,19 @@
 package sarangbang.site.file.service;
 
-import lombok.RequiredArgsConstructor;                    // 🔧 Lombok: 생성자 자동 생성
-import lombok.extern.slf4j.Slf4j;                        // 🔧 Lombok: 로깅 자동 설정
-import org.springframework.beans.factory.annotation.Value; // 🔧 Spring: 설정값 주입
-import org.springframework.stereotype.Service;            // 🔧 Spring: 서비스 계층 선언
-import org.springframework.web.multipart.MultipartFile;  // 🔧 Spring: 파일 업로드 처리
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.dto.ImageUploadResponseDTO;
-import sarangbang.site.file.enums.ImageUsage;            // 📦 우리 프로젝트: 이미지 용도 열거형
-import sarangbang.site.file.exception.FileStorageException; // 📦 우리 프로젝트: 파일 저장 예외
+import sarangbang.site.file.enums.ImageUsage;
+import sarangbang.site.file.exception.FileStorageException;
 
-import java.time.LocalDateTime;                           // 🔧 Java: 날짜/시간 처리
-import java.time.format.DateTimeFormatter;               // 🔧 Java: 날짜 형식 변환
-import java.util.Arrays;                                  // 🔧 Java: 배열 유틸리티
-import java.util.List;                                    // 🔧 Java: 리스트 컬렉션
-import java.util.UUID;                                    // 🔧 Java: 고유 식별자 생성
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 📤 이미지 업로드 서비스
@@ -25,9 +25,9 @@ import java.util.UUID;                                    // 🔧 Java: 고유 �
  * 4. 접근 가능한 URL 생성
  * 5. 에러 처리 및 응답 생성
  */
-@Slf4j                                                    // 🔧 Lombok: log 객체 자동 생성
-@Service                                                  // 🔧 Spring: 서비스 빈 등록
-@RequiredArgsConstructor                                  // 🔧 Lombok: final 필드 생성자 자동 생성
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class ImageUploadService {
 
     // 📦 우리 프로젝트: 실제 파일 저장을 담당하는 서비스 (인터페이스 사용)
@@ -156,23 +156,24 @@ public class ImageUploadService {
     /**
      * 🔄 중복되지 않는 고유한 파일명 생성
      *
-     * 🎯 생성 규칙: "yyyyMMddHHmmss_UUID앞8자리_확장자"
-     * 📋 예시: "20250714143020_a1b2c3d4.jpg"
+     * 🎯 생성 규칙: "yyyyMMddHHmmssSSS_UUID전체_확장자"
+     * 📋 예시: "20250714143020123_a1b2c3d4-e5f6-7890-abcd-ef1234567890.jpg"
      *
      * 장점:
+     * - 밀리초 단위 타임스탬프로 충돌 방지
+     * - UUID 전체 사용으로 완전한 고유성 보장
      * - 시간 기반 정렬 가능
-     * - UUID로 중복 방지
      * - 확장자 보존
      *
      * @param originalFilename 원본 파일명
      * @return 고유한 파일명
      */
     private String generateUniqueFileName(String originalFilename) {
-        // 📅 현재 시간 (yyyyMMddHHmmss 형식)
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        // 📅 현재 시간 (yyyyMMddHHmmssSSS 형식 - 밀리초 포함)
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
 
-        // 🎲 UUID 앞 8자리 (중복 방지)
-        String uuid = UUID.randomUUID().toString().substring(0, 8);
+        // 🎲 UUID 전체 (완전한 고유성 보장)
+        String uuid = UUID.randomUUID().toString();
 
         // 📎 파일 확장자 추출
         String extension = "";
