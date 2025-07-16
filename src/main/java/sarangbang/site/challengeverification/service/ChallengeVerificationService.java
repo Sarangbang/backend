@@ -124,8 +124,6 @@ public class ChallengeVerificationService {
         Set<Long> todayVerificationIds =
                 verifications.stream().map(v -> v.getChallenge().getId()).collect(Collectors.toSet());
 
-        System.out.println("오늘 인증한 챌린지 아이디요~~" +userId + todayVerificationIds.size());
-
         List<TodayVerificationStatusResponseDTO> dtos = challengeLists.stream()
                 .map(challenge -> new TodayVerificationStatusResponseDTO(
                         challenge.getId(),
