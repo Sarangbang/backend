@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public interface ChallengeVerificationRepository extends JpaRepository<ChallengeVerification, Long> {
     
-    boolean existsByChallengeAndUserAndCreatedAtBetween(
+    boolean existsByChallengeAndUserAndVerifiedAtBetween(
             Challenge challenge, User user, LocalDateTime start, LocalDateTime end
     );
 
@@ -37,6 +37,7 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
             @Param("endDate") LocalDateTime endDate
     );
 
+    List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
     Optional<ChallengeVerification> findByChallenge_IdAndUser_IdAndVerifiedAtBetween(Long challengeId, String userId, LocalDateTime start, LocalDateTime end);
     List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
 
