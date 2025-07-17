@@ -27,8 +27,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
     Page<Challenge> findByChallengeCategory_CategoryIdAndStatus(Long challengeCategoryCategoryId, boolean status, Pageable pageable);
 
     @Query("SELECT new sarangbang.site.challenge.dto.ChallengePopularityResponseDTO(" +
+            "    c.id, " +
             "    c.title, " +
-            "    c.region, " +
+            "    c.region.fullAddress, " +
             "    c.image, " +
             "    c.participants, " +
             "    COUNT(cm.challengeMemberId)) " +
