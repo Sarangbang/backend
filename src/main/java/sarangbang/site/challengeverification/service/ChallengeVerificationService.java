@@ -58,7 +58,7 @@ public class ChallengeVerificationService {
         // 6. 응답 DTO 생성
         ChallengeVerificationResponseDTO responseDTO = new ChallengeVerificationResponseDTO(
                 savedVerification.getChallenge().getId(),
-                LocalDateTime.now(),
+                savedVerification.getVerifiedAt(),
                 savedVerification.getImgUrl(),
                 savedVerification.getContent(),
                 savedVerification.getStatus(),
