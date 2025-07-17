@@ -20,6 +20,7 @@ import sarangbang.site.auth.dto.SignInRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.auth.service.AuthService;
+import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.auth.dto.SignupRequestDTO;
@@ -93,6 +94,9 @@ public class AuthController {
         } catch (NicknameAlreadyExistsException e) {
             Map<String, String> errorBody = Map.of("nickname", e.getMessage());
             return new ResponseEntity<>(errorBody, HttpStatus.CONFLICT);
+        } catch (RegionNotFoundException e){
+            Map<String, String> errorBody = Map.of("region", e.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_FOUND);
         }
     }
 }

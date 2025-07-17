@@ -44,7 +44,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://*.ilsim.site",
                 "https://ilsim.site",
-                "https://www.ilsim.site"
+                "https://www.ilsim.site",
+                "https://dev.ilsim.site"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

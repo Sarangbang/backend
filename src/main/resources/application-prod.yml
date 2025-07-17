@@ -43,11 +43,6 @@ app:
   storage:
     type: s3                # 저장소 타입 (운영환경: s3)
 
-# 로깅 설정 (운영환경용)
-logging:
-  level:
-    root: INFO
-    sarangbang.site.file: INFO
-    software.amazon.awssdk: WARN
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+discord:
+  webhook:
+    url: "${DISCORD_WEBHOOK_URL:discord_webhook_url}"

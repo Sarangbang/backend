@@ -18,13 +18,18 @@ public class ChallengeResponseDto {
     private String image;
     private int participants;
     private int currentParticipants;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     public ChallengeResponseDto(Challenge challenge, int currentParticipants) {
         this.id = challenge.getId();
         this.title = challenge.getTitle();
-        this.location = challenge.getLocation();
+        this.location = challenge.getRegion().getFullAddress();
         this.image = challenge.getImage();
         this.participants = challenge.getParticipants();
         this.currentParticipants = currentParticipants;
+        this.startDate = challenge.getStartDate();
+        this.endDate = challenge.getEndDate();
+
     }
 }

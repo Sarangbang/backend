@@ -1,10 +1,7 @@
 package sarangbang.site.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -31,9 +28,9 @@ public class SignupRequestDTO {
     @Schema(description = "성별", example = "MALE")
     private String gender;
 
-    @NotBlank (message = "지역은 필수 입력 항목입니다.")
-    @Schema(description = "지역", example = "서울특별시")
-    private String region;
+    @NotNull(message = "지역은 필수 입력 항목입니다.")
+    @Schema(description = "지역 ID", example = "182")
+    private Long regionId;
 
     public boolean passwordMatched() {
         return password != null && password.equals(passwordConfirm);

@@ -1,4 +1,4 @@
-package sarangbang.site.challengemember.dto;
+package sarangbang.site.challengeverification.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -13,39 +13,36 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChallengeMemberResponseDTO {
+public class TodayVerificationStatusResponseDTO {
 
     @Schema(description = "챌린지 id", example = "1")
-    private Long id;
+    private Long challengeId;
     @Schema(description = "챌린지 제목", example = "JPA 정복 스터디")
     private String title;
     @Schema(description = "챌린지 지역", example = "서울특별시")
     private String location;
     @Schema(description = "챌린지 대표 이미지 URL", example = "https://example.com/images/jpa_study.jpg")
     private String image;
-    @Schema(description = "챌린지 카테고리", example = "운동/건강")
-    private String category;
-    @Schema(description = "챌린지 시작일", example = "2025-07-10")
-    private LocalDate startDate;
-    @Schema(description = "챌린지 마감일", example = "2025-08-10")
-    private LocalDate endDate;
     @Schema(description = "최대 참여 가능 인원", example = "10")
     private int participants;
     @Schema(description = "현재 참여 인원", example = "5")
     private int currentParticipants;
-    @Schema(description = "챌린지에서의 역할", example = "owner")
-    private String role;
+    @Schema(description = "챌린지 인증 여부", example = "true")
+    private boolean verifyStatus;
+    @Schema(description = "시작일", example = "2025-07-15 00:00:00.000000")
+    private LocalDate startDate;
+    @Schema(description = "종료일", example = "2025-08-15 00:00:00.000000")
+    private LocalDate endDate;
 
-    public ChallengeMemberResponseDTO(Challenge challenge, int currentParticipants, String role) {
-        this.id = challenge.getId();
+    public TodayVerificationStatusResponseDTO(Challenge challenge, int currentParticipants, boolean verifyStatus) {
+        this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
         this.location = challenge.getRegion().getFullAddress();
         this.image = challenge.getImage();
-        this.category = challenge.getChallengeCategory().getCategoryName();
-        this.startDate = challenge.getStartDate();
-        this.endDate = challenge.getEndDate();
         this.participants = challenge.getParticipants();
         this.currentParticipants = currentParticipants;
-        this.role = role;
+        this.verifyStatus = verifyStatus;
+        this.startDate = challenge.getStartDate();
+        this.endDate = challenge.getEndDate();
     }
 }
