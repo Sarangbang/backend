@@ -10,9 +10,9 @@ import sarangbang.site.challengecategory.entity.ChallengeCategory;
 public class ChallengeCategoryDTO {
     @Schema(description = "챌린지 카테고리 ID", example = "2")
     private Long categoryId;
-    @Schema(description = "챌린지 카테고리 이름", example = "학습/도서")
+    @Schema(description = "챌린지 카테고리 이름", example = "운동/건강")
     private String categoryName;
-    @Schema(description = "챌린지 카테고리 이미지", example = "/images/categories/learning.png")
+    @Schema(description = "챌린지 카테고리 이미지", example = "/images/categories/default_health.png")
     private String categoryImageUrl;
 
     public static ChallengeCategoryDTO fromEntity(ChallengeCategory category) {

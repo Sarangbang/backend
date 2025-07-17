@@ -9,13 +9,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
+import sarangbang.site.challengeverification.dto.*;
 import sarangbang.site.challengeverification.service.ChallengeVerificationService;
 import sarangbang.site.security.details.CustomUserDetails;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/challenge-verifications")
@@ -63,4 +66,64 @@ public class ChallengeVerificationController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    /* 특정 챌린지 날짜별 인증 조회 */
+    @Operation(summary = "특정 챌린지 날짜별 인증 조회", description = "특정 챌린지를 날짜별로 인증을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "특정 챌린지 날짜별 인증 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeVerificationByDateDTO.class))),
+            @ApiResponse(responseCode = "400", description = "해당 챌린지 인증을 찾을 수 없음", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping("/{challengeId}")
+    public ResponseEntity<List<ChallengeVerificationByDateDTO>> getVerificationByDate(
+            @PathVariable Long challengeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<ChallengeVerificationByDateDTO> responseDTOList =
+                challengeVerificationService.getChallengeVerificationByDate(challengeId, selectedDate, userDetails.getId());
+
+        ResponseEntity<List<ChallengeVerificationByDateDTO>> response = ResponseEntity.ok(responseDTOList);
+        return response;
+    }
+
+    // 금일 챌린지 인증 내역
+    @Operation(summary = "금일 챌린지 인증 여부", description = "내가 참여한 모든 챌린지의 금일 인증 여부를 확인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "금일 챌린지 인증 내역 확인 완료", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TodayVerificationStatusResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "금일 챌린지 인증 내역 확인 실패", content = @Content)
+
+    })
+    @GetMapping("/status")
+    public ResponseEntity<List<TodayVerificationStatusResponseDTO>> getTodayVerifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        try {
+            String userId = userDetails.getId();
+            List<TodayVerificationStatusResponseDTO> dto = challengeVerificationService.getTodayVerifications(userId);
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Operation(summary = "내 챌린지 인증 내역 전체 조회", description = "로그인한 사용자의 모든 챌린지 인증 내역을 최신순으로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음", content = @Content(schema = @Schema(hidden = true)))
+    })
+    @GetMapping("/my")
+    public ResponseEntity<List<MyChallengeVerificationResponseDto>> getMyVerifications(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+
+        // 1. 주입받은 userDetails에서 사용자 ID를 직접 가져옵니다.
+        String userId = userDetails.getId(); // 또는 userDetails.getUserId() 같은 메소드
+        log.info("내 인증 내역 조회 요청. 사용자 ID: {}", userId);
+
+        // 2. 서비스에 사용자 ID를 직접 전달합니다.
+        List<MyChallengeVerificationResponseDto> myVerifications = challengeVerificationService.getMyVerifications(userId);
+
+        return ResponseEntity.ok(myVerifications);
+    }
+
 }

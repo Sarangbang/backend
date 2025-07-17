@@ -9,10 +9,15 @@ import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
+import sarangbang.site.challengeverification.entity.ChallengeVerification;
+import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.util.Optional;
@@ -26,6 +31,7 @@ public class ChallengeMemberService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final ChallengeRepository challengeRepository;
     private final UserService userService;
+    private final ChallengeVerificationRepository challengeVerificationRepository;
 
     // 챌린지 오너 저장
     public void saveChallengeOwner(String userId, Long challengeId) {
@@ -42,18 +48,36 @@ public class ChallengeMemberService {
     }
 
     // 챌린지 멤버 목록 조회
-    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId) {
+
+    public List<ChallengeMemberDTO> getMembersByChallengeId(Long challengeId, LocalDate date, String userId) {
+        
+        boolean exist = challengeRepository.existsById(challengeId);
+        if(!exist) {
+            throw new IllegalArgumentException("해당 id 의 챌린지가 존재하지 않습니다.");
+        }
+        validateMember(challengeId, userId);
+
         List<ChallengeMember> members = challengeMemberRepository.findByChallengeId(challengeId);
         List<ChallengeMemberDTO> memberDTOs = new ArrayList<>();
 
-        for (ChallengeMember member : members) {
-            ChallengeMemberDTO dto = new ChallengeMemberDTO();
+        LocalDateTime startDate = date.atStartOfDay();
+        LocalDateTime endDate = date.atTime(23, 59, 59);
 
-            dto.setId(member.getChallengeMemberId());
-            dto.setUserId(member.getUser().getId());
-            dto.setChallengeId(challengeId);
-            dto.setRole(member.getRole());
-            dto.setNickname(member.getUser().getNickname());
+        for (ChallengeMember member : members) {
+
+            Optional<ChallengeVerification> verification =
+                    challengeVerificationRepository.findByChallenge_IdAndUser_IdAndVerifiedAtBetween(challengeId, member.getUser().getId(), startDate, endDate);
+
+            boolean isVerified = verification.isPresent();
+
+            ChallengeMemberDTO dto = new ChallengeMemberDTO(
+                    member.getChallengeMemberId(),
+                    member.getUser().getNickname(),
+                    member.getRole(),
+                    member.getChallenge().getTitle(),
+                    member.getChallenge().getMethod(),
+                    isVerified
+            );
 
             memberDTOs.add(dto);
         }
@@ -91,12 +115,20 @@ public class ChallengeMemberService {
     // 내가 가입한 챌린지 목록 조회
     public List<ChallengeMemberResponseDTO> getChallengesByUserId(String userId, String role) {
 
-        List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
-        List<ChallengeMember> challengeMember = challengeMemberRepository.findByUser_IdAndRole(userId, role);
-        if(challengeMember.isEmpty()) {
-            throw new IllegalArgumentException("가입한 챌린지가 없습니다.");
+        List<ChallengeMember> challengeMembers;
+
+        if(role == null || role.isBlank()) {
+            challengeMembers = challengeMemberRepository.findByUser_Id(userId);
+        } else {
+            challengeMembers = challengeMemberRepository.findByUser_IdAndRole(userId, role);
         }
-        List<Long> challengeIds = challengeMember.stream().map(cm -> cm.getChallenge().getId()).collect(Collectors.toList());
+
+        if(challengeMembers.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ChallengeMemberResponseDTO> dto = new ArrayList<>();
+        List<Long> challengeIds = challengeMembers.stream().map(cm -> cm.getChallenge().getId()).collect(Collectors.toList());
         List<Challenge> challenges = challengeRepository.findChallengesByIdIn(challengeIds);
 
         for(Challenge challenge : challenges) {
