@@ -42,6 +42,7 @@ app:
   
   storage:
     type: s3                # 저장소 타입 (운영환경: s3)
+
 discord:
   webhook:
     url: "${DISCORD_WEBHOOK_URL:discord_webhook_url}"
