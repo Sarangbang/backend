@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
+import sarangbang.site.challenge.dto.ChallengePopularityResponseDTO;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 
 import sarangbang.site.challenge.entity.Challenge;
@@ -124,5 +125,10 @@ public class ChallengeService {
 
         //엔티티와 참여자 수를 DTO 생성자에 넘겨 변환 후 반환
         return new ChallengeDetailResponseDto(challenge, currentParticipants);
+    }
+
+    // 챌린지 인기순 조회
+    public List<ChallengePopularityResponseDTO> getChallengePopularity() {
+        return challengeRepository.findChallengesByPopularity();
     }
 }
