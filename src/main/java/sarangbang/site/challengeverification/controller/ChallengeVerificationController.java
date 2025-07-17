@@ -13,10 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationByDateDTO;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationRequestDTO;
-import sarangbang.site.challengeverification.dto.ChallengeVerificationResponseDTO;
-import sarangbang.site.challengeverification.dto.TodayVerificationStatusResponseDTO;
+import sarangbang.site.challengeverification.dto.*;
 import sarangbang.site.challengeverification.service.ChallengeVerificationService;
 import sarangbang.site.security.details.CustomUserDetails;
 
@@ -106,6 +103,27 @@ public class ChallengeVerificationController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @Operation(summary = "내 챌린지 인증 내역 전체 조회", description = "로그인한 사용자의 모든 챌린지 인증 내역을 최신순으로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음", content = @Content(schema = @Schema(hidden = true)))
+    })
+    @GetMapping("/my")
+    public ResponseEntity<List<MyChallengeVerificationResponseDto>> getMyVerifications(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+
+        // 1. 주입받은 userDetails에서 사용자 ID를 직접 가져옵니다.
+        String userId = userDetails.getId(); // 또는 userDetails.getUserId() 같은 메소드
+        log.info("내 인증 내역 조회 요청. 사용자 ID: {}", userId);
+
+        // 2. 서비스에 사용자 ID를 직접 전달합니다.
+        List<MyChallengeVerificationResponseDto> myVerifications = challengeVerificationService.getMyVerifications(userId);
+
+        return ResponseEntity.ok(myVerifications);
     }
 
 }
