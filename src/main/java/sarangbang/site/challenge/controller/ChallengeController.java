@@ -18,10 +18,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
+import sarangbang.site.challenge.dto.ChallengePopularityResponseDTO;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
+
+import java.util.List;
 
 @Tag(name = "Challenge", description = "챌린지 관련 API")
 @RestController
@@ -107,5 +110,17 @@ public class ChallengeController {
             log.error("챌린지 조회 실패 - ID: {}, 에러: {}", challengeId, e.getMessage());
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // 챌린지 인기순 조회
+    @Operation(summary = "챌린지 인기순 조회", description = "인기순으로 챌린지를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "챌린지 인기순 조회 성공"),
+            @ApiResponse(responseCode = "500", description = "챌린지 인기순 조회 실패")
+    })
+    @GetMapping("/popularity")
+    public ResponseEntity<List<ChallengePopularityResponseDTO>> getChallengePopularity() {
+        List<ChallengePopularityResponseDTO> dtos = challengeService.getChallengePopularity();
+        return ResponseEntity.ok(dtos);
     }
 }
