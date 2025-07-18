@@ -26,28 +26,22 @@ spring:
       max-request-size: 50MB   # 전체 요청 최대 크기
       enabled: true            # 멀티파트 업로드 활성화
 
-# AWS S3 설정
-aws:
-  access-key: ${AWS_ACCESS_KEY}         # 환경변수에서 읽어옴
-  secret-key: ${AWS_SECRET_KEY}         # 환경변수에서 읽어옴
-  s3:
-    bucket-name: ${AWS_S3_BUCKET_NAME:sarangbang-files-prod}  # S3 버킷 이름
-    region: ${AWS_S3_REGION:ap-northeast-2}                  # 서울 리전
+# MinIO 설정 (S3 호환 저장소)
+minio:
+  url: ${MINIO_URL:http://localhost:9000}           # MinIO 서버 주소
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}        # 접근 키
+  secret-key: ${MINIO_SECRET_KEY:minioadmin123}     # 비밀 키
+  bucket-name: ${MINIO_BUCKET:sarangbang-files}     # 버킷 이름
 
 # 애플리케이션 설정
 app:
   upload:
     max-file-size: 5242880  # 5MB in bytes
     allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
-  
+
   storage:
     type: s3                # 저장소 타입 (운영환경: s3)
 
-# 로깅 설정 (운영환경용)
-logging:
-  level:
-    root: INFO
-    sarangbang.site.file: INFO
-    software.amazon.awssdk: WARN
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+discord:
+  webhook:
+    url: "${DISCORD_WEBHOOK_URL:discord_webhook_url}"

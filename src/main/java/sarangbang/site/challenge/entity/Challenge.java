@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.global.entity.BaseEntity;
+import sarangbang.site.region.entity.Region;
 
 import java.time.LocalDate;
 
@@ -17,7 +18,6 @@ public class Challenge extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String location;
     private String title;
     @Column(length = 500)
     private String description;
@@ -33,16 +33,20 @@ public class Challenge extends BaseEntity {
     @JoinColumn(name = "categoryId")
     private ChallengeCategory challengeCategory;
 
-    public Challenge(String title, String location, String image, int participants, ChallengeCategory challengeCategory) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
+
+    public Challenge(String title, Region region, String image, int participants, ChallengeCategory challengeCategory) {
         this.title = title;
-        this.location = location;
+        this.region = region;
         this.image = image;
         this.participants = participants;
         this.challengeCategory = challengeCategory;
     }
 
-    public Challenge(String location, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory) {
-        this.location = location;
+    public Challenge(Region region, String title, String description, int participants, String method, LocalDate startDate, LocalDate endDate, String image, boolean status, ChallengeCategory challengeCategory) {
+        this.region = region;
         this.title = title;
         this.description = description;
         this.participants = participants;

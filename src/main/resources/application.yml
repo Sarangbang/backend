@@ -22,8 +22,8 @@ app:
     type: ${STORAGE_TYPE:minio}
     endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
     bucket-name: ${STORAGE_BUCKET:sarangbang-files}
-    access-key: ${STORAGE_ACCESS_KEY}
-    secret-key: ${STORAGE_SECRET_KEY}
+    access-key: ${STORAGE_ACCESS_KEY:minioadmin}
+    secret-key: ${STORAGE_SECRET_KEY:minioadmin123}
 
 management:
   endpoints:
