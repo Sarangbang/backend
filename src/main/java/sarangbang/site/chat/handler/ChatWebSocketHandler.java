@@ -9,8 +9,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import sarangbang.site.chat.dto.ChatMessage;
+import sarangbang.site.chat.dto.Sender;
 import sarangbang.site.chat.enums.MessageType;
 import sarangbang.site.chat.service.ChatService;
+import sarangbang.site.user.entity.User;
+import sarangbang.site.user.repository.UserRepository;
 
 /**
  * WebSocket 통신의 실제 로직을 처리하는 핸들러입니다.
@@ -22,6 +25,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ChatService chatService;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     /**
      * 클라이언트와 WebSocket 연결이 성공적으로 수립되었을 때 호출됩니다.
@@ -30,18 +34,21 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         Authentication authentication = (Authentication) session.getAttributes().get("user");
-        String username = authentication.getName();
+        String userEmail = authentication.getName();
+
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+        Sender sender = new Sender(String.valueOf(user.getId()), user.getNickname(), user.getProfileImageUrl());
 
         String roomId = session.getUri().getQuery().split("=")[1];
 
         session.getAttributes().put("roomId", roomId);
-        session.getAttributes().put("username", username);
+        session.getAttributes().put("sender", sender);
 
         chatService.addSessionToRoom(roomId, session);
 
         // 5. 다른 사용자들에게 새로운 사용자의 입장을 알리는 메시지를 보냅니다.
         // 수정된 부분: ChatMessage 생성자 순서 및 인자 수정
-        ChatMessage entryMessage = new ChatMessage(MessageType.ENTER, roomId, username, username + "님이 입장하셨습니다.");
+        ChatMessage entryMessage = new ChatMessage(MessageType.ENTER, roomId, sender, sender.getNickname() + "님이 입장하셨습니다.");
         chatService.sendMessageToRoom(roomId, entryMessage);
     }
 
@@ -66,13 +73,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         String roomId = (String) session.getAttributes().get("roomId");
-        String username = (String) session.getAttributes().get("username");
+        Sender sender = (Sender) session.getAttributes().get("sender");
 
         chatService.removeSessionFromRoom(roomId, session);
 
         // 다른 사용자들에게 퇴장 사실을 알리는 메시지를 보냅니다.
         // 수정된 부분: ChatMessage 생성자 순서 및 인자 수정
-        ChatMessage exitMessage = new ChatMessage(MessageType.LEAVE, roomId, username, username + "님이 퇴장하셨습니다.");
+        ChatMessage exitMessage = new ChatMessage(MessageType.LEAVE, roomId, sender, sender.getNickname() + "님이 퇴장하셨습니다.");
         chatService.sendMessageToRoom(roomId, exitMessage);
     }
 }

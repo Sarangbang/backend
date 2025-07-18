@@ -17,7 +17,7 @@ public class ChatMessage {
     private String roomId;
 
     // 메시지를 보낸 사람
-    private String sender;
+    private Sender sender;
 
     // 메시지 내용
     private String message;
