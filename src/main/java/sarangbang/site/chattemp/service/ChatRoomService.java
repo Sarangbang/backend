@@ -1,12 +1,12 @@
-package sarangbang.site.chat.service;
+package sarangbang.site.chattemp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
-import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
-import sarangbang.site.chat.dto.UserChatRoomSummaryDto;
-import sarangbang.site.chat.entity.ChatRoom;
-import sarangbang.site.chat.repository.ChatRoomRepository;
+import sarangbang.site.chattemp.dto.ChatRoomCreateRequestDto;
+import sarangbang.site.chattemp.dto.ChatRoomSummaryResponseDto;
+import sarangbang.site.chattemp.dto.UserChatRoomSummaryDto;
+import sarangbang.site.chattemp.entity.ChatRoom;
+import sarangbang.site.chattemp.repository.ChatRoomRepository;
 
 import java.time.Instant;
 import java.util.ArrayList;

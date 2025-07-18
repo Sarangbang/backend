@@ -1,4 +1,4 @@
-package sarangbang.site.chat.dto;
+package sarangbang.site.chattemp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

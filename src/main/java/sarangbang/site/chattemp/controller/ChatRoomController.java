@@ -1,13 +1,13 @@
-package sarangbang.site.chat.controller;
+package sarangbang.site.chattemp.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
-import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
-import sarangbang.site.chat.dto.UserChatRoomSummaryDto;
-import sarangbang.site.chat.service.ChatRoomService;
+import sarangbang.site.chattemp.dto.ChatRoomCreateRequestDto;
+import sarangbang.site.chattemp.dto.ChatRoomSummaryResponseDto;
+import sarangbang.site.chattemp.dto.UserChatRoomSummaryDto;
+import sarangbang.site.chattemp.service.ChatRoomService;
 import sarangbang.site.security.details.CustomUserDetails;
 
 import java.util.List;

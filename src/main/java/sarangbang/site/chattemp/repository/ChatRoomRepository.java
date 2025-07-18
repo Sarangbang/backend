@@ -1,7 +1,7 @@
-package sarangbang.site.chat.repository;
+package sarangbang.site.chattemp.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import sarangbang.site.chat.entity.ChatRoom;
+import sarangbang.site.chattemp.entity.ChatRoom;
 
 import java.util.List;
 

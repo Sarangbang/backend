@@ -1,4 +1,4 @@
-package sarangbang.site.chat.entity;
+package sarangbang.site.chattemp.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
