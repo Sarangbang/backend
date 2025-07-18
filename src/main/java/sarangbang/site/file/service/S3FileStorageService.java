@@ -3,6 +3,7 @@ package sarangbang.site.file.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
@@ -15,6 +16,7 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "s3")
+@Profile("prod")
 public class S3FileStorageService implements FileStorageService {
 
     private final S3Client s3Client;
