@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import sarangbang.site.auth.dto.LoginResponseDto;
 import sarangbang.site.auth.dto.SignInRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
@@ -27,7 +28,6 @@ import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.auth.dto.SignupRequestDTO;
-import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
 import java.net.URI;
@@ -48,11 +48,11 @@ public class AuthController {
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인을 진행하고 Access Token을 발급합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"accessToken\": \"eyJhbGciOiJIUzI1NiJ9...\", \"message\": \"로그인 성공\"}"))),
+            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponseDto.class))),
             @ApiResponse(responseCode = "401", description = "로그인 실패", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"error\": \"이메일 또는 비밀번호가 일치하지 않습니다.\"}")))
     })
     @PostMapping("/signin")
-    public ResponseEntity<Map<String, String>> login(@RequestBody SignInRequestDTO request, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody SignInRequestDTO request, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -84,13 +84,13 @@ public class AuthController {
                     .build();
             response.addHeader("Set-Cookie", cookie.toString());
 
-            Map<String, String> responseBody = Map.of(
-                    "uuid", user.getId(),
-                    "profileImageUrl", user.getProfileImageUrl(),
-                    "accessToken", accessToken,
-                    "message", "로그인 성공"
-            );
-            return ResponseEntity.ok().header("Authorization", "Bearer " + accessToken).body(responseBody);
+            LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                    .uuid(user.getId())
+                    .profileImageUrl(user.getProfileImageUrl())
+                    .accessToken(accessToken)
+                    .build();
+
+            return ResponseEntity.ok().header("Authorization", "Bearer " + accessToken).body(loginResponseDto);
         } catch (AuthenticationException e) {
             Map<String, String> errorBody = Map.of("error", "이메일 또는 비밀번호가 올바르지 않습니다.");
             return new ResponseEntity<>(errorBody, HttpStatus.UNAUTHORIZED);

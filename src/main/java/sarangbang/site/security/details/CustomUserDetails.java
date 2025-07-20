@@ -1,6 +1,7 @@
 package sarangbang.site.security.details;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,20 +11,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Getter
+@RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
     private final String id;  // UUID
     private final String email;
     private final String password;
     private final String profileImageUrl;
     private final Collection<? extends GrantedAuthority> authorities;
-
-    public CustomUserDetails(String id, String email, String password, String profileImageUrl, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.profileImageUrl = profileImageUrl;
-        this.authorities = authorities;
-    }
 
     public CustomUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
         this.id = user.getId();
