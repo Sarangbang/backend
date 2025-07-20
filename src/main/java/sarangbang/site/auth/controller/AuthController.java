@@ -85,6 +85,8 @@ public class AuthController {
             response.addHeader("Set-Cookie", cookie.toString());
 
             Map<String, String> responseBody = Map.of(
+                    "uuid", user.getId(),
+                    "profileImageUrl", user.getProfileImageUrl(),
                     "accessToken", accessToken,
                     "message", "로그인 성공"
             );
@@ -162,7 +164,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 
-    @Operation(summary = "로그아웃")
+    @Operation(summary = "로그아웃시 저장된 리프레시 토큰을 삭제합니다.")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
         if (refreshToken != null) {
