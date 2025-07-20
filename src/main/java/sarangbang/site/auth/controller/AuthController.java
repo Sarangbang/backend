@@ -130,47 +130,18 @@ public class AuthController {
     @Operation(summary = "토큰 재발급", description = "유효한 Refresh Token을 사용하여 새로운 Access Token을 발급합니다.")
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
-        if (refreshToken == null) {
-            return new ResponseEntity<>(Map.of("error", "리프레시 토큰이 없습니다."), HttpStatus.UNAUTHORIZED);
-        }
-
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            return new ResponseEntity<>(Map.of("error", "리프레시 토큰이 유효하지 않거나 만료되었습니다."), HttpStatus.UNAUTHORIZED);
-        }
-
-        String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-
         try {
-            refreshTokenService.findTokenByUserId(userId)
-                    .filter(savedToken -> savedToken.equals(refreshToken))
-                    .orElseThrow(() -> new RuntimeException("저장된 토큰과 일치하지 않습니다."));
-        } catch (RuntimeException e) {
+            String newAccessToken = authService.refresh(refreshToken);
+            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
-
-        User user = userService.getUserById(userId);
-
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority).
-                toList();
-
-        String newAccessToken = jwtTokenProvider.createAccessToken(
-                userId,
-                user.getEmail(),
-                roles
-        );
-
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 
-    @Operation(summary = "로그아웃시 저장된 리프레시 토큰을 삭제합니다.")
+    @Operation(summary = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refreshToken", required = false) String refreshToken, HttpServletResponse response) {
-        if (refreshToken != null) {
-            String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-            refreshTokenService.deleteToken(userId);
-        }
+        authService.logout(refreshToken);
 
         ResponseCookie expiredCookie = ResponseCookie.from("refreshToken", "")
                 .maxAge(0)
