@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.security.oauth.userinfo.GoogleUserInfo;
+import sarangbang.site.security.oauth.userinfo.KakaoUserInfo;
 import sarangbang.site.security.oauth.userinfo.NaverUserInfo;
 import sarangbang.site.security.oauth.userinfo.OAuth2UserInfo;
 import sarangbang.site.user.entity.User;
@@ -41,6 +42,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
         } else if (registrationId.equals("naver")) {
             oAuth2UserInfo = new NaverUserInfo((Map<String, Object>) oAuth2User.getAttributes().get("response"));
+        } else if (registrationId.equals("kakao")) {
+            oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
         } else {
             log.error("Unsupported provider: {}", registrationId);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported provider");
