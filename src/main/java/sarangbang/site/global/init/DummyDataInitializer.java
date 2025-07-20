@@ -91,11 +91,11 @@ public class DummyDataInitializer implements CommandLineRunner {
     private void createUsers() {
         Region region = regions.get(1); // 강남구
 
-        User user1 = new User("user01", "testuser@example.com", passwordEncoder.encode("12345678"), "성실한챌린저", "MALE", region, null);
-        User user2 = new User("user02", "testuser2@example.com", passwordEncoder.encode("12345678"), "열심챌린저", "FEMALE", region, null);
-        User user3 = new User("user03", "testuser3@example.com", passwordEncoder.encode("12345678"), "가끔챌린저", "MALE", region, null);
-        User user4 = new User("user04", "testuser4@example.com", passwordEncoder.encode("12345678"), "구경꾼", "FEMALE", region, null);
-        User user5 = new User("user05", "testuser5@example.com", passwordEncoder.encode("12345678"), "탈퇴한사용자", "MALE", region, null);
+        User user1 = new User("user01", "testuser@example.com", passwordEncoder.encode("12345678"), "성실한챌린저", "MALE", region, null, "local", null, true);
+        User user2 = new User("user02", "testuser2@example.com", passwordEncoder.encode("12345678"), "열심챌린저", "FEMALE", region, null, "local", null, true);
+        User user3 = new User("user03", "testuser3@example.com", passwordEncoder.encode("12345678"), "가끔챌린저", "MALE", region, null, "local", null, true);
+        User user4 = new User("user04", "testuser4@example.com", passwordEncoder.encode("12345678"), "구경꾼", "FEMALE", region, null, "local", null, true);
+        User user5 = new User("user05", "testuser5@example.com", passwordEncoder.encode("12345678"), "탈퇴한사용자", "MALE", region, null, "local", null, true);
         user5.inactive(); // 탈퇴 처리
 
         users.addAll(userRepository.saveAll(Arrays.asList(user1, user2, user3, user4, user5)));

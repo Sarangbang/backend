@@ -24,6 +24,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import sarangbang.site.security.filter.JwtAuthenticationFilter;
 import sarangbang.site.security.handler.JwtAccessDeniedHandler;
 import sarangbang.site.security.handler.JwtAuthenticationEntryPoint;
+import sarangbang.site.security.oauth.OAuth2LoginFailureHandler;
+import sarangbang.site.security.oauth.OAuth2LoginSuccessHandler;
 import sarangbang.site.user.service.CustomUserDetailsService;
 
 import java.util.List;
@@ -36,6 +38,8 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -47,7 +51,7 @@ public class SecurityConfig {
                 "https://www.ilsim.site",
                 "https://dev.ilsim.site"
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
@@ -67,12 +71,16 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable) // httpBasic 비활성화
                 .authorizeHttpRequests(authorize -> {
                     // 기본적으로 허용할 POST 경로들
                     authorize.requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll();
 
                     // 이미지 업로드 경로 허용 (컨트롤러에서 용도별 인증 체크)
                     authorize.requestMatchers(HttpMethod.POST, "/api/upload/**").permitAll();
+
+                    // OAuth2 로그인 관련 경로 허용 (경로 변경)
+                    authorize.requestMatchers("/api/oauth2/**", "/api/login/oauth2/**").permitAll();
 
                     // 기본적으로 허용할 GET 경로들
                     authorize.requestMatchers(HttpMethod.GET,
@@ -97,6 +105,17 @@ public class SecurityConfig {
                     // 위에서 정의한 경로 외 모든 요청은 인증 필요
                     authorize.anyRequest().authenticated();
                 })
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization ->
+                                authorization.baseUri("/api/oauth2/authorization")   // 기존 /oauth2/authorization
+                        )
+                        .redirectionEndpoint(redirection ->
+                                // 기본은 /login/oauth2/code/*
+                                redirection.baseUri("/api/login/oauth2/code/*")
+                        )
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                )
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
