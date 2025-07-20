@@ -54,6 +54,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+oauth2:
+  success:
+    redirect:
+      uri:${OAUTH2_SUCCESS_REDIRECT_URI:http://localhost:3000/auth/success}
 
 jwt:
   access-secret: ${ACCESS_TOKEN_SECRET:LhVYSkvR90p9A7jPFlWWZ0uB3RPiIGnN8s3aXk2lbE4=}

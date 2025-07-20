@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -31,6 +32,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+
+    @Value("${oauth2.success.redirect.uri}")
+    private String successRedirectUri;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -73,7 +78,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getEmail(), Collections.singletonList("ROLE_USER"));
 
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/auth/success")
+        String targetUrl = UriComponentsBuilder.fromUriString(successRedirectUri)
                 .queryParam("accessToken", accessToken)
                 .queryParam("profileComplete", user.isProfileComplete())
                 .build().toUriString();
