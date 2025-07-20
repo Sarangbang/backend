@@ -2,9 +2,12 @@ package sarangbang.site.user.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import sarangbang.site.security.details.CustomUserDetails;
+import sarangbang.site.user.dto.UserUpdateRequestDto;
+import sarangbang.site.user.service.UserService;
 
 
 @Tag(name = "User", description = "유저 관련 API")
@@ -13,5 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final UserService userService;
 
+    @PatchMapping("/me")
+    public ResponseEntity<Void> updateMyProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserUpdateRequestDto updateDto) {
+        userService.updateUserProfile(userDetails.getId(), updateDto);
+        return ResponseEntity.ok().build();
+    }
 }

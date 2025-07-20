@@ -62,7 +62,10 @@ public class AuthService {
                 requestDto.getNickname(),
                 requestDto.getGender(),
                 region,
-                null
+                null, // profileImageUrl
+                "local", // provider
+                null, // providerId
+                true // profileComplete
         );
 
         User saved = userRepository.save(user);

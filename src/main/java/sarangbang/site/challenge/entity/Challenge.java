@@ -37,6 +37,10 @@ public class Challenge extends BaseEntity {
     @JoinColumn(name = "region_id")
     private Region region;
 
+    public void changeImage(String image){
+        this.image = image;
+    }
+
     public Challenge(String title, Region region, String image, int participants, ChallengeCategory challengeCategory) {
         this.title = title;
         this.region = region;
