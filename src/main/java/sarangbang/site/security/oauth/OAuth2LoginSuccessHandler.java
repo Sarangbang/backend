@@ -43,16 +43,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
 
         OAuth2UserInfo oAuth2UserInfo;
-        if (registrationId.equals("google")) {
-            oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
-        } else if (registrationId.equals("naver")) {
-            oAuth2UserInfo = new NaverUserInfo((Map<String, Object>) oAuth2User.getAttributes().get("response"));
-        } else if (registrationId.equals("kakao")) {
-            oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
-        } else {
-            log.error("Unsupported provider: {}", registrationId);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported provider");
-            return;
+        switch (registrationId) {
+            case "google" -> oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+            case "naver" ->
+                    oAuth2UserInfo = new NaverUserInfo((Map<String, Object>) oAuth2User.getAttributes().get("response"));
+            case "kakao" -> oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
+            default -> {
+                log.error("Unsupported provider: {}", registrationId);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unsupported provider");
+                return;
+            }
         }
 
         String provider = oAuth2UserInfo.getProvider();
@@ -76,7 +76,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                     return userRepository.save(newUser);
                 });
 
-        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getEmail(), Collections.singletonList("ROLE_USER"));
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), Collections.singletonList("ROLE_USER"));
 
         String targetUrl = UriComponentsBuilder.fromUriString(successRedirectUri)
                 .queryParam("accessToken", accessToken)
