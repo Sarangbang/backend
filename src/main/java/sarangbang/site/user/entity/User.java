@@ -24,6 +24,7 @@ public class User extends BaseEntity {
     @Column(nullable = true)
     private String password;
 
+    @Column(unique = true)
     private String nickname;
 
     private String gender;
@@ -44,5 +45,17 @@ public class User extends BaseEntity {
         this.gender = gender;
         this.region = region;
         this.profileComplete = true;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }
