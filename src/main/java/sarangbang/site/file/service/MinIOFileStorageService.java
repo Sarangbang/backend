@@ -14,7 +14,7 @@ import java.io.InputStream;
 @Service
 @RequiredArgsConstructor
 @Profile("dev")
-public class UnifiedFileStorageService implements FileStorageService {
+public class MinIOFileStorageService implements FileStorageService {
 
     private final MinioClient minioClient;
 

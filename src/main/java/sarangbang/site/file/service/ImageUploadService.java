@@ -1,5 +1,6 @@
 package sarangbang.site.file.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,16 @@ public class ImageUploadService {
     @Value("${app.storage.public-url}")
     private String publicUrl;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    @PostConstruct
+    public void init() {
+        log.info("✅ [ImageUploadService] publicUrl = {}", publicUrl);
+        log.info("✅ [ImageUploadService] baseUrl = {}", baseUrl);
+        log.info("✅ [ImageUploadService] fileStorageService = {}", fileStorageService.getClass().getSimpleName());
+    }
+
     // 회원 프로필 이미지 저장
     public String storeProfileImage(MultipartFile file, Long userId) {
         try {
@@ -53,7 +64,7 @@ public class ImageUploadService {
             if (publicUrl != null && !publicUrl.isBlank()) {
                 imageUrl = publicUrl + "/" + filePath;
             } else {
-                imageUrl = "/api/files/" + filePath; // MinIO 또는 프록시 사용 시
+                imageUrl = baseUrl + "/api/files/" + filePath; // MinIO 또는 프록시 사용 시
             }
 
             log.info("프로필 이미지 업로드 완료: userId={}, imageUrl={}", userId, imageUrl);
@@ -81,7 +92,7 @@ public class ImageUploadService {
             if (publicUrl != null && !publicUrl.isBlank()) {
                 imageUrl = publicUrl + "/" + filePath;
             } else {
-                imageUrl = "/api/files/" + filePath;
+                imageUrl = baseUrl + "/api/files/" + filePath;
             }
             log.info("챌린지 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
             return imageUrl;
@@ -111,7 +122,7 @@ public class ImageUploadService {
             if (publicUrl != null && !publicUrl.isBlank()) {
                 imageUrl = publicUrl + "/" + filePath;
             } else {
-                imageUrl = "/api/files/" + filePath;
+                imageUrl = baseUrl + "/api/files/" + filePath;
             }
 
             fileStorageService.uploadFile(file, filePath);

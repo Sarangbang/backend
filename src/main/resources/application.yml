@@ -64,6 +64,7 @@ jwt:
   refresh-secret: ${REFRESH_TOKEN_SECRET:R4pW6qB1yH3aF7gK0jM5nC_U8iE2bT6dY9lX-cZ1vA4wS7hG3fJ0ko9zL2VeN8s}
 
 app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
   upload:
     max-file-size: 5242880  # 5MB
     allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
@@ -71,7 +72,7 @@ app:
   storage:
     type: ${STORAGE_TYPE:minio}
     endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
-    bucket-name: ${STORAGE_BUCKET:sarangbang-files}
+    bucket-name: ${STORAGE_BUCKET:ilsim-uploaded-files}
     access-key: ${STORAGE_ACCESS_KEY:minioadmin}
     secret-key: ${STORAGE_SECRET_KEY:minioadmin123}
 

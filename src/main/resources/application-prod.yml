@@ -28,6 +28,8 @@ spring:
 
 # 애플리케이션 설정
 app:
+  base-url: https://api.ilsimdongnae.com
+
   upload:
     max-file-size: 5242880  # 5MB in bytes
     allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp

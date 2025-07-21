@@ -32,9 +32,10 @@ public class ImageUploadTestController {
     @Operation(summary = "챌린지 대표 이미지 업로드")
     @PostMapping(value = "/challenge", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadChallengeImage(
-            @RequestPart("file") MultipartFile file
+            @RequestPart("file") MultipartFile file,
+            @RequestParam("challengeId") Long challengeId
     ) {
-        String imageUrl = imageUploadService.storeChallengeImage(file, 456L);
+        String imageUrl = imageUploadService.storeChallengeImage(file, challengeId);
         return ResponseEntity.ok(imageUrl);
     }
 
