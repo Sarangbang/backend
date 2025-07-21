@@ -19,7 +19,7 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
-import sarangbang.site.chattemp.repository.ChatRoomRepository;
+import sarangbang.site.chat.repository.ChatRoomRepository;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.entity.RegionType;
 import sarangbang.site.region.repository.RegionRepository;
