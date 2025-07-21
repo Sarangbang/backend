@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.enums.ImageType;
+import sarangbang.site.file.exception.FileStorageException;
 
 @Service
 @RequiredArgsConstructor
@@ -11,7 +12,7 @@ public class ImageSaveFactory {
 
     private final ImageUploadService imageUploadService;
 
-    public String getImageUploadService(MultipartFile file, ImageType type, Long personId) {
+    public String getImageUploadService(MultipartFile file, ImageType type, Long personId) throws FileStorageException {
         imageUploadService.validateImageFile(file);
         return switch (type) {
             case PROFILE -> imageUploadService.storeProfileImage(file, personId);

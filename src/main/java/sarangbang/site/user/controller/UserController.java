@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
+import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.user.dto.UserUpdateRequestDto;
 import sarangbang.site.user.service.UserService;
@@ -19,10 +21,14 @@ public class UserController {
     private final UserService userService;
 
     @PatchMapping("/me")
-    public ResponseEntity<Void> updateMyProfile(
+    public ResponseEntity<?> updateMyProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody UserUpdateRequestDto updateDto) {
-        userService.updateUserProfile(userDetails.getId(), updateDto);
+        try{
+            userService.updateUserProfile(userDetails.getId(), updateDto);
+        } catch (RegionNotFoundException | NicknameAlreadyExistsException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok().build();
     }
 }
