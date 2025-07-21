@@ -44,7 +44,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                 .getQueryParams()
                 .getFirst("token");
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        if (token != null && jwtTokenProvider.validateAccessToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             attributes.put("user", authentication);
             return true;

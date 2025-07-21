@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
+import sarangbang.site.file.enums.ImageType;
+import sarangbang.site.file.service.ImageSaveFactory;
 import sarangbang.site.chat.enums.ChatSourceType;
 import sarangbang.site.chat.enums.RoomType;
 import sarangbang.site.region.entity.Region;
@@ -41,10 +44,11 @@ public class ChallengeService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final RegionService regionService;
     private final ApplicationEventPublisher eventPublisher;
+    private final ImageSaveFactory imageSaveFactory;
 
     // 챌린지 등록
     @Transactional
-    public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId) {
+    public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId, MultipartFile imageFile) {
 
         ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
         log.debug("챌린지 카테고리 정보 : {}", category.getCategoryName());
@@ -64,6 +68,11 @@ public class ChallengeService {
                 category
         );
 
+        challengeRepository.save(challenge);
+        if (imageFile != null) {
+            String imageUrl = imageSaveFactory.getImageUploadService(imageFile, ImageType.CHALLENGE, challenge.getId());
+            challenge.changeImage(imageUrl);
+        }
         challengeMemberService.saveChallengeOwner(userId, challenge.getId());
 
         Challenge savedChallenge = challengeRepository.save(challenge);
