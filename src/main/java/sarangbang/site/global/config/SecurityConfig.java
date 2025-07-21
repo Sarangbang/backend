@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // httpBasic 비활성화
                 .authorizeHttpRequests(authorize -> {
                     // 기본적으로 허용할 POST 경로들
-                    authorize.requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/api/users/signin",  "/api/users/signup", "/api/users/refresh", "/api/users/logout").permitAll();
 
                     // 이미지 업로드 경로 허용 (컨트롤러에서 용도별 인증 체크)
                     authorize.requestMatchers(HttpMethod.POST, "/api/upload/**").permitAll();

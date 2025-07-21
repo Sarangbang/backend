@@ -61,6 +61,7 @@ oauth2:
 
 jwt:
   access-secret: ${ACCESS_TOKEN_SECRET:LhVYSkvR90p9A7jPFlWWZ0uB3RPiIGnN8s3aXk2lbE4=}
+  refresh-secret: ${REFRESH_TOKEN_SECRET:R4pW6qB1yH3aF7gK0jM5nC_U8iE2bT6dY9lX-cZ1vA4wS7hG3fJ0ko9zL2VeN8s}
 
 app:
   upload:
