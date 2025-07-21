@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponseDto {
     private String uuid;
+    private String nickname;
     private String profileImageUrl;
     private String accessToken;
 }

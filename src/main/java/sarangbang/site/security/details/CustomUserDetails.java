@@ -15,6 +15,7 @@ import java.util.Collections;
 public class CustomUserDetails implements UserDetails {
     private final String id;  // UUID
     private final String email;
+    private final String nickname;
     private final String password;
     private final String profileImageUrl;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -22,6 +23,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
         this.id = user.getId();
         this.email = user.getEmail();
+        this.nickname = user.getNickname();
         this.password = user.getPassword();
         this.profileImageUrl = user.getProfileImageUrl();
         this.authorities = authorities;
@@ -30,6 +32,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
+        this.nickname = user.getNickname();
         this.password = user.getPassword();
         this.profileImageUrl = user.getProfileImageUrl();
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));

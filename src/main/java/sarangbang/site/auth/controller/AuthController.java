@@ -65,7 +65,7 @@ public class AuthController {
 
             String accessToken = jwtTokenProvider.createAccessToken(
                     user.getId(),           // UUID
-                    user.getEmail(),        // email
+                    user.getEmail(),
                     roles
             );
 
@@ -86,6 +86,7 @@ public class AuthController {
 
             LoginResponseDto loginResponseDto = LoginResponseDto.builder()
                     .uuid(user.getId())
+                    .nickname(user.getNickname())
                     .profileImageUrl(user.getProfileImageUrl())
                     .accessToken(accessToken)
                     .build();
