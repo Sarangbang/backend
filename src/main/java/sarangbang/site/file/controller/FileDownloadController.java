@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import sarangbang.site.file.service.FileStorageService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import sarangbang.site.file.service.S3FileStorageService;
+
+import java.time.Duration;
 
 /**
  * 📥 파일 다운로드 컨트롤러
@@ -25,6 +28,14 @@ import jakarta.servlet.http.HttpServletRequest;
 public class FileDownloadController {
 
     private final FileStorageService fileStorageService;
+
+    private final S3FileStorageService s3FileStorageService;
+
+    @GetMapping("/presigned-url")
+    public ResponseEntity<String> getPresignedUrl(@RequestParam String path) {
+        String url = s3FileStorageService.generatePresignedUrl(path, Duration.ofMinutes(10));
+        return ResponseEntity.ok(url);
+    }
 
     /**
      * 📥 파일 다운로드/조회 API

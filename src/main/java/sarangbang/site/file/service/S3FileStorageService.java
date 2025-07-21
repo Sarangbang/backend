@@ -1,6 +1,7 @@
 package sarangbang.site.file.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
@@ -10,9 +11,14 @@ import sarangbang.site.file.exception.FileStorageException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
+import java.time.Duration;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "s3")
@@ -20,6 +26,7 @@ import java.io.IOException;
 public class S3FileStorageService implements FileStorageService {
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     @Value("${app.storage.bucket-name}")
     private String bucketName;
@@ -83,4 +90,27 @@ public class S3FileStorageService implements FileStorageService {
             throw new FileStorageException("S3 파일 존재 확인 실패: " + filePath, e);
         }
     }
+
+    public String generatePresignedUrl(String objectKey, Duration expiration) {
+        try {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(objectKey)
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(10))
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+
+            PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+
+            return presignedRequest.url().toString();
+
+        } catch (Exception e) {
+            log.error("Presigned URL 생성 실패: {}", e.getMessage(), e);
+            throw new FileStorageException("Presigned URL 생성에 실패했습니다.");
+        }
+    }
+
 }
