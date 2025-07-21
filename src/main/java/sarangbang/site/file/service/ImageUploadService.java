@@ -125,7 +125,7 @@ public class ImageUploadService {
     }
 
     // 파일 유효성 검증
-    private void validateImageFile(MultipartFile file) {
+    public void validateImageFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new FileStorageException("업로드할 파일을 선택해주세요.");
         }

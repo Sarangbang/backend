@@ -25,7 +25,10 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
             "    cm.user.id, " +
             "    cv.imgUrl," +
             "    CASE WHEN cv.status IS NOT NULL THEN cv.status ELSE 'PENDING' END," +
-            "    cm.user.nickname) " +
+            "    cm.user.nickname, " +
+            "    cm.role, " +
+            "    cv.content, " +
+            "    cv.verifiedAt) " +
             "FROM ChallengeMember cm " +
             "LEFT JOIN ChallengeVerification cv ON cm.challenge = cv.challenge AND cm.user = cv.user " +
             "AND cv.verifiedAt BETWEEN :startDate AND :endDate " +

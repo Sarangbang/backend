@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +30,13 @@ public class ChallengeVerificationController {
 
     private final ChallengeVerificationService challengeVerificationService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "챌린지 인증", description = "챌린지 참가자가 인증을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200", 
                     description = "인증 등록 성공",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation =
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation =
                             ChallengeVerificationResponseDTO.class))
             ),
             @ApiResponse(
@@ -52,7 +53,7 @@ public class ChallengeVerificationController {
     })
     
     public ResponseEntity<ChallengeVerificationResponseDTO> createVerification(
-            @RequestBody @Valid ChallengeVerificationRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @ModelAttribute @Valid ChallengeVerificationRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
             String userId = userDetails.getId();

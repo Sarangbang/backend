@@ -12,6 +12,8 @@ import sarangbang.site.challengeverification.dto.*;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
+import sarangbang.site.file.enums.ImageType;
+import sarangbang.site.file.service.ImageSaveFactory;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
@@ -30,6 +32,7 @@ public class ChallengeVerificationService {
     private final ChallengeService challengeService;
     private final ChallengeMemberService challengeMemberService;
     private final UserService userService;
+    private final ImageSaveFactory imageSaveFactory;
 
     public ChallengeVerificationResponseDTO createVerification(String userId, ChallengeVerificationRequestDTO dto) {
 
@@ -45,9 +48,11 @@ public class ChallengeVerificationService {
         // 4. 오늘 이미 인증했는지 확인
         validateDailyVerification(challenge, user);
 
+        String imgUrl = imageSaveFactory.getImageUploadService(dto.getImageFile(), ImageType.VERTIFICATION, dto.getChallengeId());
+
         // 5. 인증 엔티티 생성 및 저장
         ChallengeVerification verification = new ChallengeVerification(LocalDateTime.now(),
-                dto.getImgUrl(), dto.getContent(), ChallengeVerificationStatus.APPROVED, null,
+                imgUrl, dto.getContent(), ChallengeVerificationStatus.APPROVED, null,
                 challenge, user
         );
 

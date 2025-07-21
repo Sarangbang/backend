@@ -20,6 +20,8 @@ public class ChallengeResponseDto {
     private int currentParticipants;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Long categoryId;
+    private String categoryName;
 
     public ChallengeResponseDto(Challenge challenge, int currentParticipants) {
         this.id = challenge.getId();
@@ -30,6 +32,7 @@ public class ChallengeResponseDto {
         this.currentParticipants = currentParticipants;
         this.startDate = challenge.getStartDate();
         this.endDate = challenge.getEndDate();
-
+        this.categoryId = challenge.getChallengeCategory().getCategoryId();
+        this.categoryName = challenge.getChallengeCategory().getCategoryName();
     }
 }

@@ -13,9 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import sarangbang.site.challenge.dto.ChallengeDetailResponseDto;
 import sarangbang.site.challenge.dto.ChallengePopularityResponseDTO;
@@ -42,11 +44,11 @@ public class ChallengeController {
             @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
     })
-    @PostMapping
-    public ResponseEntity<ChallengeDTO> saveChallenge(@RequestBody ChallengeDTO challengeDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ChallengeDTO> saveChallenge(@RequestPart ChallengeDTO challengeDTO, @RequestPart(value = "imageFile", required = false) MultipartFile imageFile, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             log.debug("챌린지 등록 요청 : {}, 요청자 : {}", challengeDTO, userDetails.getId());
-            ChallengeDTO saveChallenge = challengeService.saveChallenge(challengeDTO, userDetails.getId());
+            ChallengeDTO saveChallenge = challengeService.saveChallenge(challengeDTO, userDetails.getId(), imageFile);
             return ResponseEntity.ok(saveChallenge);
 
         } catch (IllegalArgumentException | RegionNotFoundException e) {
