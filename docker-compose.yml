@@ -47,20 +47,20 @@ services:
     image: minio/minio:latest
     container_name: minio
     ports:
-      - "9000:9000"   # MinIO API 포트 (파일 업로드/다운로드)
-      - "9001:9001"   # MinIO 웹 관리 콘솔 포트
+      - "${MINIO_API_PORT:-9000}:9000"    # MinIO API 포트 (환경 변수로 관리 또는 기본값 9000)
+      - "${MINIO_CONSOLE_PORT:-9001}:9001" # MinIO Console 포트 (환경 변수로 관리 또는 기본값 9001)
+    profiles:
+      - "dev"
     environment:
-      # MinIO 관리자 계정 (바꿔도 됩니다)
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
-    # MinIO 서버 실행 명령어
-    command: server /data --console-address ":9001"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}       # .env 파일 또는 기본값 minioadmin 사용
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin} # .env 파일 또는 기본값 minioadmin 사용
     volumes:
       # MinIO 데이터를 저장할 볼륨 (컨테이너 삭제해도 데이터 유지)
       - minio-data:/data
     networks:
       - sarangbang-network
     restart: always
+    command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s

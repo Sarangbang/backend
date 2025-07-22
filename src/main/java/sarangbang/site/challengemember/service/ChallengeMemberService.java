@@ -11,9 +11,11 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.dto.ChallengeMemberDTO;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
+import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class ChallengeMemberService {
     private final ChallengeRepository challengeRepository;
     private final UserService userService;
     private final ChallengeVerificationRepository challengeVerificationRepository;
+    private final FileStorageService fileStorageService;
 
     // 챌린지 오너 저장
     public void saveChallengeOwner(String userId, Long challengeId) {
@@ -137,7 +140,8 @@ public class ChallengeMemberService {
             dto.add(new ChallengeMemberResponseDTO(
                     challenge,
                     currentParticipant,
-                    mem.get().getRole()
+                    mem.get().getRole(),
+                    fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10))
             ));
         }
 

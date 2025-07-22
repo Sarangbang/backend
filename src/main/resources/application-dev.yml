@@ -18,35 +18,3 @@ spring:
   data:
     mongodb:
       uri: ${DEV_DB_MONGO_URI:mongodb://root:1234@localhost:27017/mongo?authSource=admin}
-  
-  # 파일 업로드 설정
-  servlet:
-    multipart:
-      max-file-size: 10MB      # 개별 파일 최대 크기
-      max-request-size: 50MB   # 전체 요청 최대 크기
-      enabled: true            # 멀티파트 업로드 활성화
-
-# MinIO 설정 (S3 호환 저장소)
-minio:
-  url: ${MINIO_URL:http://localhost:9000}           # MinIO 서버 주소
-  access-key: ${MINIO_ACCESS_KEY:minioadmin}        # 접근 키
-  secret-key: ${MINIO_SECRET_KEY:minioadmin123}     # 비밀 키
-  bucket-name: ${MINIO_BUCKET:sarangbang-files}     # 버킷 이름
-
-# 애플리케이션 설정
-app:
-  upload:
-    max-file-size: 5242880  # 5MB in bytes
-    allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
-  
-  storage:
-    type: minio                # 저장소 타입 (local/minio/s3)
-    public-url: ${MINIO_PUBLIC_URL:http://localhost:9000/sarangbang-files} # MinIO 공개 URL
-
-logging:
-  level:
-    sarangbang.site.file: DEBUG
-    sarangbang.site.file.service: DEBUG
-    sarangbang.site.file.controller: DEBUG
-    io.minio: DEBUG
-    org.springframework.web.multipart: DEBUG
