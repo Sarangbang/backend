@@ -21,6 +21,7 @@ import sarangbang.site.user.exception.UserNotFoundException;
 import sarangbang.site.user.service.UserService;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 
 @Tag(name = "User", description = "유저 관련 API")
@@ -87,9 +88,9 @@ public class UserController {
             ) {
         try{
             userService.updateUserNickName(userDetails.getId(), updateDto);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
         } catch(NicknameAlreadyExistsException | SQLException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", "이미 존재하는 닉네임입니다."));
         }
     }
 
