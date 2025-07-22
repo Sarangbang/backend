@@ -2,12 +2,12 @@ package sarangbang.site.file.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
+import sarangbang.site.global.config.StorageProperties;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -27,16 +27,14 @@ public class S3FileStorageService implements FileStorageService {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
-
-    @Value("${app.storage.bucket-name}")
-    private String bucketName;
+    private final StorageProperties storageProperties;
 
     @Override
     public String uploadFile(MultipartFile file, String filePath) {
         try {
             s3Client.putObject(
                     PutObjectRequest.builder()
-                            .bucket(bucketName)
+                            .bucket(storageProperties.getBucket())
                             .key(filePath)
                             .contentType(file.getContentType())
                             .build(),
@@ -54,7 +52,7 @@ public class S3FileStorageService implements FileStorageService {
             GetObjectResponse response;
             byte[] data = s3Client.getObject(
                     GetObjectRequest.builder()
-                            .bucket(bucketName)
+                            .bucket(storageProperties.getBucket())
                             .key(filePath)
                             .build()
             ).readAllBytes();
@@ -69,7 +67,7 @@ public class S3FileStorageService implements FileStorageService {
     public void deleteFile(String filePath) {
         try {
             s3Client.deleteObject(DeleteObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(storageProperties.getBucket())
                     .key(filePath)
                     .build());
         } catch (Exception e) {
@@ -81,7 +79,7 @@ public class S3FileStorageService implements FileStorageService {
     public boolean fileExists(String filePath) {
         try {
             s3Client.headObject(HeadObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(storageProperties.getBucket())
                     .key(filePath)
                     .build());
             return true;
@@ -92,10 +90,10 @@ public class S3FileStorageService implements FileStorageService {
         }
     }
 
-    public String generatePresignedUrl(String objectKey, Duration expiration) {
+    public String generatePresignedUrl(String objectKey, Duration expiration) throws FileStorageException {
         try {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(storageProperties.getBucket())
                     .key(objectKey)
                     .build();
 

@@ -19,26 +19,10 @@ spring:
     mongodb:
       uri: ${DB_MONGO_URI:mongodb://root:1234@localhost:27017/mongo?authSource=admin}
 
-  # 파일 업로드 설정
-  servlet:
-    multipart:
-      max-file-size: 10MB      # 개별 파일 최대 크기
-      max-request-size: 50MB   # 전체 요청 최대 크기
-      enabled: true            # 멀티파트 업로드 활성화
-
 # 애플리케이션 설정
 app:
-  base-url: https://api.ilsimdongnae.com
-
-  upload:
-    max-file-size: 5242880  # 5MB in bytes
-    allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
-
   storage:
     type: s3
-    bucket-name: ilsim-uploaded-files
-    region: ap-northeast-2
-    public-url: https://ilsim-uploaded-files.s3.ap-northeast-2.amazonaws.com
 
 discord:
   webhook:

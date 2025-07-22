@@ -69,12 +69,13 @@ app:
     max-file-size: 5242880  # 5MB
     allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
 
-  storage:
-    type: ${STORAGE_TYPE:minio}
-    endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
-    bucket-name: ${STORAGE_BUCKET:ilsim-uploaded-files}
-    access-key: ${STORAGE_ACCESS_KEY:minioadmin}
-    secret-key: ${STORAGE_SECRET_KEY:minioadmin123}
+storage:
+  type: ${STORAGE_TYPE:minio}
+  endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
+  region: ${STORAGE_REGION:ap-northeast-2}
+  bucket: ${STORAGE_BUCKET:ilsim-uploaded-files}
+  access-key: ${STORAGE_ACCESS_KEY:minioadmin}
+  secret-key: ${STORAGE_SECRET_KEY:minioadmin}
 
 management:
   endpoints:

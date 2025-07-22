@@ -1,12 +1,12 @@
 package sarangbang.site.file.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
+import sarangbang.site.global.config.StorageProperties;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,28 +21,13 @@ import java.util.UUID;
 public class ImageUploadService {
 
     private final FileStorageService fileStorageService; // 실제 파일 저장 담당 인터페이스
+    private final StorageProperties storageProperties; // 스토리지 설정 정보
 
     @Value("${app.upload.max-file-size:5242880}")
     private long maxFileSize;
 
     @Value("${app.upload.allowed-image-types:image/jpeg,image/jpg,image/png,image/gif,image/webp}")
     private String allowedImageTypesStr;
-
-    @Value("${app.storage.public-url}")
-    private String publicUrl;
-
-    @Value("${app.base-url}")
-    private String baseUrl;
-
-    @Value("${app.storage.type}")
-    private String storageType;
-
-    @PostConstruct
-    public void init() {
-        log.info("✅ [ImageUploadService] publicUrl = {}", publicUrl);
-        log.info("✅ [ImageUploadService] baseUrl = {}", baseUrl);
-        log.info("✅ [ImageUploadService] fileStorageService = {}", fileStorageService.getClass().getSimpleName());
-    }
 
     // 회원 프로필 이미지 저장
     public String storeProfileImage(MultipartFile file, Long userId) {
@@ -63,7 +48,7 @@ public class ImageUploadService {
             String key = fileStorageService.uploadFile(file, filePath);
 
             log.info("프로필 이미지 업로드 완료: userId={}, key={}", userId, key);
-            return buildReturnValue(key);
+            return key;
 
         } catch (Exception e) {
             log.error("프로필 이미지 업로드 실패: userId={}", userId, e);
@@ -85,7 +70,7 @@ public class ImageUploadService {
             String key = fileStorageService.uploadFile(file, filePath);
 
             log.info("챌린지 이미지 업로드 완료: challengeId={}, key={}", challengeId, key);
-            return buildReturnValue(key);
+            return key;
         } catch (Exception e) {
             log.error("챌린지 이미지 업로드 실패: challengeId={}", challengeId, e);
             throw new FileStorageException("챌린지 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -111,7 +96,7 @@ public class ImageUploadService {
             String key = fileStorageService.uploadFile(file, filePath);
 
             log.info("인증 이미지 업로드 완료: challengeId={}, key={}", challengeId, key);
-            return buildReturnValue(key);
+            return key;
         } catch (Exception e) {
             log.error("인증 이미지 업로드 실패: challengeId={}", challengeId, e);
             throw new FileStorageException("인증 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -154,19 +139,5 @@ public class ImageUploadService {
         return originalFilename.substring(originalFilename.lastIndexOf("."));
     }
 
-    // 업로드 후 분기 처리
-    private String buildReturnValue(String filePath) {
-        if ("s3".equals(storageType)) {
-            // S3는 object key만 DB에 저장
-            return filePath;
-        } else {
-            // MinIO는 접근 가능한 URL까지 반환 (프록시 URL 기반)
-            if (publicUrl != null && !publicUrl.isBlank()) {
-                return publicUrl + "/" + filePath;
-            } else {
-                return baseUrl + "/api/files/" + filePath;
-            }
-        }
-    }
 
 }
