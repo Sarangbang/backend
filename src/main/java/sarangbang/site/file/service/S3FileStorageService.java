@@ -15,7 +15,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.storage.type", havingValue = "s3")
+@ConditionalOnProperty(name = "storage.type", havingValue = "s3")
 @Profile("prod")
 public class S3FileStorageService implements FileStorageService {
 
