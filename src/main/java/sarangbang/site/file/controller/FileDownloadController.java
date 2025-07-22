@@ -30,8 +30,6 @@ public class FileDownloadController {
 
     private final FileStorageService fileStorageService;
 
-    private final S3FileStorageService s3FileStorageService;
-
     @Value("${app.base-url}")
     private String baseUrl;
 
@@ -41,7 +39,7 @@ public class FileDownloadController {
     @GetMapping("/presigned-url")
     public ResponseEntity<String> getPresignedUrl(@RequestParam String key) {
         try {
-            if ("s3".equalsIgnoreCase(storageType)) {
+            if ("s3".equalsIgnoreCase(storageType) && fileStorageService instanceof S3FileStorageService s3FileStorageService) {
                 Duration expireTime = Duration.ofMinutes(10);
                 String url = s3FileStorageService.generatePresignedUrl(key, expireTime);
                 return ResponseEntity.ok(url);
