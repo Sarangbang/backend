@@ -20,6 +20,8 @@ import sarangbang.site.user.dto.UserUpdateRequestDto;
 import sarangbang.site.user.exception.UserNotFoundException;
 import sarangbang.site.user.service.UserService;
 
+import java.sql.SQLException;
+
 
 @Tag(name = "User", description = "유저 관련 API")
 @RestController
@@ -86,7 +88,7 @@ public class UserController {
         try{
             userService.updateUserNickName(userDetails.getId(), updateDto);
             return ResponseEntity.ok().build();
-        } catch(NicknameAlreadyExistsException e) {
+        } catch(NicknameAlreadyExistsException | SQLException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

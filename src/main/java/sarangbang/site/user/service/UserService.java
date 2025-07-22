@@ -19,6 +19,8 @@ import sarangbang.site.user.exception.UserExceptionMessage;
 import sarangbang.site.user.exception.UserNotFoundException;
 import sarangbang.site.user.repository.UserRepository;
 
+import java.sql.SQLException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -88,7 +90,7 @@ public class UserService {
 
     // 닉네임 변경
     @Transactional
-    public void updateUserNickName(String userId, UserUpdateNicknameRequestDTO updateDto) {
+    public void updateUserNickName(String userId, UserUpdateNicknameRequestDTO updateDto) throws SQLException {
         User user = getUserById(userId);
 
         validateUserNickname(updateDto.getNickname());
