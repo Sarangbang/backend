@@ -1,6 +1,9 @@
 package sarangbang.site.file.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import sarangbang.site.file.exception.FileStorageException;
+
+import java.time.Duration;
 
 /**
  * 파일 저장소 서비스 인터페이스
@@ -27,7 +30,7 @@ public interface FileStorageService {
      * @param filePath 저장 경로 (예: "profiles/123/profile.jpg")
      * @throws RuntimeException 저장 실패 시
      */
-    void uploadFile(MultipartFile file, String filePath);
+    String uploadFile(MultipartFile file, String filePath);
 
     /**
      * 파일을 다운로드합니다.
@@ -53,4 +56,13 @@ public interface FileStorageService {
      * @return 존재하면 true, 없으면 false
      */
     boolean fileExists(String filePath);
+
+    /**
+     * 파일에 대한 사전 서명된 URL을 생성합니다.
+     *
+     * @param filePath 파일 경로
+     * @param timeToLive URL의 유효 기간
+     * @return 사전 서명된 URL
+     */
+    String generatePresignedUrl(String filePath, Duration timeToLive) throws FileStorageException;
 }

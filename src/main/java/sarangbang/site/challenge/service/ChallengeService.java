@@ -21,10 +21,12 @@ import sarangbang.site.challengemember.service.ChallengeMemberService;
 
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.file.enums.ImageType;
+import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.file.service.ImageSaveFactory;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class ChallengeService {
     private final ChallengeMemberRepository challengeMemberRepository;
     private final RegionService regionService;
     private final ImageSaveFactory imageSaveFactory;
+    private final FileStorageService fileStorageService;
 
     // 챌린지 등록
     @Transactional
@@ -72,7 +75,7 @@ public class ChallengeService {
 
         ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getRegion().getRegionId(), challenge.getTitle(), challenge.getDescription(),
                 challenge.getParticipants(), challenge.getMethod(), challenge.getStartDate(), challenge.getEndDate(),
-                challenge.getImage(), challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
+                fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10)) , challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
 
         return challengeDTO;
     }
@@ -86,8 +89,8 @@ public class ChallengeService {
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
-
+            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants,
+                    fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10))));
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
@@ -103,7 +106,8 @@ public class ChallengeService {
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
+            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants,
+                    fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10))));
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, pageable, challenges.getTotalElements());
