@@ -10,6 +10,7 @@ import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
+import sarangbang.site.user.dto.UserProfileResponseDTO;
 import sarangbang.site.user.dto.UserUpdateNicknameRequestDTO;
 import sarangbang.site.user.dto.UserUpdatePasswordRequestDTO;
 import sarangbang.site.user.dto.UserUpdateRequestDto;
@@ -53,6 +54,21 @@ public class UserService {
         user.updateProfile(updateDto.getNickname(), updateDto.getGender(), region);
     }
 
+    // 로그인 된 사용자 정보 확인
+    public UserProfileResponseDTO getUserProfile(String userId) {
+        User user = getUserById(userId);
+
+        UserProfileResponseDTO dto = new UserProfileResponseDTO(
+                user.getEmail(),
+                user.getNickname(),
+                user.getProfileImageUrl(),
+                user.getGender(),
+                user.getRegion().getFullAddress()
+        );
+
+        return dto;
+    }
+
     // 비밀번호 변경
     @Transactional
     public void updateUserPassword(String userId, UserUpdatePasswordRequestDTO updateDto) {
@@ -62,14 +78,18 @@ public class UserService {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
 
+        if(!updateDto.passwordMatched()) {
+            throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
+        }
+
         String encodeNewPassword = passwordEncoder.encode(updateDto.getNewPassword());
         user.updatePassword(encodeNewPassword);
     }
 
     // 닉네임 변경
     @Transactional
-    public void updateUserNickName(String nickname, UserUpdateNicknameRequestDTO updateDto) {
-        User user = getUserById(nickname);
+    public void updateUserNickName(String userId, UserUpdateNicknameRequestDTO updateDto) {
+        User user = getUserById(userId);
 
         validateUserNickname(updateDto.getNickname());
 

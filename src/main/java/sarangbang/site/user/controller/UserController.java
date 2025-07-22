@@ -1,6 +1,7 @@
 package sarangbang.site.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
+import sarangbang.site.user.dto.UserProfileResponseDTO;
 import sarangbang.site.user.dto.UserUpdateNicknameRequestDTO;
 import sarangbang.site.user.dto.UserUpdatePasswordRequestDTO;
 import sarangbang.site.user.dto.UserUpdateRequestDto;
@@ -37,6 +39,22 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok().build();
+    }
+
+    // 로그인 된 사용자 정보 확인
+    @Operation(summary = "사용자 정보 확인", description = "로그인 된 사용자의 정보를 확인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 정보 확인 성공"),
+            @ApiResponse(responseCode = "400", description = "사용자 정보 확인 실패", content = @Content(mediaType = "application/json"))
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponseDTO> getUserProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try{
+            UserProfileResponseDTO dto = userService.getUserProfile(userDetails.getId());
+            return ResponseEntity.ok().body(dto);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // 비밀번호 변경
@@ -70,7 +88,7 @@ public class UserController {
             @RequestBody UserUpdateNicknameRequestDTO updateDto
             ) {
         try{
-            userService.updateUserNickName(userDetails.getNickname(), updateDto);
+            userService.updateUserNickName(userDetails.getId(), updateDto);
             return ResponseEntity.ok().build();
         } catch(NicknameAlreadyExistsException | UserNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -18,4 +18,13 @@ public class UserUpdatePasswordRequestDTO {
     @Size(min = 8, message = "비밀번호는 최소 8자 이상 입력해주세요.")
     @Schema(description ="새 비밀번호", example = "23456789")
     private String newPassword;
+
+    @NotBlank(message = "새 비밀번호 확인을 입력해주세요.")
+    @Size(min = 8, message = "비밀번호 확인은 최소 8자 이상 입력해주세요.")
+    @Schema(description = "새 비밀번호 확인", example = "12345678")
+    private String newPasswordCheck;
+
+    public boolean passwordMatched() {
+        return newPassword.equals(newPasswordCheck);
+    }
 }
