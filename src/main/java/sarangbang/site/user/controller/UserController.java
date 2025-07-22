@@ -49,12 +49,8 @@ public class UserController {
     })
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> getUserProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        try{
-            UserProfileResponseDTO dto = userService.getUserProfile(userDetails.getId());
-            return ResponseEntity.ok().body(dto);
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        UserProfileResponseDTO dto = userService.getUserProfile(userDetails.getId());
+        return ResponseEntity.ok().body(dto);
     }
 
     // 비밀번호 변경
@@ -71,7 +67,7 @@ public class UserController {
         try {
             userService.updateUserPassword(userDetails.getId(), updateDto);
             return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException | UserNotFoundException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -90,7 +86,7 @@ public class UserController {
         try{
             userService.updateUserNickName(userDetails.getId(), updateDto);
             return ResponseEntity.ok().build();
-        } catch(NicknameAlreadyExistsException | UserNotFoundException e) {
+        } catch(NicknameAlreadyExistsException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
