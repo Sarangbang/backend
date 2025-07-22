@@ -13,10 +13,12 @@ import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
 import sarangbang.site.file.enums.ImageType;
+ import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.file.service.ImageSaveFactory;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +35,7 @@ public class ChallengeVerificationService {
     private final ChallengeMemberService challengeMemberService;
     private final UserService userService;
     private final ImageSaveFactory imageSaveFactory;
+    private final FileStorageService fileStorageService;
 
     public ChallengeVerificationResponseDTO createVerification(String userId, ChallengeVerificationRequestDTO dto) {
 
@@ -107,6 +110,11 @@ public class ChallengeVerificationService {
 
         List<ChallengeVerificationByDateDTO> challengeVerificationList =
                 challengeVerificationRepository.findByChallengeAndVerifiedAt(challenge.getId(), startDate, endDate);
+
+        for (ChallengeVerificationByDateDTO challengeVerificationByDateDTO : challengeVerificationList) {
+            // 인증자의 프로필 이미지 URL을 생성
+           challengeVerificationByDateDTO.setImgUrl(fileStorageService.generatePresignedUrl(challengeVerificationByDateDTO.getImgUrl(), Duration.ofMinutes(10)));
+        }
 
         return challengeVerificationList;
     }
