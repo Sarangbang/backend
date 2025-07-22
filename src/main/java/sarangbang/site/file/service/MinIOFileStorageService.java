@@ -42,7 +42,7 @@ public class MinIOFileStorageService implements FileStorageService {
     }
 
     @Override
-    public void uploadFile(MultipartFile file, String filePath) {
+    public String uploadFile(MultipartFile file, String filePath) {
         try {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -50,6 +50,7 @@ public class MinIOFileStorageService implements FileStorageService {
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
                     .build());
+            return filePath;
         } catch (Exception e) {
             throw new FileStorageException("업로드 실패", e);
         }

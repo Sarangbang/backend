@@ -32,7 +32,7 @@ public class S3FileStorageService implements FileStorageService {
     private String bucketName;
 
     @Override
-    public void uploadFile(MultipartFile file, String filePath) {
+    public String uploadFile(MultipartFile file, String filePath) {
         try {
             s3Client.putObject(
                     PutObjectRequest.builder()
@@ -42,6 +42,7 @@ public class S3FileStorageService implements FileStorageService {
                             .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize())
             );
+            return filePath; // object key를 그대로 리턴
         } catch (IOException e) {
             throw new FileStorageException("S3 업로드 실패: " + filePath, e);
         }

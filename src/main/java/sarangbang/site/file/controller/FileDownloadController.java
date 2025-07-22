@@ -2,6 +2,7 @@ package sarangbang.site.file.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,10 +32,28 @@ public class FileDownloadController {
 
     private final S3FileStorageService s3FileStorageService;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    @Value("${app.storage.type}")
+    private String storageType;
+
     @GetMapping("/presigned-url")
-    public ResponseEntity<String> getPresignedUrl(@RequestParam String path) {
-        String url = s3FileStorageService.generatePresignedUrl(path, Duration.ofMinutes(10));
-        return ResponseEntity.ok(url);
+    public ResponseEntity<String> getPresignedUrl(@RequestParam String key) {
+        try {
+            if ("s3".equalsIgnoreCase(storageType)) {
+                Duration expireTime = Duration.ofMinutes(10);
+                String url = s3FileStorageService.generatePresignedUrl(key, expireTime);
+                return ResponseEntity.ok(url);
+            } else {
+                // MinIO 등 프록시 방식 사용 시
+                String proxyUrl = baseUrl + "/api/files/" + key;
+                return ResponseEntity.ok(proxyUrl);
+            }
+        } catch (Exception e) {
+            log.error("presigned-url 생성 실패: key={}", key, e);
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**

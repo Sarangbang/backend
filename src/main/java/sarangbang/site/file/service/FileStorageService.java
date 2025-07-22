@@ -27,7 +27,7 @@ public interface FileStorageService {
      * @param filePath 저장 경로 (예: "profiles/123/profile.jpg")
      * @throws RuntimeException 저장 실패 시
      */
-    void uploadFile(MultipartFile file, String filePath);
+    String uploadFile(MultipartFile file, String filePath);
 
     /**
      * 파일을 다운로드합니다.

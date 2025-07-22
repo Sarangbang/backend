@@ -34,6 +34,9 @@ public class ImageUploadService {
     @Value("${app.base-url}")
     private String baseUrl;
 
+    @Value("${app.storage.type}")
+    private String storageType;
+
     @PostConstruct
     public void init() {
         log.info("✅ [ImageUploadService] publicUrl = {}", publicUrl);
@@ -57,20 +60,22 @@ public class ImageUploadService {
             String filePath = String.format("profiles/%d/profile%s", userId, extension);
 
             // 4. 파일 저장
-            fileStorageService.uploadFile(file, filePath);
+            String key = fileStorageService.uploadFile(file, filePath);
 
-            // 5. 접근 가능한 URL 생성
-            String imageUrl;
-            if (publicUrl != null && !publicUrl.isBlank()) {
-                imageUrl = publicUrl + "/" + filePath;
-            } else {
-                imageUrl = baseUrl + "/api/files/" + filePath; // MinIO 또는 프록시 사용 시
-            }
+            log.info("프로필 이미지 업로드 완료: userId={}, key={}", userId, key);
+            return buildReturnValue(key);
 
-            log.info("프로필 이미지 업로드 완료: userId={}, imageUrl={}", userId, imageUrl);
-
-            return imageUrl;
-
+//            // 5. 접근 가능한 URL 생성
+//            String imageUrl;
+//            if (publicUrl != null && !publicUrl.isBlank()) {
+//                imageUrl = publicUrl + "/" + filePath;
+//            } else {
+//                imageUrl = baseUrl + "/api/files/" + filePath; // MinIO 또는 프록시 사용 시
+//            }
+//
+//            log.info("프로필 이미지 업로드 완료: userId={}, imageUrl={}", userId, imageUrl);
+//
+//            return imageUrl;
         } catch (Exception e) {
             log.error("프로필 이미지 업로드 실패: userId={}", userId, e);
             throw new FileStorageException("프로필 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -86,16 +91,21 @@ public class ImageUploadService {
             validateImageFile(file);
             String extension = getExtension(file.getOriginalFilename());
             String filePath = String.format("challenges/%d/thumbnail%s", challengeId, extension);
-            fileStorageService.uploadFile(file, filePath);
 
-            String imageUrl;
-            if (publicUrl != null && !publicUrl.isBlank()) {
-                imageUrl = publicUrl + "/" + filePath;
-            } else {
-                imageUrl = baseUrl + "/api/files/" + filePath;
-            }
-            log.info("챌린지 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
-            return imageUrl;
+            // 파일 저장 (key 반환)
+            String key = fileStorageService.uploadFile(file, filePath);
+
+            log.info("챌린지 이미지 업로드 완료: challengeId={}, key={}", challengeId, key);
+            return buildReturnValue(key);
+
+//            String imageUrl;
+//            if (publicUrl != null && !publicUrl.isBlank()) {
+//                imageUrl = publicUrl + "/" + filePath;
+//            } else {
+//                imageUrl = baseUrl + "/api/files/" + filePath;
+//            }
+//            log.info("챌린지 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
+//            return imageUrl;
         } catch (Exception e) {
             log.error("챌린지 이미지 업로드 실패: challengeId={}", challengeId, e);
             throw new FileStorageException("챌린지 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -118,17 +128,17 @@ public class ImageUploadService {
             // 저장 경로: challenges/{챌린지ID}/{날짜}/{UUID}.jpg
             String filePath = String.format("challenges/%d/%s/%s%s",
                                     challengeId, date, uuid, file.getOriginalFilename());
-            String imageUrl;
-            if (publicUrl != null && !publicUrl.isBlank()) {
-                imageUrl = publicUrl + "/" + filePath;
-            } else {
-                imageUrl = baseUrl + "/api/files/" + filePath;
-            }
+//            String imageUrl;
+//            if (publicUrl != null && !publicUrl.isBlank()) {
+//                imageUrl = publicUrl + "/" + filePath;
+//            } else {
+//                imageUrl = baseUrl + "/api/files/" + filePath;
+//            }
 
-            fileStorageService.uploadFile(file, filePath);
+            String key = fileStorageService.uploadFile(file, filePath);
 
-            log.info("인증 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
-            return imageUrl;
+            log.info("인증 이미지 업로드 완료: challengeId={}, key={}", challengeId, key);
+            return buildReturnValue(key);
         } catch (Exception e) {
             log.error("인증 이미지 업로드 실패: challengeId={}", challengeId, e);
             throw new FileStorageException("인증 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -170,4 +180,20 @@ public class ImageUploadService {
         }
         return originalFilename.substring(originalFilename.lastIndexOf("."));
     }
+
+    // 업로드 후 분기 처리
+    private String buildReturnValue(String filePath) {
+        if ("s3".equals(storageType)) {
+            // S3는 object key만 DB에 저장
+            return filePath;
+        } else {
+            // MinIO는 접근 가능한 URL까지 반환 (프록시 URL 기반)
+            if (publicUrl != null && !publicUrl.isBlank()) {
+                return publicUrl + "/" + filePath;
+            } else {
+                return baseUrl + "/api/files/" + filePath;
+            }
+        }
+    }
+
 }
