@@ -69,7 +69,7 @@ public class UserController {
             ) {
         try {
             userService.updateUserPassword(userDetails.getId(), updateDto);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
@@ -88,7 +88,7 @@ public class UserController {
             ) {
         try{
             userService.updateUserNickName(userDetails.getId(), updateDto);
-            return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
+            return ResponseEntity.ok(Map.of("message", "닉네임이 성공적으로 변경되었습니다."));
         } catch(NicknameAlreadyExistsException | SQLException e) {
             return ResponseEntity.badRequest().body(Map.of("message", "이미 존재하는 닉네임입니다."));
         }
