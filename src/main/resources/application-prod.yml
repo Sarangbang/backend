@@ -26,21 +26,17 @@ spring:
       max-request-size: 50MB   # 전체 요청 최대 크기
       enabled: true            # 멀티파트 업로드 활성화
 
-# MinIO 설정 (S3 호환 저장소)
-minio:
-  url: ${MINIO_URL:http://localhost:9000}           # MinIO 서버 주소
-  access-key: ${MINIO_ACCESS_KEY:minioadmin}        # 접근 키
-  secret-key: ${MINIO_SECRET_KEY:minioadmin123}     # 비밀 키
-  bucket-name: ${MINIO_BUCKET:sarangbang-files}     # 버킷 이름
-
 # 애플리케이션 설정
 app:
   upload:
     max-file-size: 5242880  # 5MB in bytes
     allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
-  
+
   storage:
-    type: s3                # 저장소 타입 (운영환경: s3)
+    type: s3
+    bucket-name: ilsim-uploaded-files
+    region: ap-northeast-2
+    public-url: https://ilsim-uploaded-files.s3.ap-northeast-2.amazonaws.com
 
 discord:
   webhook:

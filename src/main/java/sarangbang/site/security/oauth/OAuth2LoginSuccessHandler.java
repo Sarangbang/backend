@@ -6,12 +6,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+import sarangbang.site.auth.service.RefreshTokenService;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.security.oauth.userinfo.GoogleUserInfo;
 import sarangbang.site.security.oauth.userinfo.KakaoUserInfo;
@@ -32,6 +34,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${oauth2.success.redirect.uri}")
     private String successRedirectUri;
@@ -77,10 +80,29 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 });
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), Collections.singletonList("ROLE_USER"));
+        
+        // AuthController와 동일하게 RefreshToken 생성 및 쿠키 설정
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+        refreshTokenService.saveToken(user.getId(), refreshToken);
 
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("None")
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+
+        // AuthController 로그인과 동일한 사용자 정보를 쿼리 파라미터에 포함
+        // 한국어 닉네임 등의 특수문자가 포함될 수 있으므로 인코딩 처리
         String targetUrl = UriComponentsBuilder.fromUriString(successRedirectUri)
                 .queryParam("accessToken", accessToken)
+                .queryParam("uuid", user.getId())
+                .queryParam("nickname", user.getNickname())
+                .queryParam("profileImageUrl", user.getProfileImageUrl())
                 .queryParam("profileComplete", user.isProfileComplete())
+                .encode() // 명시적으로 URL 인코딩 처리
                 .build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

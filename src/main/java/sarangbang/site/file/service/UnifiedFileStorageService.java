@@ -4,6 +4,7 @@ import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 
 @Service
 @RequiredArgsConstructor
+@Profile("dev")
 public class UnifiedFileStorageService implements FileStorageService {
 
     private final MinioClient minioClient;

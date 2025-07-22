@@ -41,8 +41,8 @@ app:
   
   storage:
     type: minio                # 저장소 타입 (local/minio/s3)
+    public-url: ${MINIO_PUBLIC_URL:http://localhost:9000/sarangbang-files} # MinIO 공개 URL
 
-# 로깅 설정
 logging:
   level:
     sarangbang.site.file: DEBUG

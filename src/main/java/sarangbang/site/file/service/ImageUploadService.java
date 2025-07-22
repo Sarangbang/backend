@@ -27,6 +27,9 @@ public class ImageUploadService {
     @Value("${app.upload.allowed-image-types:image/jpeg,image/jpg,image/png,image/gif,image/webp}")
     private String allowedImageTypesStr;
 
+    @Value("${app.storage.public-url}")
+    private String publicUrl;
+
     // 회원 프로필 이미지 저장
     public String storeProfileImage(MultipartFile file, Long userId) {
         try {
@@ -46,7 +49,12 @@ public class ImageUploadService {
             fileStorageService.uploadFile(file, filePath);
 
             // 5. 접근 가능한 URL 생성
-            String imageUrl = "/api/files/" + filePath;
+            String imageUrl;
+            if (publicUrl != null && !publicUrl.isBlank()) {
+                imageUrl = publicUrl + "/" + filePath;
+            } else {
+                imageUrl = "/api/files/" + filePath; // MinIO 또는 프록시 사용 시
+            }
 
             log.info("프로필 이미지 업로드 완료: userId={}, imageUrl={}", userId, imageUrl);
 
@@ -68,7 +76,13 @@ public class ImageUploadService {
             String extension = getExtension(file.getOriginalFilename());
             String filePath = String.format("challenges/%d/thumbnail%s", challengeId, extension);
             fileStorageService.uploadFile(file, filePath);
-            String imageUrl = "/api/files/" + filePath;
+
+            String imageUrl;
+            if (publicUrl != null && !publicUrl.isBlank()) {
+                imageUrl = publicUrl + "/" + filePath;
+            } else {
+                imageUrl = "/api/files/" + filePath;
+            }
             log.info("챌린지 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
             return imageUrl;
         } catch (Exception e) {
@@ -93,10 +107,14 @@ public class ImageUploadService {
             // 저장 경로: challenges/{챌린지ID}/{날짜}/{UUID}.jpg
             String filePath = String.format("challenges/%d/%s/%s%s",
                                     challengeId, date, uuid, file.getOriginalFilename());
+            String imageUrl;
+            if (publicUrl != null && !publicUrl.isBlank()) {
+                imageUrl = publicUrl + "/" + filePath;
+            } else {
+                imageUrl = "/api/files/" + filePath;
+            }
 
             fileStorageService.uploadFile(file, filePath);
-
-            String imageUrl = "/api/files/" + filePath;
 
             log.info("인증 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
             return imageUrl;
