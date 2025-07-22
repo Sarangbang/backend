@@ -39,7 +39,7 @@ public class UserService {
     public void updateUserProfile(String userId, UserUpdateRequestDto updateDto) throws IllegalArgumentException, NicknameAlreadyExistsException {
         User user = getUserById(userId);
 
-        validateUserNickname(user.getNickname());
+        validateUserNickname(updateDto.getNickname());
 
         Region region = regionService.findRegionById(updateDto.getRegionId());
 
