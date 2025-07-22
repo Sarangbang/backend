@@ -8,7 +8,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import sarangbang.site.chat.dto.ChatMessage;
+import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.Sender;
 import sarangbang.site.chat.enums.MessageType;
 import sarangbang.site.chat.service.ChatService;
@@ -48,7 +48,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // 5. 다른 사용자들에게 새로운 사용자의 입장을 알리는 메시지를 보냅니다.
         // 수정된 부분: ChatMessage 생성자 순서 및 인자 수정
-        ChatMessage entryMessage = new ChatMessage(MessageType.ENTER, roomId, sender, sender.getNickname() + "님이 입장하셨습니다.");
+        ChatMessageDto entryMessage = new ChatMessageDto(MessageType.ENTER, roomId, sender, sender.getNickname() + "님이 입장하셨습니다.");
         chatService.sendMessageToRoom(roomId, entryMessage);
     }
 
@@ -60,7 +60,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        ChatMessage chatMessage = objectMapper.readValue(payload, ChatMessage.class);
+        ChatMessageDto chatMessage = objectMapper.readValue(payload, ChatMessageDto.class);
         String roomId = (String) session.getAttributes().get("roomId");
         chatService.sendMessageToRoom(roomId, chatMessage);
     }
@@ -79,7 +79,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // 다른 사용자들에게 퇴장 사실을 알리는 메시지를 보냅니다.
         // 수정된 부분: ChatMessage 생성자 순서 및 인자 수정
-        ChatMessage exitMessage = new ChatMessage(MessageType.LEAVE, roomId, sender, sender.getNickname() + "님이 퇴장하셨습니다.");
+        ChatMessageDto exitMessage = new ChatMessageDto(MessageType.LEAVE, roomId, sender, sender.getNickname() + "님이 퇴장하셨습니다.");
         chatService.sendMessageToRoom(roomId, exitMessage);
     }
 }

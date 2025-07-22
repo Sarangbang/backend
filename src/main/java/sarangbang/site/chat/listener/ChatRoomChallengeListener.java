@@ -21,7 +21,7 @@ public class ChatRoomChallengeListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleChallengeCreatedEvent(ChallengeCreatedEvent event) {
-        log.info("챌린지 생성 이벤트 수신. 챌린지 ID: {}" + event.getChallengeId());
+        log.info("챌린지 생성 이벤트 수신. 챌린지 ID: {}", event.getChallengeId());
 
         List<String> participantList = new ArrayList<>();
         participantList.add(event.getCreatorId());

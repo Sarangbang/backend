@@ -8,7 +8,7 @@ import sarangbang.site.chat.enums.MessageType;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessage {
+public class ChatMessageDto {
 
     // 메시지 유형 (입장, 퇴장, 대화)
     private MessageType type;

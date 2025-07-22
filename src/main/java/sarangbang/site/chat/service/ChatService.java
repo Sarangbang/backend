@@ -1,11 +1,19 @@
 package sarangbang.site.chat.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import sarangbang.site.chat.dto.ChatMessageDto;
+import sarangbang.site.chat.dto.MessageHistoryResponseDto;
+import sarangbang.site.chat.entity.ChatMessage;
+import sarangbang.site.chat.repository.ChatMessageRepository;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,15 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * 채팅방 관리 및 메시지 발송 로직을 담당하는 서비스 클래스입니다.
  */
 @Service
+@RequiredArgsConstructor
 public class ChatService {
     // 채팅방 ID와 해당 방에 참여한 세션들의 Set을 매핑하여 관리합니다.
     // 동시성 문제를 방지하기 위해 ConcurrentHashMap을 사용합니다.
     private final Map<String, Set<WebSocketSession>> chatRooms = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
-
-    public ChatService(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private final ChatMessageRepository chatMessageRepository;
 
     /**
      * 특정 채팅방에 새로운 세션을 추가합니다.
@@ -32,6 +38,20 @@ public class ChatService {
     public void addSessionToRoom(String roomId, WebSocketSession session) {
         // computeIfAbsent: 키(roomId)에 해당하는 값이 없으면 새로운 HashSet을 생성하고, 있으면 기존 Set을 반환합니다.
         chatRooms.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(session);
+        // 이전 대화 기록을 조회하여 새로운 세션에만 전송
+        sendPreviousMessages(roomId, session);
+    }
+
+    private void sendPreviousMessages(String roomId, WebSocketSession session) {
+        List<ChatMessage> messages = chatMessageRepository.findByRoomIdOrderByCreatedAtAsc(roomId);
+        try {
+            for (ChatMessage message : messages) {
+                String messagePayload = objectMapper.writeValueAsString(message);
+                session.sendMessage(new TextMessage(messagePayload));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -54,23 +74,36 @@ public class ChatService {
      * @param roomId 메시지를 보낼 채팅방 ID
      * @param message 전송할 메시지 객체
      */
-    public void sendMessageToRoom(String roomId, Object message) {
-        if (chatRooms.containsKey(roomId)) {
-            // 메시지 객체를 JSON 문자열로 변환합니다.
-            try {
-                String messagePayload = objectMapper.writeValueAsString(message);
-                TextMessage textMessage = new TextMessage(messagePayload);
+    public void sendMessageToRoom(String roomId, ChatMessageDto message) {
+        // 메시지 객체를 JSON 문자열로 변환합니다.
+        try {
+            ChatMessage chatMessage = new ChatMessage(message.getRoomId(), message.getType(), message.getSender(), message.getMessage());
+            chatMessageRepository.save(chatMessage);
 
-                // 해당 채팅방의 모든 세션에 대해 반복하며 메시지를 전송합니다.
+            String messagePayload = objectMapper.writeValueAsString(message);
+            TextMessage textMessage = new TextMessage(messagePayload);
+
+            // 해당 채팅방의 모든 세션에 대해 반복하며 메시지를 전송합니다.
+            if (chatRooms.containsKey(roomId)) {
                 for (WebSocketSession session : chatRooms.get(roomId)) {
                     if (session.isOpen()) {
                         session.sendMessage(textMessage);
                     }
                 }
-            } catch (IOException e) {
-                // 로깅 또는 예외 처리
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            // 로깅 또는 예외 처리
+            e.printStackTrace();
         }
+    }
+
+    public MessageHistoryResponseDto getMessageHistory(String roomId, Pageable pageable) {
+
+        Slice<ChatMessage> messageSlice = chatMessageRepository.findByRoomId(roomId, pageable);
+        List<ChatMessage> messages = messageSlice.getContent().stream()
+                .map(doc -> new ChatMessage(doc.get_id(), doc.getRoomId(), doc.getType(), doc.getSender(), doc.getMessage(), doc.getCreatedAt())).toList();
+
+        MessageHistoryResponseDto responseDto = new MessageHistoryResponseDto(messages, messageSlice.hasNext());
+        return responseDto;
     }
 }
