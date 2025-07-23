@@ -56,4 +56,4 @@ jobs:
               ProxyCommand ssh -q -W %h:%p bastion
           EOF
 
-          ssh backend "cd /home/ec2-user/backend && bash deploy.sh"
+          ssh -o StrictHostKeyChecking=no backend "cd /home/ec2-user/backend && bash deploy.sh"
