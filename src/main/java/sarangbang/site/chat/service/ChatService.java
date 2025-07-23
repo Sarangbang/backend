@@ -1,6 +1,7 @@
 package sarangbang.site.chat.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -10,7 +11,10 @@ import org.springframework.web.socket.WebSocketSession;
 import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.MessageHistoryResponseDto;
 import sarangbang.site.chat.entity.ChatMessage;
+import sarangbang.site.chat.entity.ChatReadStatus;
 import sarangbang.site.chat.repository.ChatMessageRepository;
+import sarangbang.site.chat.repository.ChatReadStatusRepository;
+import sarangbang.site.security.details.CustomUserDetails;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,6 +33,27 @@ public class ChatService {
     private final Map<String, Set<WebSocketSession>> chatRooms = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatReadStatusRepository chatReadStatusRepository;
+
+    /**
+     * 특정 채팅방의 메시지를 사용자가 모두 읽었음을 기록합니다.
+     * @param roomId 채팅방 ID
+     * @param userDetails 현재 로그인한 사용자 정보
+     */
+    @Transactional
+    public void markAsRead(String roomId, CustomUserDetails userDetails) {
+        String userId = userDetails.getId(); // 사용자 ID 추출
+
+        // 1. roomId와 userId로 기존 '읽음 상태' 정보가 있는지 조회합니다.
+        ChatReadStatus readStatus = chatReadStatusRepository.findByUserIdAndRoomId(userId, roomId)
+                .orElse(new ChatReadStatus(userId, roomId)); // 없으면 새로 생성합니다.
+
+        // 2. 마지막으로 읽은 시간을 현재 시간으로 갱신합니다.
+        readStatus.updateLastReadAt();
+
+        // 3. 변경된 상태를 DB에 저장합니다. (새로 생성했거나, 기존 정보를 업데이트)
+        chatReadStatusRepository.save(readStatus);
+    }
 
     /**
      * 특정 채팅방에 새로운 세션을 추가합니다.

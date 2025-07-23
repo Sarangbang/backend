@@ -16,4 +16,14 @@ public class UserChatRoomSummaryDto {
     private List<String> participants;
     private Instant createdAt;
     private String avatar;
+    private Long unreadCount;
+
+    public UserChatRoomSummaryDto(String roomId, String roomName, String creatorId, List<String> participants, Instant createdAt, String avatar) {
+        this.roomId = roomId;
+        this.roomName = roomName;
+        this.creatorId = creatorId;
+        this.participants = participants;
+        this.createdAt = createdAt;
+        this.avatar = avatar;
+    }
 }

@@ -7,6 +7,9 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import sarangbang.site.challenge.event.ChallengeCreatedEvent;
 import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
+import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
+import sarangbang.site.chat.entity.ChatReadStatus;
+import sarangbang.site.chat.repository.ChatReadStatusRepository;
 import sarangbang.site.chat.service.ChatRoomService;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.List;
 public class ChatRoomChallengeListener {
 
     private final ChatRoomService chatRoomService;
+    private final ChatReadStatusRepository readStatusRepository;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleChallengeCreatedEvent(ChallengeCreatedEvent event) {
@@ -36,9 +40,20 @@ public class ChatRoomChallengeListener {
                 event.getChallengeImageUrl()
         );
 
-        chatRoomService.createRoom(
+        ChatRoomSummaryResponseDto createdRoom= chatRoomService.createRoom(
                 requestDto,
                 event.getCreatorId()
         );
+
+        log.info("챌린지 생성자({})의 읽음 상태를 초기화합니다. 채팅방 ID: {}", event.getCreatorId(), createdRoom.getRoomId());
+
+        ChatReadStatus creatorReadStatus = new ChatReadStatus(
+                event.getCreatorId(),               // userId (Long)
+                createdRoom.getRoomId()             // roomId (String)
+        );
+
+        readStatusRepository.save(creatorReadStatus);
+
+        log.info("읽음 상태 초기화 완료.");
     }
 }

@@ -26,7 +26,6 @@ public class JwtTokenProvider {
     private String accessSecretStr;
     private Key accessSecretKey;
     private final long accessTokenValidity = 60 * 60 * 1000L; // 1시간
-//    private final long accessTokenValidity = 60 * 60 * 1000L; // 1시간
 
     @Value("${jwt.refresh-secret}")
     private String  refreshSecretStr;
