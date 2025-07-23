@@ -10,7 +10,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.Sender;
-import sarangbang.site.chat.enums.MessageType;
 import sarangbang.site.chat.service.ChatService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
@@ -32,7 +31,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @param session 연결된 클라이언트의 WebSocket 세션
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session){
         Authentication authentication = (Authentication) session.getAttributes().get("user");
         String userEmail = authentication.getName();
 
@@ -45,11 +44,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         session.getAttributes().put("sender", sender);
 
         chatService.addSessionToRoom(roomId, session);
-
-        // 5. 다른 사용자들에게 새로운 사용자의 입장을 알리는 메시지를 보냅니다.
-        // 수정된 부분: ChatMessage 생성자 순서 및 인자 수정
-        ChatMessageDto entryMessage = new ChatMessageDto(MessageType.ENTER, roomId, sender, sender.getNickname() + "님이 입장하셨습니다.");
-        chatService.sendMessageToRoom(roomId, entryMessage);
     }
 
     /**
@@ -71,15 +65,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * @param status 종료 상태 정보 (정상 종료, 에러 등)
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status){
         String roomId = (String) session.getAttributes().get("roomId");
         Sender sender = (Sender) session.getAttributes().get("sender");
 
         chatService.removeSessionFromRoom(roomId, session);
-
-        // 다른 사용자들에게 퇴장 사실을 알리는 메시지를 보냅니다.
-        // 수정된 부분: ChatMessage 생성자 순서 및 인자 수정
-        ChatMessageDto exitMessage = new ChatMessageDto(MessageType.LEAVE, roomId, sender, sender.getNickname() + "님이 퇴장하셨습니다.");
-        chatService.sendMessageToRoom(roomId, exitMessage);
     }
 }

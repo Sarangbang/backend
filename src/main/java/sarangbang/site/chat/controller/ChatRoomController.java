@@ -6,9 +6,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
-import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import sarangbang.site.chat.dto.MessageHistoryResponseDto;
 import sarangbang.site.chat.dto.UserChatRoomSummaryDto;
 import sarangbang.site.chat.service.ChatRoomService;
@@ -25,13 +26,13 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final ChatService chatService;
 
-    /* 채팅방 생성 */
-    @PostMapping
-    public ResponseEntity<ChatRoomSummaryResponseDto> createRoom(@RequestBody ChatRoomCreateRequestDto request, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        ChatRoomSummaryResponseDto responseDto = chatRoomService.createRoom(request, userDetails.getId());
-        ResponseEntity<ChatRoomSummaryResponseDto> response = ResponseEntity.ok(responseDto);
-        return response;
-    }
+//    /* 채팅방 생성 */
+//    @PostMapping
+//    public ResponseEntity<ChatRoomSummaryResponseDto> createRoom(@RequestBody ChatRoomCreateRequestDto request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+//        ChatRoomSummaryResponseDto responseDto = chatRoomService.createRoom(request, userDetails.getId());
+//        ResponseEntity<ChatRoomSummaryResponseDto> response = ResponseEntity.ok(responseDto);
+//        return response;
+//    }
 
     @GetMapping
     public ResponseEntity<List<UserChatRoomSummaryDto>> getAllRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {

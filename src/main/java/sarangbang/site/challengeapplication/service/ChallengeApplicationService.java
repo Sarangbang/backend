@@ -14,6 +14,8 @@ import sarangbang.site.challengeapplication.exception.DuplicateApplicationExcept
 import sarangbang.site.challengeapplication.repository.ChallengeApplicationRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
+import org.springframework.context.ApplicationEventPublisher;
+import sarangbang.site.challengeapplication.event.ChallengeMemberAcceptedEvent;
 
 import java.util.Optional;
 import sarangbang.site.user.entity.User;
@@ -28,6 +30,7 @@ public class ChallengeApplicationService {
     private final ChallengeMemberService challengeMemberService;
     private final UserService userService;
     private final ChallengeService challengeService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 챌린지 신청 수락/거부
     @Transactional
@@ -59,6 +62,14 @@ public class ChallengeApplicationService {
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
                 }
                 challengeMemberService.saveChallengeMember(app.getUser().getId(), app.getChallenge().getId());
+                Challenge challenge = challengeService.getChallengeById(app.getChallenge().getId());
+                User user = userService.getUserById(app.getUser().getId());
+                ChallengeMemberAcceptedEvent event = new ChallengeMemberAcceptedEvent(
+                        challenge.getId(),
+                        user.getId(),
+                        user.getNickname()
+                );
+                eventPublisher.publishEvent(event);
             }
             challengeApplicationRepository.save(app);
 

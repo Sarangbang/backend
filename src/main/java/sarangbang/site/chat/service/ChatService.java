@@ -1,12 +1,12 @@
 package sarangbang.site.chat.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.MessageHistoryResponseDto;
 import sarangbang.site.chat.entity.ChatMessage;
@@ -69,18 +69,14 @@ public class ChatService {
         }
     }
 
-    /**
-     * 특정 채팅방의 모든 세션에게 메시지를 발송(브로드캐스트)합니다.
-     * @param roomId 메시지를 보낼 채팅방 ID
-     * @param message 전송할 메시지 객체
-     */
+   
     public void sendMessageToRoom(String roomId, ChatMessageDto message) {
         // 메시지 객체를 JSON 문자열로 변환합니다.
         try {
             ChatMessage chatMessage = new ChatMessage(message.getRoomId(), message.getType(), message.getSender(), message.getMessage());
             chatMessageRepository.save(chatMessage);
 
-            String messagePayload = objectMapper.writeValueAsString(message);
+            String messagePayload = objectMapper.writeValueAsString(chatMessage);
             TextMessage textMessage = new TextMessage(messagePayload);
 
             // 해당 채팅방의 모든 세션에 대해 반복하며 메시지를 전송합니다.
