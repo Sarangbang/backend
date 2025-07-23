@@ -1,5 +1,6 @@
 package sarangbang.site.security.filter;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import sarangbang.site.security.details.CustomUserDetails;
@@ -17,15 +18,11 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
-
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService customUserDetailsService) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.customUserDetailsService = customUserDetailsService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -33,21 +30,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.debug("요청에서 JWT 토큰 추출됨: {}", token);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String username = jwtTokenProvider.getUsernameFromToken(token);
-            log.info("유효한 토큰입니다. 사용자 인증 처리 진행: {}", username);
+        if (token != null && jwtTokenProvider.validateAccessToken(token)) {
+            String userEmail = jwtTokenProvider.getEmailFromAccessToken(token);
+            log.info("유효한 토큰입니다. 사용자 인증 처리 진행: {}", userEmail);
 
-            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(username);
+            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(userEmail);
 
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            log.debug("SecurityContext에 사용자 인증 정보 저장 완료: {}", username);
+            log.debug("SecurityContext에 사용자 인증 정보 저장 완료: {}", userEmail);
 
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else if (token != null) {
-            log.warn("토큰이 존재하지만 유효하지 않습니다.");
+            log.warn("Access Token이 존재하지만 유효하지 않습니다.");
         } else {
-            log.debug("요청에 JWT 토큰이 없습니다.");
+            log.debug("요청에 Access Token이 없습니다.");
         }
 
         chain.doFilter(request, response);

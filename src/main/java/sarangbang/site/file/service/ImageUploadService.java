@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
+import sarangbang.site.global.config.StorageProperties;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class ImageUploadService {
 
     private final FileStorageService fileStorageService; // 실제 파일 저장 담당 인터페이스
+    private final StorageProperties storageProperties; // 스토리지 설정 정보
 
     @Value("${app.upload.max-file-size:5242880}")
     private long maxFileSize;
@@ -28,7 +30,7 @@ public class ImageUploadService {
     private String allowedImageTypesStr;
 
     // 회원 프로필 이미지 저장
-    public String storeProfileImage(MultipartFile file, Long userId) {
+    public String storeProfileImage(MultipartFile file, String userId) {
         try {
             log.info("프로필 이미지 업로드 시작: userId={}, filename={}, size={}bytes",
                     userId, file.getOriginalFilename(), file.getSize());
@@ -40,17 +42,13 @@ public class ImageUploadService {
             String extension = getExtension(file.getOriginalFilename());
 
             // 3. 저장 경로 설정 (ex. profiles/123/profile.jpg)
-            String filePath = String.format("profiles/%d/profile%s", userId, extension);
+            String filePath = String.format("profiles/%s/profile%s", userId, extension);
 
             // 4. 파일 저장
-            fileStorageService.uploadFile(file, filePath);
+            String key = fileStorageService.uploadFile(file, filePath);
 
-            // 5. 접근 가능한 URL 생성
-            String imageUrl = "/api/files/" + filePath;
-
-            log.info("프로필 이미지 업로드 완료: userId={}, imageUrl={}", userId, imageUrl);
-
-            return imageUrl;
+            log.info("프로필 이미지 업로드 완료: userId={}, key={}", userId, key);
+            return key;
 
         } catch (Exception e) {
             log.error("프로필 이미지 업로드 실패: userId={}", userId, e);
@@ -67,10 +65,12 @@ public class ImageUploadService {
             validateImageFile(file);
             String extension = getExtension(file.getOriginalFilename());
             String filePath = String.format("challenges/%d/thumbnail%s", challengeId, extension);
-            fileStorageService.uploadFile(file, filePath);
-            String imageUrl = "/api/files/" + filePath;
-            log.info("챌린지 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
-            return imageUrl;
+
+            // 파일 저장 (key 반환)
+            String key = fileStorageService.uploadFile(file, filePath);
+
+            log.info("챌린지 이미지 업로드 완료: challengeId={}, key={}", challengeId, key);
+            return key;
         } catch (Exception e) {
             log.error("챌린지 이미지 업로드 실패: challengeId={}", challengeId, e);
             throw new FileStorageException("챌린지 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -93,13 +93,10 @@ public class ImageUploadService {
             // 저장 경로: challenges/{챌린지ID}/{날짜}/{UUID}.jpg
             String filePath = String.format("challenges/%d/%s/%s%s",
                                     challengeId, date, uuid, file.getOriginalFilename());
+            String key = fileStorageService.uploadFile(file, filePath);
 
-            fileStorageService.uploadFile(file, filePath);
-
-            String imageUrl = "/api/files/" + filePath;
-
-            log.info("인증 이미지 업로드 완료: challengeId={}, imageUrl={}", challengeId, imageUrl);
-            return imageUrl;
+            log.info("인증 이미지 업로드 완료: challengeId={}, key={}", challengeId, key);
+            return key;
         } catch (Exception e) {
             log.error("인증 이미지 업로드 실패: challengeId={}", challengeId, e);
             throw new FileStorageException("인증 이미지 업로드에 실패했습니다: " + e.getMessage(), e);
@@ -107,7 +104,7 @@ public class ImageUploadService {
     }
 
     // 파일 유효성 검증
-    private void validateImageFile(MultipartFile file) {
+    public void validateImageFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new FileStorageException("업로드할 파일을 선택해주세요.");
         }
@@ -141,4 +138,6 @@ public class ImageUploadService {
         }
         return originalFilename.substring(originalFilename.lastIndexOf("."));
     }
+
+
 }

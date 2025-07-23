@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.challenge.dto.ChallengeDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,13 @@ import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
+import sarangbang.site.file.enums.ImageType;
+import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.file.service.ImageSaveFactory;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +41,12 @@ public class ChallengeService {
     private final ChallengeMemberService challengeMemberService;
     private final ChallengeMemberRepository challengeMemberRepository;
     private final RegionService regionService;
+    private final ImageSaveFactory imageSaveFactory;
+    private final FileStorageService fileStorageService;
 
     // 챌린지 등록
     @Transactional
-    public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId) {
+    public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId, MultipartFile imageFile) {
 
         ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
         log.debug("챌린지 카테고리 정보 : {}", category.getCategoryName());
@@ -60,11 +67,20 @@ public class ChallengeService {
         );
 
         challengeRepository.save(challenge);
+        if (imageFile != null) {
+            String imageUrl = imageSaveFactory.getImageUploadService(imageFile, ImageType.CHALLENGE, challenge.getId());
+            challenge.changeImage(imageUrl);
+        }
         challengeMemberService.saveChallengeOwner(userId, challenge.getId());
+
+        String imageUrl = null;
+        if (challenge.getImage() != null) {
+            imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+        }
 
         ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getRegion().getRegionId(), challenge.getTitle(), challenge.getDescription(),
                 challenge.getParticipants(), challenge.getMethod(), challenge.getStartDate(), challenge.getEndDate(),
-                challenge.getImage(), challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
+                imageUrl , challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
 
         return challengeDTO;
     }
@@ -78,8 +94,11 @@ public class ChallengeService {
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
-
+            String imageUrl = null;
+            if (challenge.getImage() != null) {
+                imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+            }
+            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants, imageUrl));
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
@@ -95,7 +114,11 @@ public class ChallengeService {
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
+            String imageUrl = null;
+            if (challenge.getImage() != null) {
+                imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+            }
+            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants, imageUrl));
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, pageable, challenges.getTotalElements());

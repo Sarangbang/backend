@@ -21,8 +21,10 @@ public class User extends BaseEntity {
 
     private String email;
 
+    @Column(nullable = true)
     private String password;
 
+    @Column(unique = true)
     private String nickname;
 
     private String gender;
@@ -32,4 +34,28 @@ public class User extends BaseEntity {
     private Region region;
 
     private String profileImageUrl;
+
+    // OAuth2
+    private String provider; // google
+    private String providerId; // google sub
+    private boolean profileComplete;
+
+    public void updateProfile(String nickname, String gender, Region region) {
+        this.nickname = nickname;
+        this.gender = gender;
+        this.region = region;
+        this.profileComplete = true;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
