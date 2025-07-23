@@ -11,10 +11,7 @@ import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.file.service.ImageUploadService;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
-import sarangbang.site.user.dto.UserProfileResponseDTO;
-import sarangbang.site.user.dto.UserUpdateNicknameRequestDTO;
-import sarangbang.site.user.dto.UserUpdatePasswordRequestDTO;
-import sarangbang.site.user.dto.UserUpdateRequestDto;
+import sarangbang.site.user.dto.*;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.exception.UserExceptionMessage;
 import sarangbang.site.user.exception.UserNotFoundException;
@@ -114,5 +111,36 @@ public class UserService {
         String key = imageUploadService.storeProfileImage(file, userId);
 
         user.updateProfileImageUrl(key);
+    }
+
+    // 프로필 이미지 삭제
+    @Transactional
+    public void deleteUserAvatar(String userId) {
+        User user = getUserById(userId);
+
+        String imageUrl = user.getProfileImageUrl();
+        if(imageUrl != null){
+            fileStorageService.deleteFile(imageUrl);
+        } else {
+            throw new IllegalArgumentException("프로필 이미지가 존재하지 않습니다.");
+        }
+
+        user.updateProfileImageUrl(null);
+    }
+
+    // 지역 변경
+    public void updateUserRegion(String userId, UserUpdateRegionRequestDTO updateDto) {
+        User user = getUserById(userId);
+
+        if(updateDto.getRegionId() == null) {
+            throw new IllegalArgumentException("지역을 선택해주세요.");
+        }
+        Region region = regionService.findRegionById(updateDto.getRegionId());
+
+        if(region == null) {
+            throw new IllegalArgumentException("해당 지역은 존재하지 않는 지역입니다.");
+        }
+
+        user.updateRegion(region);
     }
 }
