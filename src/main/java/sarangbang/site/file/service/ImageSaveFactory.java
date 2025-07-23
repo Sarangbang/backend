@@ -12,12 +12,12 @@ public class ImageSaveFactory {
 
     private final ImageUploadService imageUploadService;
 
-    public String getImageUploadService(MultipartFile file, ImageType type, Long personId) throws FileStorageException {
+    public <T> String getImageUploadService(MultipartFile file, ImageType type, T personId) throws FileStorageException {
         imageUploadService.validateImageFile(file);
         return switch (type) {
-            case PROFILE -> imageUploadService.storeProfileImage(file, personId);
-            case CHALLENGE -> imageUploadService.storeChallengeImage(file, personId);
-            case VERTIFICATION -> imageUploadService.storeProofImage(file, personId);
+            case PROFILE -> imageUploadService.storeProfileImage(file, (String) personId);
+            case CHALLENGE -> imageUploadService.storeChallengeImage(file, (Long) personId);
+            case VERTIFICATION -> imageUploadService.storeProofImage(file, (Long) personId);
             default -> throw new IllegalArgumentException("지원하지 않는 이미지 타입입니다: " + type);
         };
     }
