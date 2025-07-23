@@ -23,11 +23,11 @@ public class ChallengeResponseDto {
     private Long categoryId;
     private String categoryName;
 
-    public ChallengeResponseDto(Challenge challenge, int currentParticipants) {
+    public ChallengeResponseDto(Challenge challenge, int currentParticipants, String imageUrl) {
         this.id = challenge.getId();
         this.title = challenge.getTitle();
         this.location = challenge.getRegion().getFullAddress();
-        this.image = challenge.getImage();
+        this.image = imageUrl;
         this.participants = challenge.getParticipants();
         this.currentParticipants = currentParticipants;
         this.startDate = challenge.getStartDate();
@@ -35,4 +35,5 @@ public class ChallengeResponseDto {
         this.categoryId = challenge.getChallengeCategory().getCategoryId();
         this.categoryName = challenge.getChallengeCategory().getCategoryName();
     }
+
 }

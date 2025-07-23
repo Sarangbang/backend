@@ -23,12 +23,14 @@ import sarangbang.site.challengemember.service.ChallengeMemberService;
 
 import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.file.enums.ImageType;
+import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.file.service.ImageSaveFactory;
 import sarangbang.site.chat.enums.ChatSourceType;
 import sarangbang.site.chat.enums.RoomType;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,7 @@ public class ChallengeService {
     private final RegionService regionService;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageSaveFactory imageSaveFactory;
+    private final FileStorageService fileStorageService;
 
     // 챌린지 등록
     @Transactional
@@ -88,10 +91,14 @@ public class ChallengeService {
         );
 
         eventPublisher.publishEvent(event);
+        String imageUrl = null;
+        if (challenge.getImage() != null) {
+            imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+        }
 
         ChallengeDTO challengeDTO = new ChallengeDTO(challenge.getRegion().getRegionId(), challenge.getTitle(), challenge.getDescription(),
                 challenge.getParticipants(), challenge.getMethod(), challenge.getStartDate(), challenge.getEndDate(),
-                challenge.getImage(), challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
+                imageUrl , challenge.isStatus(), challenge.getChallengeCategory().getCategoryId());
 
         return challengeDTO;
     }
@@ -105,8 +112,11 @@ public class ChallengeService {
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
-
+            String imageUrl = null;
+            if (challenge.getImage() != null) {
+                imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+            }
+            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants, imageUrl));
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, challenges.getPageable(), challenges.getTotalElements());
@@ -122,7 +132,11 @@ public class ChallengeService {
 
         for (Challenge challenge : challenges) {
             int currentParticipants = challengeMemberRepository.countByChallengeId(challenge.getId());
-            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants));
+            String imageUrl = null;
+            if (challenge.getImage() != null) {
+                imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+            }
+            responseDtos.add(new ChallengeResponseDto(challenge, currentParticipants, imageUrl));
         }
 
         PageImpl<ChallengeResponseDto> responseDtoPage = new PageImpl<>(responseDtos, pageable, challenges.getTotalElements());
