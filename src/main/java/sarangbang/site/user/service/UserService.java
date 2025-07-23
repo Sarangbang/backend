@@ -62,11 +62,16 @@ public class UserService {
     // 로그인 된 사용자 정보 확인
     public UserProfileResponseDTO getUserProfile(String userId) {
         User user = getUserById(userId);
+      
+        String imageUrl = null;
+        if (user.getProfileImageUrl != null){
+           imageUrl = fileStorageService.generatePresignedUrl(user.getProfileImageUrl(), Duration.ofMinutes(10));
+        }
 
         UserProfileResponseDTO dto = new UserProfileResponseDTO(
                 user.getEmail(),
                 user.getNickname(),
-                fileStorageService.generatePresignedUrl(user.getProfileImageUrl(), Duration.ofMinutes(10)),
+                imageUrl,
                 user.getGender(),
                 user.getRegion().getFullAddress()
         );
