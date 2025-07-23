@@ -109,6 +109,22 @@ public class UserController {
         }
     }
 
+    // 프로필 사진 삭제
+    @Operation(summary = "사용자 프로필 사진 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 사진 삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "프로필 사진 삭제 실패")
+    })
+    @DeleteMapping("/me/avatar")
+    public ResponseEntity<?> deleteAvatar(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            userService.deleteUserAvatar(userDetails.getId());
+            return ResponseEntity.ok(Map.of("message", "프로필 이미지가 성공적으로 삭제되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     // 지역 변경
     @Operation(summary = "사용자 지역 변경")
     @ApiResponses(value = {

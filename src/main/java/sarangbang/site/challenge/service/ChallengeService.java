@@ -1,5 +1,6 @@
 package sarangbang.site.challenge.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import sarangbang.site.challenge.dto.ChallengePopularityResponseDTO;
 import sarangbang.site.challenge.dto.ChallengeResponseDto;
 
 import sarangbang.site.challenge.entity.Challenge;
+import sarangbang.site.challenge.event.ChallengeCreatedEvent;
 import sarangbang.site.challenge.repository.ChallengeRepository;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
@@ -23,6 +25,8 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.file.enums.ImageType;
 import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.file.service.ImageSaveFactory;
+import sarangbang.site.chat.enums.ChatSourceType;
+import sarangbang.site.chat.enums.RoomType;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 
@@ -41,6 +45,7 @@ public class ChallengeService {
     private final ChallengeMemberService challengeMemberService;
     private final ChallengeMemberRepository challengeMemberRepository;
     private final RegionService regionService;
+    private final ApplicationEventPublisher eventPublisher;
     private final ImageSaveFactory imageSaveFactory;
     private final FileStorageService fileStorageService;
 
@@ -73,6 +78,19 @@ public class ChallengeService {
         }
         challengeMemberService.saveChallengeOwner(userId, challenge.getId());
 
+        Challenge savedChallenge = challengeRepository.save(challenge);
+
+        // 챌린지 생성 후 챌린지 채팅방 생성 이벤트
+        ChallengeCreatedEvent event = new ChallengeCreatedEvent(
+                savedChallenge.getId(),
+                savedChallenge.getTitle(),
+                userId,
+                RoomType.GROUP,
+                ChatSourceType.CHALLENGE,
+                savedChallenge.getImage()
+        );
+
+        eventPublisher.publishEvent(event);
         String imageUrl = null;
         if (challenge.getImage() != null) {
             imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));

@@ -1,14 +1,12 @@
 package sarangbang.site.chat.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoomSummaryResponseDto {
 
@@ -17,4 +15,5 @@ public class ChatRoomSummaryResponseDto {
     private String creatorId;
     private List<String> participants;
     private Instant createdAt;
+    private String challengeImageUrl;
 }

@@ -113,6 +113,21 @@ public class UserService {
         user.updateProfileImageUrl(key);
     }
 
+    // 프로필 이미지 삭제
+    @Transactional
+    public void deleteUserAvatar(String userId) {
+        User user = getUserById(userId);
+
+        String imageUrl = user.getProfileImageUrl();
+        if(imageUrl != null){
+            fileStorageService.deleteFile(imageUrl);
+        } else {
+            throw new IllegalArgumentException("프로필 이미지가 존재하지 않습니다.");
+        }
+
+        user.updateProfileImageUrl(null);
+    }
+
     // 지역 변경
     public void updateUserRegion(String userId, UserUpdateRegionRequestDTO updateDto) {
         User user = getUserById(userId);
