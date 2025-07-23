@@ -113,7 +113,10 @@ public class ChallengeVerificationService {
 
         for (ChallengeVerificationByDateDTO challengeVerificationByDateDTO : challengeVerificationList) {
             // 인증자의 프로필 이미지 URL을 생성
-           challengeVerificationByDateDTO.setImgUrl(fileStorageService.generatePresignedUrl(challengeVerificationByDateDTO.getImgUrl(), Duration.ofMinutes(10)));
+            if (challengeVerificationByDateDTO.getImgUrl() != null) {
+                // presigned URL 생성
+                challengeVerificationByDateDTO.setImgUrl(fileStorageService.generatePresignedUrl(challengeVerificationByDateDTO.getImgUrl(), Duration.ofMinutes(10)));
+            }
         }
 
         return challengeVerificationList;

@@ -137,11 +137,15 @@ public class ChallengeMemberService {
         for(Challenge challenge : challenges) {
             int currentParticipant = challengeMemberRepository.countByChallengeId(challenge.getId());
             Optional<ChallengeMember> mem = getMemberByChallengeId(userId, challenge.getId());
+            String imageUrl = null;
+            if (challenge.getImage() != null) {
+                imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+            }
             dto.add(new ChallengeMemberResponseDTO(
                     challenge,
                     currentParticipant,
                     mem.get().getRole(),
-                    fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10))
+                    imageUrl
             ));
         }
 
