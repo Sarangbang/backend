@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
@@ -93,7 +94,7 @@ public class UserController {
     }
 
     // 프로필 사진 변경
-    /*@Operation(summary = "사용자 프로필 이미지 변경")
+    @Operation(summary = "사용자 프로필 이미지 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필 이미지 변경 성공"),
             @ApiResponse(responseCode = "400", description = "프로필 이미지 변경 실패")
@@ -105,10 +106,10 @@ public class UserController {
             ) {
         try{
             userService.updateUserAvatar(userDetails.getId(), file);
-            return ResponseEntity.ok().build();
-        } catch () {
-
+            return ResponseEntity.ok(Map.of("message", "프로필 이미지가 성공적으로 변경되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-    }*/
+    }
 
 }

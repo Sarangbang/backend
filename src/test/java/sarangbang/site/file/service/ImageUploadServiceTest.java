@@ -29,7 +29,7 @@ public class ImageUploadServiceTest {
         );
 
         // 3. 이미지 업로드 테스트 실행
-        String imageUrl = imageUploadService.storeProfileImage(mockFile, 1L);
+        String imageUrl = imageUploadService.storeProfileImage(mockFile, "1L");
 
         // 4. 검증
         System.out.println("업로드 결과 URL: " + imageUrl);

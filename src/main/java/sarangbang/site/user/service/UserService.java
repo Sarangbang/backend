@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.file.service.ImageUploadService;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 import sarangbang.site.user.dto.UserProfileResponseDTO;
@@ -27,7 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RegionService regionService;
     private final PasswordEncoder passwordEncoder;
-    private final FileStorageService fileStorageService;
+    private final ImageUploadService imageUploadService;
 
     public User getUserById(String userId) throws UserNotFoundException {
         return userRepository.findById(userId)
@@ -98,12 +100,12 @@ public class UserService {
     }
 
     // 프로필 이미지 변경
-    /*@Transactional
-    public void updateUserAvatar(String id, MultipartFile file) {
-        User user = getUserById(id);
+    @Transactional
+    public void updateUserAvatar(String userId, MultipartFile file) {
+        User user = getUserById(userId);
 
-        fileStorageService.uploadFile();
+        String key = imageUploadService.storeProfileImage(file, userId);
 
-        user.updateProfileImageUrl();
-    }*/
+        user.updateProfileImageUrl(key);
+    }
 }

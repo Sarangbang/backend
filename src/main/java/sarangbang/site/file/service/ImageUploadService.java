@@ -30,7 +30,7 @@ public class ImageUploadService {
     private String allowedImageTypesStr;
 
     // 회원 프로필 이미지 저장
-    public String storeProfileImage(MultipartFile file, Long userId) {
+    public String storeProfileImage(MultipartFile file, String userId) {
         try {
             log.info("프로필 이미지 업로드 시작: userId={}, filename={}, size={}bytes",
                     userId, file.getOriginalFilename(), file.getSize());
@@ -42,7 +42,7 @@ public class ImageUploadService {
             String extension = getExtension(file.getOriginalFilename());
 
             // 3. 저장 경로 설정 (ex. profiles/123/profile.jpg)
-            String filePath = String.format("profiles/%d/profile%s", userId, extension);
+            String filePath = String.format("profiles/%s/profile%s", userId, extension);
 
             // 4. 파일 저장
             String key = fileStorageService.uploadFile(file, filePath);
