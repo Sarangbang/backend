@@ -117,6 +117,9 @@ public class UserService {
     public void updateUserRegion(String userId, UserUpdateRegionRequestDTO updateDto) {
         User user = getUserById(userId);
 
+        if(updateDto.getRegionId() == null) {
+            throw new IllegalArgumentException("지역을 선택해주세요.");
+        }
         Region region = regionService.findRegionById(updateDto.getRegionId());
 
         user.updateRegion(region);
