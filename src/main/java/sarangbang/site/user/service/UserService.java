@@ -122,6 +122,10 @@ public class UserService {
         }
         Region region = regionService.findRegionById(updateDto.getRegionId());
 
+        if(region == null) {
+            throw new IllegalArgumentException("해당 지역은 존재하지 않는 지역입니다.");
+        }
+
         user.updateRegion(region);
     }
 }
