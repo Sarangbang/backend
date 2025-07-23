@@ -36,8 +36,29 @@ jobs:
 
       - name: Deploy to EC2 (Prod)
         run: |
-          echo "${{ secrets.PROD_EC2_SSH_PRIVATE_KEY_BACK }}" > private_key.pem
-          chmod 400 private_key.pem
-          
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.PROD_EC2_SSH_PRIVATE_KEY_BACK }}" > ~/.ssh/private_key.pem
+          chmod 400 ~/.ssh/private_key.pem
 
-          ssh -o StrictHostKeyChecking=no -i private_key.pem -J ec2-user@${{ secrets.BASTION_HOST_PUBLIC_IP }} ec2-user@${{ secrets.PROD_EC2_PRIVATE_IP }} "cd /home/ec2-user/backend && bash deploy.sh"
+          # ~/.ssh/config 파일 생성 및 설정
+          cat << EOF > ~/.ssh/config
+          Host bastion
+              HostName ${{ secrets.BASTION_HOST_PUBLIC_IP }}
+              User ec2-user
+              IdentityFile ~/.ssh/private_key.pem
+              StrictHostKeyChecking no
+              UserKnownHostsFile /dev/null
+
+          Host backend
+              HostName ${{ secrets.PROD_EC2_PRIVATE_IP }}
+              User ec2-user
+              IdentityFile ~/.ssh/private_key.pem
+              # ProxyCommand 내부에 StrictHostKeyChecking=no와 IdentityFile을 명시적으로 추가
+              ProxyCommand ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key.pem -q -W %h:%p ec2-user@${{ secrets.BASTION_HOST_PUBLIC_IP }}
+          EOF
+          
+          # ~/.ssh/config 파일 권한 설정 (필요한 경우)
+          chmod 600 ~/.ssh/config
+
+          # 최종 SSH 접속 명령어 (여기도 StrictHostKeyChecking=no 유지)
+          ssh -o StrictHostKeyChecking=no backend "cd /home/ec2-user/backend && bash deploy.sh"
