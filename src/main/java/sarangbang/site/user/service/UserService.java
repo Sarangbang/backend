@@ -64,7 +64,7 @@ public class UserService {
         User user = getUserById(userId);
       
         String imageUrl = null;
-        if (user.getProfileImageUrl != null){
+        if (user.getProfileImageUrl() != null){
            imageUrl = fileStorageService.generatePresignedUrl(user.getProfileImageUrl(), Duration.ofMinutes(10));
         }
 
