@@ -6,19 +6,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
-@Profile("prod")  // 운영환경에서만 활성화
-public class S3Config {
-
-    @Value("${storage.region:ap-northeast-2}")
-    private String region;
+public class S3PresignerConfig {
 
     @Bean
-    public S3Client s3Client() {
-        //NOTE: AWS IAM 역할로 부여합니다
-        return S3Client.builder()
+    @Profile("prod")
+    public S3Presigner s3Presigner(@Value("${storage.region}") String region) {
+        return S3Presigner.builder()
                 .region(Region.of(region))
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();

@@ -36,11 +36,11 @@ public class ChallengeMemberResponseDTO {
     @Schema(description = "챌린지에서의 역할", example = "owner")
     private String role;
 
-    public ChallengeMemberResponseDTO(Challenge challenge, int currentParticipants, String role) {
+    public ChallengeMemberResponseDTO(Challenge challenge, int currentParticipants, String role, String imageUrl) {
         this.id = challenge.getId();
         this.title = challenge.getTitle();
         this.location = challenge.getRegion().getFullAddress();
-        this.image = challenge.getImage();
+        this.image = imageUrl;
         this.category = challenge.getChallengeCategory().getCategoryName();
         this.startDate = challenge.getStartDate();
         this.endDate = challenge.getEndDate();
