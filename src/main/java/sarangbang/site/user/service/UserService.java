@@ -11,10 +11,7 @@ import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.file.service.ImageUploadService;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
-import sarangbang.site.user.dto.UserProfileResponseDTO;
-import sarangbang.site.user.dto.UserUpdateNicknameRequestDTO;
-import sarangbang.site.user.dto.UserUpdatePasswordRequestDTO;
-import sarangbang.site.user.dto.UserUpdateRequestDto;
+import sarangbang.site.user.dto.*;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.exception.UserExceptionMessage;
 import sarangbang.site.user.exception.UserNotFoundException;
@@ -114,5 +111,14 @@ public class UserService {
         String key = imageUploadService.storeProfileImage(file, userId);
 
         user.updateProfileImageUrl(key);
+    }
+
+    // 지역 변경
+    public void updateUserRegion(String userId, UserUpdateRegionRequestDTO updateDto) {
+        User user = getUserById(userId);
+
+        Region region = regionService.findRegionById(updateDto.getRegionId());
+
+        user.updateRegion(region);
     }
 }

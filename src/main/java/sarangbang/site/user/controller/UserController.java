@@ -13,10 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
-import sarangbang.site.user.dto.UserProfileResponseDTO;
-import sarangbang.site.user.dto.UserUpdateNicknameRequestDTO;
-import sarangbang.site.user.dto.UserUpdatePasswordRequestDTO;
-import sarangbang.site.user.dto.UserUpdateRequestDto;
+import sarangbang.site.user.dto.*;
 import sarangbang.site.user.service.UserService;
 
 import java.sql.SQLException;
@@ -112,4 +109,22 @@ public class UserController {
         }
     }
 
+    // 지역 변경
+    @Operation(summary = "사용자 지역 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "지역 변경 성공"),
+            @ApiResponse(responseCode = "400", description = "지역 변경 실패")
+    })
+    @PatchMapping("/me/region")
+    public ResponseEntity<?> updateRegion(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserUpdateRegionRequestDTO updateDto
+            ) {
+        try {
+            userService.updateUserRegion(userDetails.getId(), updateDto);
+            return ResponseEntity.ok(Map.of("message", "지역이 성공적으로 변경되었습니다."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }
