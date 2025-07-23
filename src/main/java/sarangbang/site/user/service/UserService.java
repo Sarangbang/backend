@@ -21,6 +21,7 @@ import sarangbang.site.user.exception.UserNotFoundException;
 import sarangbang.site.user.repository.UserRepository;
 
 import java.sql.SQLException;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class UserService {
     private final RegionService regionService;
     private final PasswordEncoder passwordEncoder;
     private final ImageUploadService imageUploadService;
+    private final FileStorageService fileStorageService;
 
     public User getUserById(String userId) throws UserNotFoundException {
         return userRepository.findById(userId)
@@ -64,7 +66,7 @@ public class UserService {
         UserProfileResponseDTO dto = new UserProfileResponseDTO(
                 user.getEmail(),
                 user.getNickname(),
-                user.getProfileImageUrl(),
+                fileStorageService.generatePresignedUrl(user.getProfileImageUrl(), Duration.ofMinutes(10)),
                 user.getGender(),
                 user.getRegion().getFullAddress()
         );
