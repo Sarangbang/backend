@@ -36,7 +36,24 @@ jobs:
 
       - name: Deploy to EC2 (Prod)
         run: |
-          echo "${{ secrets.PROD_EC2_SSH_PRIVATE_KEY_BACK }}" > private_key.pem
-          chmod 400 private_key.pem
-          
-          ssh -o StrictHostKeyChecking=no -i private_key.pem -J ec2-user@${{ secrets.BASTION_HOST_PUBLIC_IP }} ec2-user@${{ secrets.PROD_EC2_PRIVATE_IP }} "cd /home/ec2-user/backend && bash deploy.sh"
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.PROD_EC2_SSH_PRIVATE_KEY_BACK }}" > ~/.ssh/private_key.pem
+          chmod 400 ~/.ssh/private_key.pem
+
+          cat << EOF > ~/.ssh/config
+
+          Host bastion
+              HostName ${{ secrets.BASTION_HOST_PUBLIC_IP }}
+              User ec2-user
+              IdentityFile ~/.ssh/private_key.pem
+              StrictHostKeyChecking no
+              UserKnownHostsFile /dev/null
+
+          Host backend
+              HostName ${{ secrets.PROD_EC2_PRIVATE_IP }}
+              User ec2-user
+              IdentityFile ~/.ssh/private_key.pem
+              ProxyCommand ssh -q -W %h:%p bastion
+          EOF
+
+          ssh backend "cd /home/ec2-user/backend && bash deploy.sh"
