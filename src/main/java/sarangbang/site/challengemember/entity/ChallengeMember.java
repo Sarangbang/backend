@@ -7,7 +7,7 @@ import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.user.entity.User;
 
 @Entity
-@Table(name = "ChallengeMembers")
+@Table(name = "challenge_members")
 @NoArgsConstructor
 @Getter
 public class ChallengeMember {
@@ -19,11 +19,11 @@ public class ChallengeMember {
     private String role;
 
     @ManyToOne
-    @JoinColumn(name = "challengeId")
+    @JoinColumn(name = "challenge_id")
     private Challenge challenge;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     public ChallengeMember(String role, Challenge challenge, User user) {
