@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.cglib.core.Local;
+import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.region.entity.Region;
 
 import java.time.LocalDate;
@@ -35,5 +36,9 @@ public class ChallengePopularityResponseDTO {
     private Long categoryId;
     @Schema(description = "카테고리 이름", example = "기상/루틴")
     private String categoryName;
+
+    public void updateImageUrl(String imageUrl) {
+        this.image = imageUrl;
+    }
 
 }
