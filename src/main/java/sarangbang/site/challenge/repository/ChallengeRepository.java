@@ -39,6 +39,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             "    c.challengeCategory.categoryName) " +
             "FROM Challenge c " +
             "LEFT JOIN ChallengeMember cm ON c.id = cm.challenge.id " +
+            "WHERE c.status = true " +
             "GROUP BY c.id, c.title, c.region.fullAddress, c.image, c.participants, " +
             "         c.startDate, c.endDate, c.challengeCategory.categoryId, c.challengeCategory.categoryName " +
             "ORDER BY COUNT(cm.challengeMemberId) DESC")
