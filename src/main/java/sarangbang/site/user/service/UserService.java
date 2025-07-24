@@ -129,6 +129,7 @@ public class UserService {
     }
 
     // 지역 변경
+    @Transactional
     public void updateUserRegion(String userId, UserUpdateRegionRequestDTO updateDto) {
         User user = getUserById(userId);
 
