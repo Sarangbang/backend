@@ -6,9 +6,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.dto.SignupRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
+import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.file.service.ImageUploadService;
+import sarangbang.site.global.config.StorageProperties;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.service.RegionService;
 import sarangbang.site.security.details.CustomUserDetails;
@@ -31,6 +35,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final ImageUploadService imageUploadService;
 
     @Transactional
     public String register(SignupRequestDTO requestDto) {
@@ -49,11 +54,17 @@ public class AuthService {
             throw new NicknameAlreadyExistsException("이미 사용 중인 닉네임입니다.");
         }
 
+
         String hash = passwordEncoder.encode(requestDto.getPassword());
         String newUserId = UUID.randomUUID().toString();
 
-        Region region = regionService.findRegionById(requestDto.getRegionId());
+        String profileImageKey = null;
+        MultipartFile profileImage = requestDto.getProfileImage();
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageKey = imageUploadService.storeProfileImage(profileImage, newUserId);
+        }
 
+        Region region = regionService.findRegionById(requestDto.getRegionId());
 
         User user = new User(
                 newUserId,
@@ -62,7 +73,7 @@ public class AuthService {
                 requestDto.getNickname(),
                 requestDto.getGender(),
                 region,
-                null, // profileImageUrl
+                profileImageKey,
                 "local", // provider
                 null, // providerId
                 true // profileComplete
