@@ -34,7 +34,7 @@ public class SignupRequestDTO {
     @Schema(description = "지역 ID", example = "182")
     private Long regionId;
 
-    @Schema(description = "프로필 사진", example = "https://example.com/profile.jpg")
+    @Schema(description = "프로필 사진", example = "profiles/728629df-7893-462a-9c52-fee0861434e3/profile.jpg")
     private MultipartFile profileImage;
 
     public boolean passwordMatched() {
