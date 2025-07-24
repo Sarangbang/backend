@@ -32,10 +32,15 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             "    c.region.fullAddress, " +
             "    c.image, " +
             "    c.participants, " +
-            "    COUNT(cm.challengeMemberId)) " +
+            "    COUNT(cm.challengeMemberId), " +
+            "    c.startDate, " +
+            "    c.endDate, " +
+            "    c.challengeCategory.categoryId, " +
+            "    c.challengeCategory.categoryName) " +
             "FROM Challenge c " +
             "LEFT JOIN ChallengeMember cm ON c.id = cm.challenge.id " +
-            "GROUP BY c.id, c.title, c.region, c.image, c.participants " +
+            "GROUP BY c.id, c.title, c.region.fullAddress, c.image, c.participants, " +
+            "         c.startDate, c.endDate, c.challengeCategory.categoryId, c.challengeCategory.categoryName " +
             "ORDER BY COUNT(cm.challengeMemberId) DESC")
     List<ChallengePopularityResponseDTO> findChallengesByPopularity();
 }
