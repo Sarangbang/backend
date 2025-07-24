@@ -2,7 +2,7 @@ package sarangbang.site.chat.dto;
 
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -14,6 +14,6 @@ public class ChatRoomSummaryResponseDto {
     private String roomName;
     private String creatorId;
     private List<String> participants;
-    private Instant createdAt;
+    private LocalDateTime createdAt;
     private String challengeImageUrl;
 }

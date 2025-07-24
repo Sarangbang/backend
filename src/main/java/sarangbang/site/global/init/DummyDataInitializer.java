@@ -19,6 +19,9 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
+import sarangbang.site.chat.entity.ChatRoom;
+import sarangbang.site.chat.enums.ChatSourceType;
+import sarangbang.site.chat.enums.RoomType;
 import sarangbang.site.chat.repository.ChatRoomRepository;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.entity.RegionType;
@@ -27,10 +30,8 @@ import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -119,8 +120,18 @@ public class DummyDataInitializer implements CommandLineRunner {
                 "https://picsum.photos/200/300", false, categories.get(0));
         challenges.add(challengeRepository.save(finishedChallenge));
         challengeMemberRepository.save(new ChallengeMember("owner", finishedChallenge, users.get(0)));
-        // chatRoomRepository.save(new ChatRoom(finishedChallenge.getId().toString(), finishedChallenge.getTitle(),
-        //         users.get(0).getId(), Arrays.asList(users.get(0).getId()), Instant.now()));
+        // chatRoomRepository.save(
+        //         new ChatRoom(
+        //                 UUID.randomUUID().toString(),
+        //                 RoomType.GROUP,
+        //                 ChatSourceType.CHALLENGE,
+        //         finishedChallenge.getId(),
+        //         finishedChallenge.getTitle(),
+        //         users.get(0).getId(),
+        //         Arrays.asList(users.get(0).getId(), users.get(1).getId()),
+        //         LocalDateTime.now(),
+        //         "https://picsum.photos/200/300"
+        //                 ));
 
 
         // 2. 진행 중인 챌린지 - user2(testuser2)가 방장

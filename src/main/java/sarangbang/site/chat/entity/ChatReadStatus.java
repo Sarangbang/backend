@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -21,7 +21,7 @@ public class ChatReadStatus {
 
     private String roomId;
 
-    private Instant lastReadAt;
+    private LocalDateTime lastReadAt;
 
     public ChatReadStatus(String userId, String roomId) {
         this.userId = userId;
@@ -29,6 +29,6 @@ public class ChatReadStatus {
     }
 
     public void updateLastReadAt() {
-        this.lastReadAt = Instant.now();
+        this.lastReadAt = LocalDateTime.now();
     }
 }
