@@ -20,6 +20,7 @@ import sarangbang.site.security.details.CustomUserDetails;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/challenge-verifications")
@@ -52,7 +53,7 @@ public class ChallengeVerificationController {
             )
     })
     
-    public ResponseEntity<ChallengeVerificationResponseDTO> createVerification(
+    public ResponseEntity<?> createVerification(
             @ModelAttribute @Valid ChallengeVerificationRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
@@ -62,9 +63,9 @@ public class ChallengeVerificationController {
 
             return ResponseEntity.ok(result);
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             log.error("챌린지 인증 등록 실패: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 

@@ -42,6 +42,10 @@ public class ChallengeVerificationService {
         // 1. 챌린지 존재 확인
         Challenge challenge = challengeService.getChallengeById(dto.getChallengeId());
 
+        if(!challenge.isStarted()) {
+            throw new IllegalStateException("아직 시작되지 않은 챌린지입니다.");
+        }
+
         // 2. 사용자 조회 (ID로 조회)
         User user = userService.getUserById(userId);
 
@@ -162,7 +166,15 @@ public class ChallengeVerificationService {
     @Transactional(readOnly = true) // 데이터를 조회만 하므로 성능 최적화를 위해 readOnly 설정
     public List<MyChallengeVerificationResponseDto> getMyVerifications(String userId) {
 
+        List<MyChallengeVerificationResponseDto> dtos = challengeVerificationRepository.findMyVerifications(userId, ChallengeVerificationStatus.APPROVED);
+
+        for(MyChallengeVerificationResponseDto dto : dtos){
+            String imgUrl = dto.getImgUrl();
+            if(imgUrl != null){
+                dto.updateImgUrl(fileStorageService.generatePresignedUrl(imgUrl, Duration.ofMinutes(10)));
+            }
+        }
         // Repository에 사용자 ID를 전달하여 데이터를 요청합니다.
-        return challengeVerificationRepository.findMyVerifications(userId, ChallengeVerificationStatus.APPROVED);
+        return dtos;
     }
 }
