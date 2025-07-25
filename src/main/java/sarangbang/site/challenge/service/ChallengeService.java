@@ -53,6 +53,11 @@ public class ChallengeService {
     @Transactional
     public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId, MultipartFile imageFile) {
 
+        boolean exist = challengeRepository.existsByTitleAndUserIsCreator(dto.getTitle(), userId);
+        if(exist) {
+            throw new IllegalStateException("동일한 챌린지를 생성하였습니다.");
+        }
+
         ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
         log.debug("챌린지 카테고리 정보 : {}", category.getCategoryName());
 
