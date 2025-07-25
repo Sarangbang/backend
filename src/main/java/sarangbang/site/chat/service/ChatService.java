@@ -66,7 +66,7 @@ public class ChatService {
         // computeIfAbsent: 키(roomId)에 해당하는 값이 없으면 새로운 HashSet을 생성하고, 있으면 기존 Set을 반환합니다.
         chatRooms.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(session);
         // 이전 대화 기록을 조회하여 새로운 세션에만 전송
-        sendPreviousMessages(roomId, session);
+//        sendPreviousMessages(roomId, session);
     }
 
     private void sendPreviousMessages(String roomId, WebSocketSession session) {
@@ -147,6 +147,7 @@ public class ChatService {
 
         for (ChatMessage message : messages) {
             ChatMessageDto dto = new ChatMessageDto(
+                    message.get_id(),
                     message.getType(),
                     message.getRoomId(),
                     message.getSender(),

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ChatMessageDto {
 
+    private String _id;
     // 메시지 유형 (입장, 퇴장, 대화)
     private MessageType type;
 
@@ -28,7 +29,8 @@ public class ChatMessageDto {
 
     private int unreadCount;
 
-    public ChatMessageDto(MessageType type, String roomId, Sender sender, String message, LocalDateTime createdAt) {
+    public ChatMessageDto(String _id, MessageType type, String roomId, Sender sender, String message, LocalDateTime createdAt) {
+        this._id = _id;
         this.type = type;
         this.roomId = roomId;
         this.sender = sender;

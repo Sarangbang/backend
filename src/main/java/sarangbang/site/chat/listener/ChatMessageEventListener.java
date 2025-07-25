@@ -40,6 +40,7 @@ public class ChatMessageEventListener {
         Sender sender = new Sender(user.getId(), user.getNickname(), user.getProfileImageUrl());
         String messageContent = user.getNickname() + "님이 챌린지에 참여했습니다.";
         ChatMessageDto entryMessage = new ChatMessageDto(
+                null,
             MessageType.ENTER,
             chatRoom.getRoomId(),
             sender,
