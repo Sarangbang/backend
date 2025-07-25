@@ -22,10 +22,14 @@ public class ChallengeCategory extends BaseEntity {
     private String categoryName;
 
     @Column(nullable = false)
-    private String imageUrl;
+    private String challengeImageUrl;
 
-    public ChallengeCategory(String categoryName, String imageUrl) {
+    @Column(nullable = false)
+    private String categoryImageUrl;
+
+    public ChallengeCategory(String categoryName, String challengeImageUrl, String categoryImageUrl) {
         this.categoryName = categoryName;
-        this.imageUrl = imageUrl;
+        this.challengeImageUrl = challengeImageUrl;
+        this.categoryImageUrl = categoryImageUrl;
     }
 }
