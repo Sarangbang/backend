@@ -136,11 +136,12 @@ public class ChallengeApplicationService {
         // 방장 권한 확인
         validateOwnerPermission(ownerId, challengeId);
 
+        // PENDING 상태인 신청서만 조회
         List<ChallengeApplication> applications = challengeApplicationRepository
-                .findByChallengeIdWithUserAndRegion(challengeId);
+                .findByChallengeIdAndStatusWithUserAndRegion(challengeId, ChallengeApplyStatus.PENDING);
 
         List<ChallengeApplicationDTO> result = applications.stream()
-                .map(app -> ChallengeApplicationDTO.from(app, fileStorageService)) // fileStorageService 전달
+                .map(app -> ChallengeApplicationDTO.from(app, fileStorageService))
                 .collect(Collectors.toList());
 
         log.info("<= 챌린지 참여 신청 목록 조회 완료. challengeId: {}, 신청 개수: {}", challengeId, result.size());
