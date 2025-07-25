@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sarangbang.site.challengeapplication.dto.ChangeChallengeAppDTO;
+import sarangbang.site.challengeapplication.dto.ChallengeApplicationDTO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,8 @@ import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 import sarangbang.site.challengeapplication.exception.ChallengeApplicationExceptionHandler;
 import sarangbang.site.challengeapplication.service.ChallengeApplicationService;
 import sarangbang.site.security.details.CustomUserDetails;
+
+import java.util.List;
 
 @Tag(name = "Challenge-application", description = "챌린지 신청서 관련 API")
 @Slf4j
@@ -92,6 +95,89 @@ public class ChallengeApplicationController {
 
         ResponseEntity<ChallengeJoinDTO> response = ResponseEntity.ok(requestDTO);
         return response;
+    }
+
+
+    @GetMapping("/manage/{challengeId}")
+    @Operation(summary = "챌린지 참여 신청 목록 조회", description = "방장이 특정 챌린지의 참여 신청 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "신청 목록 조회 성공",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeApplicationDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "방장 권한 없음",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "챌린지를 찾을 수 없음",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<List<ChallengeApplicationDTO>> getChallengeApplications(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        try {
+            log.info("=> 챌린지 참여 신청 목록 조회 요청. challengeId: {}, ownerId: {}", challengeId, userDetails.getId());
+            
+            List<ChallengeApplicationDTO> applications = challengeApplicationService
+                    .getChallengeApplications(challengeId, userDetails.getId());
+            
+            log.info("<= 챌린지 참여 신청 목록 조회 성공. challengeId: {}, 신청 개수: {}", challengeId, applications.size());
+            return ResponseEntity.ok(applications);
+            
+        } catch (IllegalArgumentException e) {
+            log.error("챌린지 참여 신청 목록 조회 실패. challengeId: {}, 오류: {}", challengeId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (SecurityException e) {
+            log.error("챌린지 참여 신청 목록 조회 권한 없음. challengeId: {}, 오류: {}", challengeId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @GetMapping("/detail/{applicationId}")
+    @Operation(summary = "챌린지 신청서 상세 조회", description = "방장이 특정 신청서의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "신청서 상세 조회 성공",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChallengeApplicationDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "방장 권한 없음",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "신청서를 찾을 수 없음",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<ChallengeApplicationDTO> getChallengeApplicationDetail(
+            @PathVariable Long applicationId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        try {
+            log.info("=> 챌린지 신청서 상세 조회 요청. applicationId: {}, ownerId: {}", applicationId, userDetails.getId());
+            
+            ChallengeApplicationDTO application = challengeApplicationService
+                    .getChallengeApplicationDetail(applicationId, userDetails.getId());
+            
+            log.info("<= 챌린지 신청서 상세 조회 성공. applicationId: {}", applicationId);
+            return ResponseEntity.ok(application);
+            
+        } catch (IllegalArgumentException e) {
+            log.error("챌린지 신청서 상세 조회 실패. applicationId: {}, 오류: {}", applicationId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (SecurityException e) {
+            log.error("챌린지 신청서 상세 조회 권한 없음. applicationId: {}, 오류: {}", applicationId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }
 

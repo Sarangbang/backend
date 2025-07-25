@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challengeapplication.dto.ChangeChallengeAppDTO;
+import sarangbang.site.challengeapplication.dto.ChallengeApplicationDTO;
 import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
@@ -17,7 +18,9 @@ import sarangbang.site.challengemember.service.ChallengeMemberService;
 import org.springframework.context.ApplicationEventPublisher;
 import sarangbang.site.challengeapplication.event.ChallengeMemberAcceptedEvent;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
@@ -118,5 +121,64 @@ public class ChallengeApplicationService {
 
         log.info("<= 챌린지 신청서 저장 로직 종료. userId: {}, applicationId: {}", userId, challengeApplication.getId());
         return responseDTO;
+    }
+
+    /**
+     * 특정 챌린지의 참여 신청 목록 조회 (방장 전용)
+     */
+    @Transactional(readOnly = true)
+    public List<ChallengeApplicationDTO> getChallengeApplications(Long challengeId, String ownerId) {
+        log.info("=> 챌린지 참여 신청 목록 조회 시작. challengeId: {}, ownerId: {}", challengeId, ownerId);
+        
+        // 방장 권한 확인
+        validateOwnerPermission(ownerId, challengeId);
+        
+        List<ChallengeApplication> applications = challengeApplicationRepository
+                .findByChallengeIdWithUserAndRegion(challengeId);
+        
+        List<ChallengeApplicationDTO> result = applications.stream()
+                .map(ChallengeApplicationDTO::from)
+                .collect(Collectors.toList());
+        
+        log.info("<= 챌린지 참여 신청 목록 조회 완료. challengeId: {}, 신청 개수: {}", challengeId, result.size());
+        return result;
+    }
+
+    /**
+     * 특정 신청서 상세 조회 (방장 전용)
+     */
+    @Transactional(readOnly = true)
+    public ChallengeApplicationDTO getChallengeApplicationDetail(Long applicationId, String ownerId) {
+        log.info("=> 챌린지 신청서 상세 조회 시작. applicationId: {}, ownerId: {}", applicationId, ownerId);
+        
+        ChallengeApplication application = challengeApplicationRepository
+                .findByIdWithUserAndRegion(applicationId);
+        
+        if (application == null) {
+            throw new IllegalArgumentException("신청서를 찾을 수 없습니다. applicationId: " + applicationId);
+        }
+        
+        // 방장 권한 확인
+        validateOwnerPermission(ownerId, application.getChallenge().getId());
+        
+        ChallengeApplicationDTO result = ChallengeApplicationDTO.from(application);
+        
+        log.info("<= 챌린지 신청서 상세 조회 완료. applicationId: {}", applicationId);
+        return result;
+    }
+
+    /**
+     * 방장 권한 검증
+     */
+    private void validateOwnerPermission(String ownerId, Long challengeId) {
+        Optional<ChallengeMember> member = challengeMemberService.getMemberByChallengeId(ownerId, challengeId);
+        
+        if (member.isEmpty()) {
+            throw new IllegalArgumentException("챌린지 멤버를 찾을 수 없습니다.");
+        }
+        
+        if (!"owner".equals(member.get().getRole())) {
+            throw new SecurityException("챌린지 방장만 참여 신청을 조회할 수 있습니다.");
+        }
     }
 }
