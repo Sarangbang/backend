@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import sarangbang.site.chat.enums.MessageType;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,16 @@ public class ChatMessageDto {
 
     // 메시지 내용
     private String message;
+
+    private LocalDateTime createdAt;
+
+    private int unreadCount;
+
+    public ChatMessageDto(MessageType type, String roomId, Sender sender, String message, LocalDateTime createdAt) {
+        this.type = type;
+        this.roomId = roomId;
+        this.sender = sender;
+        this.message = message;
+        this.createdAt = createdAt;
+    }
 }

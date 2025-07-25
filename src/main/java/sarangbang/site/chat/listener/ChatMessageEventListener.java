@@ -12,6 +12,8 @@ import sarangbang.site.chat.service.ChatService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 import sarangbang.site.chat.entity.ChatRoom;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -41,7 +43,8 @@ public class ChatMessageEventListener {
             MessageType.ENTER,
             chatRoom.getRoomId(),
             sender,
-            messageContent
+            messageContent,
+            LocalDateTime.now()
         );
         chatService.sendMessageToRoom(chatRoom.getRoomId(), entryMessage);
     }

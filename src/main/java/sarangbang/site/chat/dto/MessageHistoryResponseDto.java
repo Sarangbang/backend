@@ -2,7 +2,6 @@ package sarangbang.site.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import sarangbang.site.chat.entity.ChatMessage;
 
 import java.util.List;
 
@@ -10,6 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 public class MessageHistoryResponseDto {
 
-    private List<ChatMessage> messages;
+    private List<ChatMessageDto> messages;
     private boolean hasNext;
 }
