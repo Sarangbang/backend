@@ -21,6 +21,8 @@ import sarangbang.site.challengeapplication.event.ChallengeMemberAcceptedEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
@@ -34,6 +36,7 @@ public class ChallengeApplicationService {
     private final UserService userService;
     private final ChallengeService challengeService;
     private final ApplicationEventPublisher eventPublisher;
+    private final FileStorageService fileStorageService;
 
     // 챌린지 신청 수락/거부
     @Transactional
@@ -129,17 +132,17 @@ public class ChallengeApplicationService {
     @Transactional(readOnly = true)
     public List<ChallengeApplicationDTO> getChallengeApplications(Long challengeId, String ownerId) {
         log.info("=> 챌린지 참여 신청 목록 조회 시작. challengeId: {}, ownerId: {}", challengeId, ownerId);
-        
+
         // 방장 권한 확인
         validateOwnerPermission(ownerId, challengeId);
-        
+
         List<ChallengeApplication> applications = challengeApplicationRepository
                 .findByChallengeIdWithUserAndRegion(challengeId);
-        
+
         List<ChallengeApplicationDTO> result = applications.stream()
-                .map(ChallengeApplicationDTO::from)
+                .map(app -> ChallengeApplicationDTO.from(app, fileStorageService)) // fileStorageService 전달
                 .collect(Collectors.toList());
-        
+
         log.info("<= 챌린지 참여 신청 목록 조회 완료. challengeId: {}, 신청 개수: {}", challengeId, result.size());
         return result;
     }
@@ -150,19 +153,19 @@ public class ChallengeApplicationService {
     @Transactional(readOnly = true)
     public ChallengeApplicationDTO getChallengeApplicationDetail(Long applicationId, String ownerId) {
         log.info("=> 챌린지 신청서 상세 조회 시작. applicationId: {}, ownerId: {}", applicationId, ownerId);
-        
+
         ChallengeApplication application = challengeApplicationRepository
                 .findByIdWithUserAndRegion(applicationId);
-        
+
         if (application == null) {
             throw new IllegalArgumentException("신청서를 찾을 수 없습니다. applicationId: " + applicationId);
         }
-        
+
         // 방장 권한 확인
         validateOwnerPermission(ownerId, application.getChallenge().getId());
-        
-        ChallengeApplicationDTO result = ChallengeApplicationDTO.from(application);
-        
+
+        ChallengeApplicationDTO result = ChallengeApplicationDTO.from(application, fileStorageService); // 수정
+
         log.info("<= 챌린지 신청서 상세 조회 완료. applicationId: {}", applicationId);
         return result;
     }
