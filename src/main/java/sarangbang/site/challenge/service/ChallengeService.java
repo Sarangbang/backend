@@ -55,7 +55,7 @@ public class ChallengeService {
 
         boolean exist = challengeRepository.existsByTitleAndUserIsCreator(dto.getTitle(), userId);
         if(exist) {
-            throw new IllegalStateException("동일한 챌린지를 생성하였습니다.");
+            throw new IllegalStateException("동일한 챌린지를 생성하였습니다. 잠시만 기다려주세요.");
         }
 
         ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
