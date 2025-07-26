@@ -19,7 +19,7 @@ public class ChallengeCategoryDTO {
         return new ChallengeCategoryDTO(
             category.getCategoryId(),
             category.getCategoryName(),
-            category.getImageUrl()
+            category.getCategoryImageUrl()
         );
     }
 }

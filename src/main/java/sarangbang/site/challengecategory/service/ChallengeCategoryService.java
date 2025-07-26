@@ -37,16 +37,15 @@ public class ChallengeCategoryService {
      */
     private void insertDefaultCategories() {
         List<ChallengeCategory> defaultCategories = Arrays.asList(
-            new ChallengeCategory("전체", "/images/charactors/category_all.png"),
-            new ChallengeCategory("기상/루틴", "/images/charactors/default_wakeup.png"),
-            new ChallengeCategory("학습/도서", "/images/charactors/default_study.png"),
-            new ChallengeCategory("운동/건강", "/images/charactors/default_health.png"),
-            new ChallengeCategory("생활/정리", "/images/charactors/default_life.png"),
-            new ChallengeCategory("마음/감정", "/images/charactors/default_mind.png"),
-            new ChallengeCategory("취미/자기계발", "/images/charactors/default_hobby.png"),
-            new ChallengeCategory("관계/소통", "/images/charactors/default_communication.png"),
-            new ChallengeCategory("재테크/자산", "/images/charactors/default_money.png"),
-            new ChallengeCategory("그 외", "/images/charactors/default_general.png")
+            new ChallengeCategory("기상/루틴", "/images/charactors/default_wakeup.png", "/images/categories/sun.png"),
+            new ChallengeCategory("학습/도서", "/images/charactors/default_study.png", "/images/categories/book.png"),
+            new ChallengeCategory("운동/건강", "/images/charactors/default_health.png","/images/categories/runningshoes.png"),
+            new ChallengeCategory("생활/정리", "/images/charactors/default_life.png", "/images/categories/box.png"),
+            new ChallengeCategory("마음/감정", "/images/charactors/default_mind.png", "/images/categories/smile.png"),
+            new ChallengeCategory("취미/자기계발", "/images/charactors/default_hobby.png", "/images/categories/pallete.png"),
+            new ChallengeCategory("관계/소통", "/images/charactors/default_communication.png", "/images/categories/chat.png"),
+            new ChallengeCategory("재테크/자산", "/images/charactors/default_money.png", "/images/categories/money.png"),
+            new ChallengeCategory("그 외", "/images/charactors/default_general.png", "/images/categories/question.png")
         );
         
         challengeCategoryRepository.saveAll(defaultCategories);
