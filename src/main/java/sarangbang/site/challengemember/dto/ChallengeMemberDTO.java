@@ -24,4 +24,9 @@ public class ChallengeMemberDTO {
     private String challengeMethod;
     @Schema(description = "인증 여부", example = "true")
     private boolean status;
+
+    @Schema(description = "사용자 프로필 이미지 URL", example = "https://example.com/profile.jpg")
+    private String profileImageUrl;
+    @Schema(description = "사용자 지역", example = "서울특별시 강남구")
+    private String userRegion;
 }

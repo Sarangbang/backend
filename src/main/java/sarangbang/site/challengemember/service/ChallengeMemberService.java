@@ -73,13 +73,30 @@ public class ChallengeMemberService {
 
             boolean isVerified = verification.isPresent();
 
+            // 프로필 이미지 presigned URL 생성
+            String profileImageUrl = null;
+            if (member.getUser().getProfileImageUrl() != null) {
+                profileImageUrl = fileStorageService.generatePresignedUrl(
+                        member.getUser().getProfileImageUrl(),
+                        Duration.ofMinutes(10)
+                );
+            }
+
+            // 지역 정보 처리
+            String userRegion = null;
+            if (member.getUser().getRegion() != null) {
+                userRegion = member.getUser().getRegion().getFullAddress();
+            }
+
             ChallengeMemberDTO dto = new ChallengeMemberDTO(
                     member.getChallengeMemberId(),
                     member.getUser().getNickname(),
                     member.getRole(),
                     member.getChallenge().getTitle(),
                     member.getChallenge().getMethod(),
-                    isVerified
+                    isVerified,
+                    profileImageUrl,  // 추가
+                    userRegion       // 추가
             );
 
             memberDTOs.add(dto);

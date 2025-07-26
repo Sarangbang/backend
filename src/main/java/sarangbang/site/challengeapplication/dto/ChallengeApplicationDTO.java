@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
+import sarangbang.site.file.service.FileStorageService;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Schema(description = "챌린지 관리 참여 신청 DTO")
@@ -55,21 +57,29 @@ public class ChallengeApplicationDTO {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
-    
-    public static ChallengeApplicationDTO from(ChallengeApplication application) {
+    public static ChallengeApplicationDTO from(ChallengeApplication application, FileStorageService fileStorageService) {
+        // 프로필 이미지 presigned URL 생성
+        String profileImageUrl = null;
+        if (application.getUser().getProfileImageUrl() != null) {
+            profileImageUrl = fileStorageService.generatePresignedUrl(
+                    application.getUser().getProfileImageUrl(),
+                    Duration.ofMinutes(10)
+            );
+        }
+
         return new ChallengeApplicationDTO(
-            application.getId(),
-            application.getUser().getId(),
-            application.getUser().getNickname(),
-            application.getUser().getProfileImageUrl(),
-            application.getUser().getRegion() != null ? 
-                application.getUser().getRegion().getFullAddress() : null,
-            application.getIntroduction(),
-            application.getReason(),
-            application.getCommitment(),
-            application.getChallengeApplyStatus(),
-            application.getComment(),
-            application.getCreatedAt()
+                application.getId(),
+                application.getUser().getId(),
+                application.getUser().getNickname(),
+                profileImageUrl, // presigned URL로 변경
+                application.getUser().getRegion() != null ?
+                        application.getUser().getRegion().getFullAddress() : null,
+                application.getIntroduction(),
+                application.getReason(),
+                application.getCommitment(),
+                application.getChallengeApplyStatus(),
+                application.getComment(),
+                application.getCreatedAt()
         );
     }
 }

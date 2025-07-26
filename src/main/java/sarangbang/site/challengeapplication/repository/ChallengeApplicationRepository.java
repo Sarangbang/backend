@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challengeapplication.entity.ChallengeApplication;
+import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 import sarangbang.site.user.entity.User;
 
 import java.util.List;
@@ -14,6 +15,14 @@ import java.util.List;
 public interface ChallengeApplicationRepository extends JpaRepository<ChallengeApplication, Long> {
     ChallengeApplication findChallengeApplicationById(Long id);
     boolean existsByUserAndChallenge(User user, Challenge challenge);
+
+    @Query("SELECT ca FROM ChallengeApplication ca " +
+            "JOIN FETCH ca.user " +
+            "LEFT JOIN FETCH ca.user.region " +
+            "WHERE ca.challenge.id = :challengeId " +
+            "AND ca.challengeApplyStatus = :status " +
+            "ORDER BY ca.createdAt DESC")
+    List<ChallengeApplication> findByChallengeIdAndStatusWithUserAndRegion(@Param("challengeId") Long challengeId, @Param("status") ChallengeApplyStatus status);
     
     @Query("SELECT ca FROM ChallengeApplication ca " +
            "JOIN FETCH ca.user " +
