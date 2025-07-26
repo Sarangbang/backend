@@ -62,4 +62,8 @@ public class Challenge extends BaseEntity {
         this.challengeCategory = challengeCategory;
     }
 
+    public boolean isStarted() {
+        return !this.startDate.isAfter(LocalDate.now());
+    }
+
 }
