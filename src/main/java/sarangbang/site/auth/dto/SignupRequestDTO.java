@@ -1,5 +1,7 @@
 package sarangbang.site.auth.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -31,6 +33,9 @@ public class SignupRequestDTO {
     @NotNull(message = "지역은 필수 입력 항목입니다.")
     @Schema(description = "지역 ID", example = "182")
     private Long regionId;
+
+    @Schema(description = "프로필 사진", example = "profiles/728629df-7893-462a-9c52-fee0861434e3/profile.jpg")
+    private MultipartFile profileImage;
 
     public boolean passwordMatched() {
         return password != null && password.equals(passwordConfirm);

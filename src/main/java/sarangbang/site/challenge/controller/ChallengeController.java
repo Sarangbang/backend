@@ -16,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.challenge.dto.ChallengeDTO;
@@ -27,6 +28,7 @@ import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Challenge", description = "챌린지 관련 API")
 @RestController
@@ -45,7 +47,7 @@ public class ChallengeController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ChallengeDTO> saveChallenge(@RequestPart ChallengeDTO challengeDTO, @RequestPart(value = "imageFile", required = false) MultipartFile imageFile, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> saveChallenge(@RequestPart ChallengeDTO challengeDTO, @RequestPart(value = "imageFile", required = false) MultipartFile imageFile, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             log.debug("챌린지 등록 요청 : {}, 요청자 : {}", challengeDTO, userDetails.getId());
             ChallengeDTO saveChallenge = challengeService.saveChallenge(challengeDTO, userDetails.getId(), imageFile);
@@ -53,7 +55,10 @@ public class ChallengeController {
 
         } catch (IllegalArgumentException | RegionNotFoundException e) {
             log.error("챌린지 등록 입력값 오류 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            log.error("중복 챌린지 생성 오류 - 요청자 : {}, 오류 : {}", userDetails.getId(), e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 

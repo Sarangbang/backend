@@ -105,7 +105,7 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "데이터 중복 (이미 사용 중인 이메일 또는 닉네임)", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"error\": \"이미 가입된 이메일입니다.\"}")))
     })
     @PostMapping("/signup")
-    public ResponseEntity<?> register(@Valid @RequestBody SignupRequestDTO requestDto) {
+    public ResponseEntity<?> register(@Valid @ModelAttribute SignupRequestDTO requestDto) {
         try {
             String userId = authService.register(requestDto);
             Map<String, String> responseBody = Map.of(
