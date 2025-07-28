@@ -184,20 +184,19 @@ public class ChallengeVerificationService {
     // 챌린지 인증 내역 취소
     @Transactional
     public void deleteVerification(String userId, DeleteChallengeVerificationDTO dto) {
-        if(!dto.getVerifyDate().isEqual(LocalDate.now())) {
+        if(!dto.getVerifiedAt().isEqual(LocalDate.now())) {
             throw new IllegalArgumentException("이전 챌린지는 취소가 불가능합니다.");
         }
 
         ChallengeMember member = challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(userId, dto.getChallengeId()).orElseThrow(() -> new IllegalArgumentException("챌린지 멤버가 아닙니다.")); // 로그인된 user
         String role = member.getRole();
 
-        LocalDateTime startDate = dto.getVerifyDate().atStartOfDay();
-        LocalDateTime endDate = dto.getVerifyDate().atTime(23, 59, 59);
+        LocalDateTime startDate = dto.getVerifiedAt().atStartOfDay();
+        LocalDateTime endDate = dto.getVerifiedAt().atTime(23, 59, 59);
 
         ChallengeVerification verification = challengeVerificationRepository.findByChallenge_IdAndUser_IdAndVerifiedAtBetween(dto.getChallengeId(), dto.getUserId(), startDate, endDate).orElseThrow(() -> new IllegalArgumentException("해당 인증내역이 존재하지 않습니다."));
         String imageUrl = verification.getImgUrl();
 
-        // 방장일경우
         if(imageUrl != null){
             if(role.equals("owner")){
                 fileStorageService.deleteFile(imageUrl);

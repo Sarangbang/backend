@@ -135,13 +135,13 @@ public class ChallengeVerificationController {
             @ApiResponse(responseCode = "400", description = "인증 내역 취소 실패")
     })
     @DeleteMapping
-    public ResponseEntity<?> deleteVerifications(
+    public ResponseEntity<Map<String, String>> deleteVerifications(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody DeleteChallengeVerificationDTO deleteChallengeVerificationDTO
     ) {
         try{
             challengeVerificationService.deleteVerification(userDetails.getId(), deleteChallengeVerificationDTO);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(Map.of("message", "사진이 성공적으로 삭제되었습니다."));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }

@@ -22,5 +22,5 @@ public class DeleteChallengeVerificationDTO {
     private Long challengeId;
     @NotBlank
     @Schema(description = "인증일", example = "2025-07-28")
-    private LocalDate verifyDate;
+    private LocalDate verifiedAt;
 }
