@@ -30,6 +30,7 @@ import sarangbang.site.challengeapplication.service.ChallengeApplicationService;
 import sarangbang.site.security.details.CustomUserDetails;
 
 import java.util.List;
+import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 
 @Tag(name = "Challenge-application", description = "챌린지 신청서 관련 API")
 @Slf4j
@@ -177,6 +178,39 @@ public class ChallengeApplicationController {
         } catch (SecurityException e) {
             log.error("챌린지 신청서 상세 조회 권한 없음. applicationId: {}, 오류: {}", applicationId, e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @GetMapping("/status/{challengeId}")
+    @Operation(summary = "사용자의 챌린지 신청 상태 조회", description = "현재 로그인한 사용자의 특정 챌린지 신청 상태를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "신청 상태 조회 성공",
+                    content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "챌린지를 찾을 수 없음",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<String> getUserApplicationStatus(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        
+        try {
+            log.info("=> 사용자 신청 상태 조회 요청. challengeId: {}, userId: {}", challengeId, userDetails.getId());
+            
+            String status = challengeApplicationService
+                    .getUserApplicationStatus(challengeId, userDetails.getId());
+            
+            log.info("<= 사용자 신청 상태 조회 성공. challengeId: {}, status: {}", challengeId, status);
+            return ResponseEntity.ok(status);
+            
+        } catch (IllegalArgumentException e) {
+            log.error("사용자 신청 상태 조회 실패. challengeId: {}, 오류: {}", challengeId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
