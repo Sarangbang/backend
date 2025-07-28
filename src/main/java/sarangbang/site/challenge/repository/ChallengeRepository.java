@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import sarangbang.site.challenge.dto.ChallengePopularityResponseDTO;
 import sarangbang.site.challenge.entity.Challenge;
 
@@ -32,10 +33,26 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
             "    c.region.fullAddress, " +
             "    c.image, " +
             "    c.participants, " +
-            "    COUNT(cm.challengeMemberId)) " +
+            "    COUNT(cm.challengeMemberId), " +
+            "    c.startDate, " +
+            "    c.endDate, " +
+            "    c.challengeCategory.categoryId, " +
+            "    c.challengeCategory.categoryName) " +
             "FROM Challenge c " +
             "LEFT JOIN ChallengeMember cm ON c.id = cm.challenge.id " +
-            "GROUP BY c.id, c.title, c.region, c.image, c.participants " +
+            "WHERE c.status = true " +
+            "GROUP BY c.id, c.title, c.region.fullAddress, c.image, c.participants, " +
+            "         c.startDate, c.endDate, c.challengeCategory.categoryId, c.challengeCategory.categoryName " +
             "ORDER BY COUNT(cm.challengeMemberId) DESC")
     List<ChallengePopularityResponseDTO> findChallengesByPopularity();
+
+    @Query("""
+    SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END
+    FROM Challenge c
+    JOIN ChallengeMember cm ON cm.challenge = c
+    WHERE cm.user.id = :userId
+      AND cm.role = 'owner'
+      AND c.title = :title
+""")
+    boolean existsByTitleAndUserIsCreator(@Param("title") String title, @Param("userId") String userId);
 }

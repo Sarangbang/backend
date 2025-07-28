@@ -38,11 +38,11 @@ public class ChallengeDetailResponseDto {
     * @param challenge 데이터베이스에서 조회한 Challenge 엔티티 객체
     * @param currentParticipants ChallengeMemberRepository에서 계산한 현재 참여자 수
     * */
-    public ChallengeDetailResponseDto(Challenge challenge, int currentParticipants) {
+    public ChallengeDetailResponseDto(Challenge challenge, String imageUrl, int currentParticipants) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
         this.description = challenge.getDescription();
-        this.imageUrl = challenge.getImage();
+        this.imageUrl = imageUrl;
         this.method = challenge.getMethod();
         this.maxParticipants = challenge.getParticipants();
         this.startDate = challenge.getStartDate();
@@ -55,7 +55,8 @@ public class ChallengeDetailResponseDto {
         this.category = new ChallengeCategoryDTO(
                 challenge.getChallengeCategory().getCategoryId(),
                 challenge.getChallengeCategory().getCategoryName(),
-                challenge.getChallengeCategory().getImageUrl()
+                challenge.getChallengeCategory().getChallengeImageUrl()
         );
+
     }
 }

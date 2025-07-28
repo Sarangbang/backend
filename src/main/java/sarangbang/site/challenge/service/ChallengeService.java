@@ -53,6 +53,11 @@ public class ChallengeService {
     @Transactional
     public ChallengeDTO saveChallenge(ChallengeDTO dto, String userId, MultipartFile imageFile) {
 
+        boolean exist = challengeRepository.existsByTitleAndUserIsCreator(dto.getTitle(), userId);
+        if(exist) {
+            throw new IllegalStateException("동일한 챌린지를 생성하였습니다. 잠시만 기다려주세요.");
+        }
+
         ChallengeCategory category = challengeCategoryRepository.findChallengeCategoryByCategoryId(dto.getCategoryId());
         log.debug("챌린지 카테고리 정보 : {}", category.getCategoryName());
 
@@ -164,12 +169,30 @@ public class ChallengeService {
         //현재 참여자 수를 조회
         int currentParticipants = challengeMemberRepository.countByChallengeId(challengeId);
 
+        String imageUrl = null;
+        if(challenge.getImage() != null) {
+            imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+        }
+
         //엔티티와 참여자 수를 DTO 생성자에 넘겨 변환 후 반환
-        return new ChallengeDetailResponseDto(challenge, currentParticipants);
+        return new ChallengeDetailResponseDto(challenge, imageUrl, currentParticipants);
     }
 
     // 챌린지 인기순 조회
     public List<ChallengePopularityResponseDTO> getChallengePopularity() {
-        return challengeRepository.findChallengesByPopularity();
+
+        List<ChallengePopularityResponseDTO> challenges = challengeRepository.findChallengesByPopularity();
+
+        for(ChallengePopularityResponseDTO challenge : challenges) {
+            String imageUrl = challenge.getImage();
+            if(imageUrl != null) {
+                imageUrl = fileStorageService.generatePresignedUrl(challenge.getImage(), Duration.ofMinutes(10));
+                challenge.updateImageUrl(imageUrl);
+            } else {
+                challenge.updateImageUrl(null);
+            }
+        }
+
+        return challenges;
     }
 }

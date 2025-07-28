@@ -15,6 +15,6 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
     Slice<ChatMessage> findByRoomId(String roomId, Pageable pageable);
 
     long countByRoomIdAndSender_UserIdNotAndCreatedAtAfter(String roomId, String sender_UserId, LocalDateTime createdAtAfter);
-    
-    
+
+
 }

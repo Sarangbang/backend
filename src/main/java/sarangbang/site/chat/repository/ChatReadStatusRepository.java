@@ -3,7 +3,6 @@ package sarangbang.site.chat.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import sarangbang.site.chat.entity.ChatReadStatus;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

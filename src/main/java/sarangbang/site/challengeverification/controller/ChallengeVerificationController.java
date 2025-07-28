@@ -20,6 +20,7 @@ import sarangbang.site.security.details.CustomUserDetails;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/challenge-verifications")
@@ -52,7 +53,7 @@ public class ChallengeVerificationController {
             )
     })
     
-    public ResponseEntity<ChallengeVerificationResponseDTO> createVerification(
+    public ResponseEntity<?> createVerification(
             @ModelAttribute @Valid ChallengeVerificationRequestDTO dto, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         try {
@@ -62,9 +63,9 @@ public class ChallengeVerificationController {
 
             return ResponseEntity.ok(result);
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             log.error("챌린지 인증 등록 실패: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -125,6 +126,25 @@ public class ChallengeVerificationController {
         List<MyChallengeVerificationResponseDto> myVerifications = challengeVerificationService.getMyVerifications(userId);
 
         return ResponseEntity.ok(myVerifications);
+    }
+
+    // 챌린지 인증내역 취소
+    @Operation(summary = "챌린지 인증 취소", description = "챌린지의 인증 내역을 취소합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 내역 취소 성공"),
+            @ApiResponse(responseCode = "400", description = "인증 내역 취소 실패")
+    })
+    @DeleteMapping
+    public ResponseEntity<Map<String, String>> deleteVerifications(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody DeleteChallengeVerificationDTO deleteChallengeVerificationDTO
+    ) {
+        try{
+            challengeVerificationService.deleteVerification(userDetails.getId(), deleteChallengeVerificationDTO);
+            return ResponseEntity.ok(Map.of("message", "사진이 성공적으로 삭제되었습니다."));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
 }

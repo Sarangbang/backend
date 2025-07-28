@@ -19,9 +19,6 @@ import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
 import sarangbang.site.challengeverification.enums.ChallengeVerificationStatus;
 import sarangbang.site.challengeverification.repository.ChallengeVerificationRepository;
-import sarangbang.site.chat.entity.ChatRoom;
-import sarangbang.site.chat.enums.ChatSourceType;
-import sarangbang.site.chat.enums.RoomType;
 import sarangbang.site.chat.repository.ChatRoomRepository;
 import sarangbang.site.region.entity.Region;
 import sarangbang.site.region.entity.RegionType;
@@ -30,8 +27,10 @@ import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
@@ -103,10 +102,10 @@ public class DummyDataInitializer implements CommandLineRunner {
     }
 
     private void createChallengeCategories() {
-        ChallengeCategory cat1 = new ChallengeCategory("운동", "https://picsum.photos/200/300");
-        ChallengeCategory cat2 = new ChallengeCategory("스터디", "https://picsum.photos/200/300");
-        ChallengeCategory cat3 = new ChallengeCategory("생활습관", "https://picsum.photos/200/300");
-        ChallengeCategory cat4 = new ChallengeCategory("취미", "https://picsum.photos/200/300");
+        ChallengeCategory cat1 = new ChallengeCategory("운동", "https://picsum.photos/200/300", "https://picsum.photos/200/300");
+        ChallengeCategory cat2 = new ChallengeCategory("스터디", "https://picsum.photos/200/300", "https://picsum.photos/200/300");
+        ChallengeCategory cat3 = new ChallengeCategory("생활습관", "https://picsum.photos/200/300", "https://picsum.photos/200/300");
+        ChallengeCategory cat4 = new ChallengeCategory("취미", "https://picsum.photos/200/300", "https://picsum.photos/200/300");
 
         categories.addAll(challengeCategoryRepository.saveAll(Arrays.asList(cat1, cat2, cat3, cat4)));
     }

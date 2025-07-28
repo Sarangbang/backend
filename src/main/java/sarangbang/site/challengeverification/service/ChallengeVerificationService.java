@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
+import sarangbang.site.challengemember.entity.ChallengeMember;
+import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 import sarangbang.site.challengeverification.dto.*;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
@@ -36,11 +38,16 @@ public class ChallengeVerificationService {
     private final UserService userService;
     private final ImageSaveFactory imageSaveFactory;
     private final FileStorageService fileStorageService;
+    private final ChallengeMemberRepository challengeMemberRepository;
 
     public ChallengeVerificationResponseDTO createVerification(String userId, ChallengeVerificationRequestDTO dto) {
 
         // 1. 챌린지 존재 확인
         Challenge challenge = challengeService.getChallengeById(dto.getChallengeId());
+
+        if(!challenge.isStarted()) {
+            throw new IllegalStateException("아직 시작되지 않은 챌린지입니다.");
+        }
 
         // 2. 사용자 조회 (ID로 조회)
         User user = userService.getUserById(userId);
@@ -162,7 +169,45 @@ public class ChallengeVerificationService {
     @Transactional(readOnly = true) // 데이터를 조회만 하므로 성능 최적화를 위해 readOnly 설정
     public List<MyChallengeVerificationResponseDto> getMyVerifications(String userId) {
 
+        List<MyChallengeVerificationResponseDto> dtos = challengeVerificationRepository.findMyVerifications(userId, ChallengeVerificationStatus.APPROVED);
+
+        for(MyChallengeVerificationResponseDto dto : dtos){
+            String imgUrl = dto.getImgUrl();
+            if(imgUrl != null){
+                dto.updateImgUrl(fileStorageService.generatePresignedUrl(imgUrl, Duration.ofMinutes(10)));
+            }
+        }
         // Repository에 사용자 ID를 전달하여 데이터를 요청합니다.
-        return challengeVerificationRepository.findMyVerifications(userId, ChallengeVerificationStatus.APPROVED);
+        return dtos;
+    }
+
+    // 챌린지 인증 내역 취소
+    @Transactional
+    public void deleteVerification(String userId, DeleteChallengeVerificationDTO dto) {
+        if(!dto.getVerifiedAt().isEqual(LocalDate.now())) {
+            throw new IllegalArgumentException("이전 챌린지는 취소가 불가능합니다.");
+        }
+
+        ChallengeMember member = challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(userId, dto.getChallengeId()).orElseThrow(() -> new IllegalArgumentException("챌린지 멤버가 아닙니다.")); // 로그인된 user
+        String role = member.getRole();
+
+        LocalDateTime startDate = dto.getVerifiedAt().atStartOfDay();
+        LocalDateTime endDate = dto.getVerifiedAt().atTime(23, 59, 59);
+
+        ChallengeVerification verification = challengeVerificationRepository.findByChallenge_IdAndUser_IdAndVerifiedAtBetween(dto.getChallengeId(), dto.getUserId(), startDate, endDate).orElseThrow(() -> new IllegalArgumentException("해당 인증내역이 존재하지 않습니다."));
+        String imageUrl = verification.getImgUrl();
+
+        if(imageUrl != null){
+            if(role.equals("owner")){
+                fileStorageService.deleteFile(imageUrl);
+            } else {
+                if(!userId.equals(dto.getUserId())) {
+                    throw new IllegalArgumentException("본인 이외의 챌린지는 취소가 불가능합니다.");
+                }
+                fileStorageService.deleteFile(imageUrl);
+            }
+        }
+        challengeVerificationRepository.delete(verification);
+
     }
 }
