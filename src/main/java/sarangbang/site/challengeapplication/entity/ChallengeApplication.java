@@ -52,4 +52,13 @@ public class ChallengeApplication extends BaseEntity {
     public void updateAppComment(String comment) {
         this.comment = comment;
     }
+
+    // 거절된 신청서 재신청 시 전체 내용 업데이트
+    public void updateApplication(String introduction, String reason, String commitment, ChallengeApplyStatus status) {
+        this.introduction = introduction;
+        this.reason = reason;
+        this.commitment = commitment;
+        this.challengeApplyStatus = status;
+        this.comment = null; // 재신청 시 이전 코멘트 초기화
+    }
 }
