@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.service.ChallengeService;
 import sarangbang.site.challengemember.dto.ChallengeMemberResponseDTO;
+import sarangbang.site.challengemember.entity.ChallengeMember;
+import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 import sarangbang.site.challengeverification.dto.*;
 import sarangbang.site.challengeverification.entity.ChallengeVerification;
@@ -36,6 +38,7 @@ public class ChallengeVerificationService {
     private final UserService userService;
     private final ImageSaveFactory imageSaveFactory;
     private final FileStorageService fileStorageService;
+    private final ChallengeMemberRepository challengeMemberRepository;
 
     public ChallengeVerificationResponseDTO createVerification(String userId, ChallengeVerificationRequestDTO dto) {
 
@@ -176,5 +179,37 @@ public class ChallengeVerificationService {
         }
         // Repository에 사용자 ID를 전달하여 데이터를 요청합니다.
         return dtos;
+    }
+
+    // 챌린지 인증 내역 취소
+    @Transactional
+    public void deleteVerification(String userId, DeleteChallengeVerificationDTO dto) {
+        if(!dto.getVerifyDate().isEqual(LocalDate.now())) {
+            throw new IllegalArgumentException("이전 챌린지는 취소가 불가능합니다.");
+        }
+
+        User user = userService.getUserById(dto.getUserId()); // 인증내역 삭제할 user
+        ChallengeMember member = challengeMemberRepository.findChallengeMemberByUser_IdAndChallenge_Id(userId, dto.getChallengeId()).orElseThrow(() -> new IllegalArgumentException("챌린지 멤버가 아닙니다.")); // 로그인된 user
+        String role = member.getRole();
+
+        LocalDateTime startDate = dto.getVerifyDate().atStartOfDay();
+        LocalDateTime endDate = dto.getVerifyDate().atTime(23, 59, 59);
+
+        ChallengeVerification verification = challengeVerificationRepository.findByChallenge_IdAndUser_IdAndVerifiedAtBetween(dto.getChallengeId(), user.getId(), startDate, endDate).orElseThrow(() -> new IllegalArgumentException("해당 인증내역이 존재하지 않습니다."));
+        String imageUrl = verification.getImgUrl();
+
+        // 방장일경우
+        if(imageUrl != null){
+            if(role.equals("owner")){
+                fileStorageService.deleteFile(imageUrl);
+            } else {
+                if(!userId.equals(dto.getUserId())) {
+                    throw new IllegalArgumentException("본인 이외의 챌린지는 취소가 불가능합니다.");
+                }
+                fileStorageService.deleteFile(imageUrl);
+            }
+        }
+        challengeVerificationRepository.delete(verification);
+
     }
 }
