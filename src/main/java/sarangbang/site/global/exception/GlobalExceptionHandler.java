@@ -11,6 +11,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import sarangbang.site.file.exception.FileStorageException;
 import sarangbang.site.global.error.ErrorCode;
 import sarangbang.site.global.error.ErrorResponse;
 import sarangbang.site.global.notification.DiscordWebhookService;
@@ -61,4 +62,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(FileStorageException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleFileStorageException(FileStorageException e) {
+        log.error("파일 처리 오류: {}", e.getMessage());
+
+        ErrorCode errorCode = determineFileErrorCode(e.getMessage());
+        ErrorResponse response = new ErrorResponse(errorCode.getStatus(), errorCode.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    private ErrorCode determineFileErrorCode(String message) {
+        if (message.contains("크기가 너무 큽니다")) {
+            return ErrorCode.FILE_SIZE_EXCEEDED;
+        } else if (message.contains("지원하지 않는") && message.contains("형식")) {
+            return ErrorCode.INVALID_FILE_FORMAT;
+        } else if (message.contains("유효하지 않은 이미지")) {
+            return ErrorCode.INVALID_IMAGE_FILE;
+        } else if (message.contains("손상되었")) {
+            return ErrorCode.CORRUPTED_IMAGE_FILE;
+        } else {
+            return ErrorCode.FILE_UPLOAD_FAILED;
+        }
+    }
 }
