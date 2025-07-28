@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import sarangbang.site.chat.dto.Sender;
 import sarangbang.site.chat.enums.MessageType;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -29,13 +29,13 @@ public class ChatMessage {
 
     private String message;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     public ChatMessage(String roomId, MessageType type, Sender sender, String message) {
         this.roomId = roomId;
         this.type = type;
         this.sender = sender;
         this.message = message;
-        this.createdAt = Instant.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

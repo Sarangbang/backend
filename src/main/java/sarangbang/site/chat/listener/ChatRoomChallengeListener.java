@@ -51,6 +51,7 @@ public class ChatRoomChallengeListener {
                 event.getCreatorId(),               // userId (Long)
                 createdRoom.getRoomId()             // roomId (String)
         );
+        creatorReadStatus.updateLastReadAt();
 
         readStatusRepository.save(creatorReadStatus);
 

@@ -37,8 +37,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         User user = userRepository.findByEmail(userEmail).orElse(null);
         Sender sender = new Sender(String.valueOf(user.getId()), user.getNickname(), user.getProfileImageUrl());
+//        String roomId = ((String) session.getAttributes().get("roomId")).split("&")[0];
 
-        String roomId = session.getUri().getQuery().split("=")[1];
+        String roomId = (session.getUri().getQuery().split("=")[1]).split("&")[0];
 
         session.getAttributes().put("roomId", roomId);
         session.getAttributes().put("sender", sender);
@@ -55,7 +56,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         ChatMessageDto chatMessage = objectMapper.readValue(payload, ChatMessageDto.class);
-        String roomId = (String) session.getAttributes().get("roomId");
+        String roomId = ((String) session.getAttributes().get("roomId")).split("&")[0];
         chatService.sendMessageToRoom(roomId, chatMessage);
     }
 
@@ -66,7 +67,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status){
-        String roomId = (String) session.getAttributes().get("roomId");
+        String roomId = ((String) session.getAttributes().get("roomId")).split("&")[0];
         Sender sender = (Sender) session.getAttributes().get("sender");
 
         chatService.removeSessionFromRoom(roomId, session);

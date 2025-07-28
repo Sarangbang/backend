@@ -12,14 +12,15 @@ import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.MessageHistoryResponseDto;
 import sarangbang.site.chat.entity.ChatMessage;
 import sarangbang.site.chat.entity.ChatReadStatus;
+import sarangbang.site.chat.entity.ChatRoom;
 import sarangbang.site.chat.repository.ChatMessageRepository;
 import sarangbang.site.chat.repository.ChatReadStatusRepository;
+import sarangbang.site.chat.repository.ChatRoomRepository;
 import sarangbang.site.security.details.CustomUserDetails;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -34,6 +35,7 @@ public class ChatService {
     private final ObjectMapper objectMapper;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     /**
      * 특정 채팅방의 메시지를 사용자가 모두 읽었음을 기록합니다.
@@ -64,7 +66,7 @@ public class ChatService {
         // computeIfAbsent: 키(roomId)에 해당하는 값이 없으면 새로운 HashSet을 생성하고, 있으면 기존 Set을 반환합니다.
         chatRooms.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(session);
         // 이전 대화 기록을 조회하여 새로운 세션에만 전송
-        sendPreviousMessages(roomId, session);
+//        sendPreviousMessages(roomId, session);
     }
 
     private void sendPreviousMessages(String roomId, WebSocketSession session) {
@@ -118,13 +120,85 @@ public class ChatService {
         }
     }
 
-    public MessageHistoryResponseDto getMessageHistory(String roomId, Pageable pageable) {
+    /**
+     * 특정 채팅방의 메시지 내역을 조회하며, 내가 보낸 메시지의 '안 읽은 수'를 계산합니다.
+     */
+    @Transactional
+    public MessageHistoryResponseDto getMessageHistory(String roomId, Pageable pageable, String userId) {
+        // 1. 채팅방의 전체 참여자 목록을 미리 조회합니다.
+        ChatRoom chatRoom = chatRoomRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다: " + roomId));
+        List<String> allParticipantIds = chatRoom.getParticipants();
 
+        // 2. 해당 채팅방의 모든 '읽음 상태' 정보를 Map으로 변환하여 성능을 최적화합니다.
+        Map<String, LocalDateTime> readStatusMap = new HashMap<>();
+
+        List<ChatReadStatus> readStatusList = chatReadStatusRepository.findByRoomId(roomId);
+
+        for (ChatReadStatus status : readStatusList) {
+            readStatusMap.put(status.getUserId(), status.getLastReadAt());
+        }
+
+        // 3. DB에서 메시지 목록을 페이지네이션하여 조회합니다.
         Slice<ChatMessage> messageSlice = chatMessageRepository.findByRoomId(roomId, pageable);
-        List<ChatMessage> messages = messageSlice.getContent().stream()
-                .map(doc -> new ChatMessage(doc.get_id(), doc.getRoomId(), doc.getType(), doc.getSender(), doc.getMessage(), doc.getCreatedAt())).toList();
 
-        MessageHistoryResponseDto responseDto = new MessageHistoryResponseDto(messages, messageSlice.hasNext());
+        List<ChatMessageDto> messageDtoList = new ArrayList<>();
+        List<ChatMessage> messages = messageSlice.getContent();
+
+        for (ChatMessage message : messages) {
+            ChatMessageDto dto = new ChatMessageDto(
+                    message.get_id(),
+                    message.getType(),
+                    message.getRoomId(),
+                    message.getSender(),
+                    message.getMessage(),
+                    message.getCreatedAt()
+            );
+
+            // 현재 사용자가 보낸 메시지에 대해서만 안 읽은 수를 계산
+            if (message.getSender().getUserId().equals(userId)) {
+                int unreadCount = calculateUnreadCount(message, allParticipantIds, readStatusMap);
+                dto.setUnreadCount(unreadCount);
+            }
+
+            messageDtoList.add(dto);
+        }
+
+        MessageHistoryResponseDto responseDto = new MessageHistoryResponseDto(messageDtoList, messageSlice.hasNext());
+
         return responseDto;
+    }
+
+    /**
+     * 특정 메시지에 대해 안 읽은 사람 수를 계산하는 핵심 메서드입니다.
+     * @param message 기준 메시지
+     * @param allParticipantIds 채팅방 전체 참여자 ID 목록
+     * @param readStatusMap 채팅방 참여자들의 마지막 읽은 시간 Map
+     * @return 안 읽은 사람 수
+     */
+    private int calculateUnreadCount(ChatMessage message, List<String> allParticipantIds, Map<String, LocalDateTime> readStatusMap) {
+        String senderId = message.getSender().getUserId();
+
+        // 1. 전체 참여자 중에서
+        int unreadCount = 0;
+        for (String participantId : allParticipantIds) {
+            // 2. 메시지를 보낸 자신을 제외하고
+            if (participantId.equals(senderId)) {
+                continue;
+            }
+
+            // 3. 각 참여자의 마지막 읽은 시간(lastReadAt)을 가져와서
+            // 4. 메시지가 생성된 시간(createdAt)과 비교합니다.
+            // 읽은 기록이 없으면 아주 오래된 시간(EPOCH)으로 간주
+            LocalDateTime lastReadAt = readStatusMap.getOrDefault(participantId, LocalDateTime.MIN);
+
+            // 마지막 읽은 시간이 메시지 생성 시간보다 이전이면 '안 읽음' 상태
+            // 5. 조건을 만족하는 사용자의 총 수를 계산합니다.
+            if (lastReadAt.isBefore(message.getCreatedAt())) {
+                unreadCount++;
+            }
+        }
+
+        return unreadCount;
     }
 }
