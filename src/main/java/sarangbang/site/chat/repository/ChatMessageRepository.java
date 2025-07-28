@@ -5,7 +5,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import sarangbang.site.chat.entity.ChatMessage;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
@@ -14,5 +14,7 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
 
     Slice<ChatMessage> findByRoomId(String roomId, Pageable pageable);
 
-    Long countByRoomIdAndCreatedAtAfter(String roomId, Instant lastReadAt);
+    long countByRoomIdAndSender_UserIdNotAndCreatedAtAfter(String roomId, String sender_UserId, LocalDateTime createdAtAfter);
+
+
 }

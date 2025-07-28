@@ -235,11 +235,11 @@ public class ChallengeApplicationService {
      */
     private void validateOwnerPermission(String ownerId, Long challengeId) {
         Optional<ChallengeMember> member = challengeMemberService.getMemberByChallengeId(ownerId, challengeId);
-        
+
         if (member.isEmpty()) {
             throw new IllegalArgumentException("챌린지 멤버를 찾을 수 없습니다.");
         }
-        
+
         if (!"owner".equals(member.get().getRole())) {
             throw new SecurityException("챌린지 방장만 참여 신청을 조회할 수 있습니다.");
         }
