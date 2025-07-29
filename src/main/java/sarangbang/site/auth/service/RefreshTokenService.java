@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sarangbang.site.auth.entity.RefreshToken;
 import sarangbang.site.auth.repository.RefreshTokenRepository;
+import sarangbang.site.user.entity.User;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,26 +18,31 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void saveToken(String userId, String refreshTokenValue) {
+    public void issueNewToken(User user, String refreshTokenValue, String deviceInfo, String ipAddress, LocalDateTime expiresAt) { // 파라미터명 변경
 
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserId(userId);
+        RefreshToken newRefreshToken = RefreshToken.create(
+                user,
+                refreshTokenValue, // 변경된 파라미터명 전달
+                deviceInfo,
+                ipAddress,
+                expiresAt
+        );
 
-        if (existingToken.isPresent()) {
-            existingToken.get().updateToken(refreshTokenValue);
-        } else {
-            RefreshToken newToken = new RefreshToken(userId, refreshTokenValue);
-            refreshTokenRepository.save(newToken);
-        }
+        refreshTokenRepository.save(newRefreshToken);
     }
 
     @Transactional
-    public Optional<String> findTokenByUserId(String userId) {
-        return refreshTokenRepository.findByUserId(userId)
-                .map(RefreshToken::getRefreshToken);
+    public void deleteTokenByRefreshTokenValue(String refreshTokenValue) { // 메서드명 및 파라미터명 변경
+        refreshTokenRepository.deleteByRefreshTokenValue(refreshTokenValue); // 변경된 리포지토리 메서드 호출
     }
 
-    @Transactional
-    public void deleteToken(String userId) {
-        refreshTokenRepository.deleteByUserId(userId);
+    /**
+     * 특정 사용자가 발급받은 모든 리프레시 토큰 목록을 조회합니다.
+     * @param user 조회할 사용자
+     * @return 해당 사용자의 리프레시 토큰 리스트
+     */
+    @Transactional(readOnly = true) // 단순 조회이므로 readOnly=true 옵션으로 성능 최적화
+    public List<RefreshToken> findAllTokensByUser(User user) {
+        return refreshTokenRepository.findAllByUserOrderByCreatedAtDesc(user);
     }
 }
