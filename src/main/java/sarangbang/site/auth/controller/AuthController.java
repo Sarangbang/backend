@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,12 @@ import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.auth.dto.SignupRequestDTO;
+import sarangbang.site.user.entity.User;
 
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -51,30 +56,45 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "로그인 실패", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"error\": \"이메일 또는 비밀번호가 일치하지 않습니다.\"}")))
     })
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@RequestBody SignInRequestDTO request, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody SignInRequestDTO request, HttpServletRequest httpServletRequest, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-            CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = userDetails.getUser();
 
-            List<String> roles = user.getAuthorities().stream()
+            List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
             String accessToken = jwtTokenProvider.createAccessToken(
-                    user.getId(),           // UUID
-                    user.getEmail(),
+                    userDetails.getId(),           // UUID
+                    userDetails.getEmail(),
                     roles
             );
 
-            String refreshToken = jwtTokenProvider.createRefreshToken(
-                    user.getId()
+            String refreshTokenValue = jwtTokenProvider.createRefreshToken(
+                    userDetails.getId()
             );
 
-            refreshTokenService.saveToken(user.getId(), refreshToken);
+            String deviceInfo = httpServletRequest.getHeader("User-Agent");
+            String ipAddress = httpServletRequest.getRemoteAddr();
 
-            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+            long refreshTokenValidity = 14 * 24 * 60 * 60 * 1000L; // 14일 (Provider와 동일하게)
+            LocalDateTime expiresAt = new Date(System.currentTimeMillis() + refreshTokenValidity).toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+
+            refreshTokenService.issueNewToken(
+                    user,
+                    refreshTokenValue,
+                    deviceInfo,
+                    ipAddress,
+                    expiresAt
+            );
+
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshTokenValue)
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
@@ -84,9 +104,9 @@ public class AuthController {
             response.addHeader("Set-Cookie", cookie.toString());
 
             LoginResponseDto loginResponseDto = LoginResponseDto.builder()
-                    .uuid(user.getId())
-                    .nickname(user.getNickname())
-                    .profileImageUrl(user.getProfileImageUrl())
+                    .uuid(userDetails.getId())
+                    .nickname(userDetails.getNickname())
+                    .profileImageUrl(userDetails.getProfileImageUrl())
                     .accessToken(accessToken)
                     .build();
 

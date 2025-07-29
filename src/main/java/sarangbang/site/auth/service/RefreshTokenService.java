@@ -37,6 +37,16 @@ public class RefreshTokenService {
     }
 
     /**
+     * 리프레시 토큰 값으로 토큰 객체를 조회합니다.
+     * @param refreshTokenValue 조회할 리프레시 토큰 값
+     * @return Optional<RefreshToken>
+     */
+    @Transactional(readOnly = true)
+    public Optional<RefreshToken> findTokenByRefreshTokenValue(String refreshTokenValue) {
+        return refreshTokenRepository.findByRefreshTokenValue(refreshTokenValue);
+    }
+
+    /**
      * 특정 사용자가 발급받은 모든 리프레시 토큰 목록을 조회합니다.
      * @param user 조회할 사용자
      * @return 해당 사용자의 리프레시 토큰 리스트
