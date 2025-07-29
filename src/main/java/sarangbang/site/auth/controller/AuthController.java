@@ -78,7 +78,6 @@ public class AuthController {
                     userDetails.getId()
             );
 
-            String deviceInfo = httpServletRequest.getHeader("User-Agent");
             String ipAddress = httpServletRequest.getRemoteAddr();
 
             long refreshTokenValidity = 14 * 24 * 60 * 60 * 1000L; // 14일 (Provider와 동일하게)
@@ -89,7 +88,6 @@ public class AuthController {
             refreshTokenService.issueNewToken(
                     user,
                     refreshTokenValue,
-                    deviceInfo,
                     ipAddress,
                     expiresAt
             );

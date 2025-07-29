@@ -5,14 +5,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import sarangbang.site.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_tokens")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class RefreshToken{
 
     @Id
@@ -27,7 +30,7 @@ public class RefreshToken{
     private String refreshTokenValue;
 
     @Column(nullable = false)
-    private String deviceInfo;
+    private String deviceInfo; // UUID
 
     @Column(nullable = false)
     private String ipAddress;
@@ -47,7 +50,11 @@ public class RefreshToken{
         this.expiresAt = expiresAt;
     }
 
-    public static RefreshToken create(User user, String refreshTokenValue, String deviceInfo, String ipAddress, LocalDateTime expiresAt) {
+    public static RefreshToken create(User user, String refreshTokenValue, String ipAddress, LocalDateTime expiresAt) { // deviceInfo 파라미터 삭제
+
+        // deviceInfo를 내부에서 직접 생성
+        String deviceInfo = UUID.randomUUID().toString();
+
         return new RefreshToken(user, refreshTokenValue, deviceInfo, ipAddress, expiresAt);
     }
 }

@@ -87,7 +87,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         // AuthController와 동일하게 RefreshToken 생성 및 쿠키 설정
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        String deviceInfo = request.getHeader("User-Agent");
         String ipAddress = request.getRemoteAddr();
 
         long refreshTokenValidity = 14 * 24 * 60 * 60 * 1000L; // 14일
@@ -98,7 +97,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         refreshTokenService.issueNewToken(
                 user,
                 refreshToken,
-                deviceInfo,
                 ipAddress,
                 expiresAt
         );

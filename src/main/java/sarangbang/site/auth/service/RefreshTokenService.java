@@ -18,12 +18,11 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void issueNewToken(User user, String refreshTokenValue, String deviceInfo, String ipAddress, LocalDateTime expiresAt) { // 파라미터명 변경
+    public void issueNewToken(User user, String refreshTokenValue, String ipAddress, LocalDateTime expiresAt) { // 파라미터명 변경
 
         RefreshToken newRefreshToken = RefreshToken.create(
                 user,
                 refreshTokenValue, // 변경된 파라미터명 전달
-                deviceInfo,
                 ipAddress,
                 expiresAt
         );
