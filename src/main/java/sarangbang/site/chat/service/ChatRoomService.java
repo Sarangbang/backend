@@ -72,7 +72,7 @@ public class ChatRoomService {
             LocalDateTime lastReadAt = readStatusMap.getOrDefault(room.getRoomId(), LocalDateTime.now().minusYears(1));
 
             // 마지막으로 읽은 시간 이후에 온 메시지의 개수를 DB에서 조회합니다.
-            long unreadCount = chatMessageRepository.countByRoomIdAndSender_UserIdNotAndCreatedAtAfter(room.getRoomId(), userId, lastReadAt);
+            long unreadCount = chatMessageRepository.countByRoomIdAndSenderNotAndCreatedAtAfter(room.getRoomId(), userId, lastReadAt);
 
             // 최종 DTO를 생성합니다.
             UserChatRoomSummaryDto summaryDto = new UserChatRoomSummaryDto(

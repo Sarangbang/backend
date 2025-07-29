@@ -10,6 +10,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.MessageHistoryResponseDto;
+import sarangbang.site.chat.dto.Sender;
 import sarangbang.site.chat.entity.ChatMessage;
 import sarangbang.site.chat.entity.ChatReadStatus;
 import sarangbang.site.chat.entity.ChatRoom;
@@ -17,6 +18,8 @@ import sarangbang.site.chat.repository.ChatMessageRepository;
 import sarangbang.site.chat.repository.ChatReadStatusRepository;
 import sarangbang.site.chat.repository.ChatRoomRepository;
 import sarangbang.site.security.details.CustomUserDetails;
+import sarangbang.site.user.dto.UserProfileResponseDTO;
+import sarangbang.site.user.service.UserService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -36,6 +39,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final UserService userService;
 
     /**
      * 특정 채팅방의 메시지를 사용자가 모두 읽었음을 기록합니다.
@@ -100,10 +104,19 @@ public class ChatService {
     public void sendMessageToRoom(String roomId, ChatMessageDto message) {
         // 메시지 객체를 JSON 문자열로 변환합니다.
         try {
-            ChatMessage chatMessage = new ChatMessage(message.getRoomId(), message.getType(), message.getSender(), message.getMessage());
+            ChatMessage chatMessage = new ChatMessage(message.getRoomId(), message.getType(), message.getSender().getUserId(), message.getMessage());
             chatMessageRepository.save(chatMessage);
 
-            String messagePayload = objectMapper.writeValueAsString(chatMessage);
+            UserProfileResponseDTO user = userService.getUserProfile(message.getSender().getUserId());
+            ChatMessageDto chatMessageDto = new ChatMessageDto(
+                    chatMessage.get_id(),
+                    chatMessage.getType(),
+                    chatMessage.getRoomId(),
+                    new Sender(user.getId(), user.getNickname(), user.getProfileImageUrl()),
+                    chatMessage.getMessage(),
+                    chatMessage.getCreatedAt()
+            );
+            String messagePayload = objectMapper.writeValueAsString(chatMessageDto);
             TextMessage textMessage = new TextMessage(messagePayload);
 
             // 해당 채팅방의 모든 세션에 대해 반복하며 메시지를 전송합니다.
@@ -146,17 +159,18 @@ public class ChatService {
         List<ChatMessage> messages = messageSlice.getContent();
 
         for (ChatMessage message : messages) {
+            UserProfileResponseDTO user = userService.getUserProfile(message.getSender());
             ChatMessageDto dto = new ChatMessageDto(
                     message.get_id(),
                     message.getType(),
                     message.getRoomId(),
-                    message.getSender(),
+                    new Sender(user.getId(), user.getNickname(), user.getProfileImageUrl()),
                     message.getMessage(),
                     message.getCreatedAt()
             );
 
             // 현재 사용자가 보낸 메시지에 대해서만 안 읽은 수를 계산
-            if (message.getSender().getUserId().equals(userId)) {
+            if (message.getSender().equals(userId)) {
                 int unreadCount = calculateUnreadCount(message, allParticipantIds, readStatusMap);
                 dto.setUnreadCount(unreadCount);
             }
@@ -177,7 +191,7 @@ public class ChatService {
      * @return 안 읽은 사람 수
      */
     private int calculateUnreadCount(ChatMessage message, List<String> allParticipantIds, Map<String, LocalDateTime> readStatusMap) {
-        String senderId = message.getSender().getUserId();
+        String senderId = message.getSender();
 
         // 1. 전체 참여자 중에서
         int unreadCount = 0;

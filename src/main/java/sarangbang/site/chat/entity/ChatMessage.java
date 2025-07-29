@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import sarangbang.site.chat.dto.Sender;
 import sarangbang.site.chat.enums.MessageType;
 
 import java.time.LocalDateTime;
@@ -25,13 +24,13 @@ public class ChatMessage {
 
     private MessageType type;
 
-    private Sender sender;
+    private String sender;
 
     private String message;
 
     private LocalDateTime createdAt;
 
-    public ChatMessage(String roomId, MessageType type, Sender sender, String message) {
+    public ChatMessage(String roomId, MessageType type, String sender, String message) {
         this.roomId = roomId;
         this.type = type;
         this.sender = sender;
