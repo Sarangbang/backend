@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import sarangbang.site.auth.dto.LoginResponseDto;
 import sarangbang.site.auth.dto.SignInRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
+import sarangbang.site.auth.exception.InvalidRefreshTokenException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.auth.service.AuthService;
 import sarangbang.site.auth.service.RefreshTokenService;
@@ -28,7 +29,6 @@ import sarangbang.site.region.exception.RegionNotFoundException;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.security.jwt.JwtTokenProvider;
 import sarangbang.site.auth.dto.SignupRequestDTO;
-import sarangbang.site.user.service.UserService;
 
 import java.net.URI;
 import java.util.List;
@@ -44,7 +44,6 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
-    private final UserService userService;
 
     @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인을 진행하고 Access Token을 발급합니다.")
     @ApiResponses(value = {
@@ -134,7 +133,7 @@ public class AuthController {
         try {
             String newAccessToken = authService.refresh(refreshToken);
             return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | InvalidRefreshTokenException e) {
             return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.UNAUTHORIZED);
         }
     }

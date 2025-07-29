@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.dto.SignupRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
+import sarangbang.site.auth.exception.InvalidRefreshTokenException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.file.service.ImageUploadService;
 import sarangbang.site.region.entity.Region;
@@ -96,7 +97,7 @@ public class AuthService {
 
         refreshTokenService.findTokenByUserId(userId)
                 .filter(savedToken -> savedToken.equals(refreshToken))
-                .orElseThrow(() -> new RuntimeException("저장된 토큰과 일치하지 않습니다."));
+                .orElseThrow(() -> new InvalidRefreshTokenException("서버에 저장된 토큰과 일치하지 않아 액세스 토큰을 갱신할 수 없습니다."));
 
         User user = userService.getUserById(userId);
 
