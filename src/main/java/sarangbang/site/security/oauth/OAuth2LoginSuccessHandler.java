@@ -23,7 +23,10 @@ import sarangbang.site.user.entity.User;
 import sarangbang.site.user.repository.UserRepository;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -83,7 +86,22 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         
         // AuthController와 동일하게 RefreshToken 생성 및 쿠키 설정
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
-        refreshTokenService.saveToken(user.getId(), refreshToken);
+
+        String deviceInfo = request.getHeader("User-Agent");
+        String ipAddress = request.getRemoteAddr();
+
+        long refreshTokenValidity = 14 * 24 * 60 * 60 * 1000L; // 14일
+        LocalDateTime expiresAt = new Date(System.currentTimeMillis() + refreshTokenValidity).toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        refreshTokenService.issueNewToken(
+                user,
+                refreshToken,
+                deviceInfo,
+                ipAddress,
+                expiresAt
+        );
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
