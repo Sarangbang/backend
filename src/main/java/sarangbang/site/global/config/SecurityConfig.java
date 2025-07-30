@@ -92,6 +92,7 @@ public class SecurityConfig {
                             "/api/files/**",  // 파일 다운로드 허용
                             "/error",
                             "/ws/chat/**",
+                            "/api/notifications/subscribe",
                             "/ws/user/**"
                     ).permitAll();
 

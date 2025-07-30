@@ -168,4 +168,12 @@ public class ChallengeMemberService {
 
         return dto;
     }
+
+    // 챌린지 방장 찾기
+    public String findChallengeOwnerByChallengeId(Long challengeId) {
+        ChallengeMember member = challengeMemberRepository.findByChallenge_IdAndRoleIsContaining(challengeId, "owner");
+        String owner = member.getUser().getId();
+        log.info("챌린지 방장 Id : {}", owner);
+        return owner;
+    }
 }
