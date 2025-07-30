@@ -233,7 +233,7 @@ public class ChatService {
 
             // 필터링된 대상자들에게 '안 읽은 메시지' 알림 전송
             if (!notificationTargets.isEmpty()) {
-                UnreadMessageEventDto unreadEvent = new UnreadMessageEventDto(roomId);
+                UnreadMessageEventDto unreadEvent = new UnreadMessageEventDto(roomId, message.getMessage(), LocalDateTime.now());
                 String unreadPayload = objectMapper.writeValueAsString(unreadEvent);
                 TextMessage unreadMessage = new TextMessage(unreadPayload);
 
