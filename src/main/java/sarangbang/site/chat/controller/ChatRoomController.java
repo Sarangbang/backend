@@ -40,7 +40,11 @@ public class ChatRoomController {
 
     /* 채팅 메시지 페이징 조회 */
     @GetMapping("/{roomId}/messages")
-    public ResponseEntity<MessageHistoryResponseDto> getMessageHistory(@PathVariable String roomId, @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<MessageHistoryResponseDto> getMessageHistory(
+            @PathVariable String roomId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ) {
         MessageHistoryResponseDto history = chatService.getMessageHistory(roomId, pageable, userDetails.getId());
         return ResponseEntity.ok(history);
     }
@@ -51,6 +55,7 @@ public class ChatRoomController {
      * @param userDetails 현재 로그인한 사용자 정보
      * @return 성공 시 200 OK
      */
+    @Deprecated
     @PostMapping("/{roomId}/read")
     public ResponseEntity<Void> markAsRead(
             @PathVariable String roomId,

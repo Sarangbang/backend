@@ -57,6 +57,7 @@ public class UserService {
     }
 
     // 로그인 된 사용자 정보 확인
+    @Transactional
     public UserProfileResponseDTO getUserProfile(String userId) {
         User user = getUserById(userId);
       
@@ -66,6 +67,7 @@ public class UserService {
         }
 
         UserProfileResponseDTO dto = new UserProfileResponseDTO(
+                user.getId(),
                 user.getEmail(),
                 user.getNickname(),
                 imageUrl,
