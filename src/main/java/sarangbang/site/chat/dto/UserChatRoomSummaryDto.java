@@ -17,6 +17,8 @@ public class UserChatRoomSummaryDto {
     private LocalDateTime createdAt;
     private String avatar;
     private Long unreadCount;
+    private String lastChatMessage;
+    private LocalDateTime lastMessageCreatedAt;
 
     public UserChatRoomSummaryDto(String roomId, String roomName, String creatorId, List<String> participants, LocalDateTime createdAt, String avatar) {
         this.roomId = roomId;

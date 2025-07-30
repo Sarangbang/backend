@@ -13,6 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 import sarangbang.site.chat.dto.ChatMessageDto;
 import sarangbang.site.chat.dto.MessageHistoryResponseDto;
 import sarangbang.site.chat.dto.Sender;
+import sarangbang.site.chat.dto.UnreadMessageEventDto;
 import sarangbang.site.chat.entity.ChatMessage;
 import sarangbang.site.chat.entity.ChatReadStatus;
 import sarangbang.site.chat.entity.ChatRoom;
@@ -31,6 +32,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 채팅방 관리 및 메시지 발송 로직을 담당하는 서비스 클래스입니다.
@@ -42,6 +44,7 @@ public class ChatService {
     // 채팅방 ID와 해당 방에 참여한 세션들의 Set을 매핑하여 관리합니다.
     // 동시성 문제를 방지하기 위해 ConcurrentHashMap을 사용합니다.
     private final Map<String, Set<WebSocketSession>> chatRooms = new ConcurrentHashMap<>();
+    private final Map<String, Set<WebSocketSession>> userSessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatReadStatusRepository chatReadStatusRepository;
@@ -49,6 +52,19 @@ public class ChatService {
     private final UserService userService;
     private final FileStorageService fileStorageService;
     private final WebSocketUtils webSocketUtils;
+
+    public void addUserSession(String userId, WebSocketSession session) {
+        userSessions.computeIfAbsent(userId, k -> ConcurrentHashMap.newKeySet()).add(session);
+    }
+
+    public void removeUserSession(String userId, WebSocketSession session) {
+        if (userSessions.containsKey(userId)) {
+            userSessions.get(userId).remove(session);
+            if (userSessions.get(userId).isEmpty()) {
+                userSessions.remove(userId);
+            }
+        }
+    }
 
     /**
      * 특정 채팅방의 메시지를 사용자가 모두 읽었음을 기록합니다.
@@ -134,18 +150,6 @@ public class ChatService {
 
     }
 
-    private void sendPreviousMessages(String roomId, WebSocketSession session) {
-        List<ChatMessage> messages = chatMessageRepository.findByRoomIdOrderByCreatedAtAsc(roomId);
-        try {
-            for (ChatMessage message : messages) {
-                String messagePayload = objectMapper.writeValueAsString(message);
-                session.sendMessage(new TextMessage(messagePayload));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * 특정 채팅방에서 세션을 제거합니다. (사용자 퇴장 시)
      * @param roomId 채팅방 ID
@@ -179,10 +183,12 @@ public class ChatService {
         return null;
     }
 
-   
+
     public void sendMessageToRoom(String roomId, ChatMessageDto message) {
         // 메시지 객체를 JSON 문자열로 변환합니다.
         try {
+            Set<WebSocketSession> activeSessions = chatRooms.getOrDefault(roomId, Collections.emptySet());
+
             // 해당 채팅방의 모든 세션에 대해 반복하며 메시지를 전송합니다.
             if (chatRooms.containsKey(roomId)) {
                 for (WebSocketSession session : chatRooms.get(roomId)) {
@@ -208,9 +214,43 @@ public class ChatService {
                     }
                 }
             }
+
+            // 채팅방 전체 참여자 ID 목록 조회
+            ChatRoom chatRoom = chatRoomRepository.findByRoomId(roomId)
+                    .orElseThrow(() -> new RuntimeException("채팅방 없음 : " + roomId));
+            List<String> allParticipants = chatRoom.getParticipants();
+            String senderId = message.getSender().getUserId();
+
+            // 현재 방에 접속 중인 사용자들의 ID 목록을 만듦
+            Set<String> activeParticipantIds = activeSessions.stream()
+                    .map(session -> (String) session.getAttributes().get("userId"))
+                    .collect(Collectors.toSet());
+
+            // 알림을 보낼 대상 필터링: 전체 참여자 - (보낸 사람 + 현재 방에 있는 사람)
+            List<String> notificationTargets = allParticipants.stream()
+                    .filter(participantId -> !allParticipants.equals(senderId) && !activeParticipantIds.contains(participantId))
+                    .toList();
+
+            // 필터링된 대상자들에게 '안 읽은 메시지' 알림 전송
+            if (!notificationTargets.isEmpty()) {
+                UnreadMessageEventDto unreadEvent = new UnreadMessageEventDto(roomId, message.getMessage(), LocalDateTime.now());
+                String unreadPayload = objectMapper.writeValueAsString(unreadEvent);
+                TextMessage unreadMessage = new TextMessage(unreadPayload);
+
+                for (String targetId : notificationTargets) {
+                    // userSessions 맵에서 해당 유저의 세션을 조회
+                    if (userSessions.containsKey(targetId)) {
+                        for (WebSocketSession session : userSessions.get(targetId)) {
+                            if (session.isOpen()) {
+                                session.sendMessage(unreadMessage);
+                            }
+                        }
+                    }
+                }
+            }
         } catch (IOException e) {
             // 로깅 또는 예외 처리
-            e.printStackTrace();
+            throw new RuntimeException("메시지 전송 및 알림 처리 중 오류 발생", e);
         }
     }
 
@@ -264,7 +304,6 @@ public class ChatService {
 
         // 5. 메시지 목록과 다음 페이지 여부를 포함한 응답 DTO를 생성합니다.
         MessageHistoryResponseDto responseDto = new MessageHistoryResponseDto(messageDtoList, messageSlice.hasNext());
-
         return responseDto;
     }
 

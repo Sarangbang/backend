@@ -6,4 +6,5 @@ public enum MessageType {
     TALK,    // 일반 대화 메시지
     RE_ENTER, // 사용자가 채팅방에 재입장
     RE_LEAVE, // 사용자가 채팅방에서 재퇴장
+    UNREAD_MESSAGE
 }
