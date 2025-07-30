@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.notification.constant.NotificationConstant;
 import sarangbang.site.notification.service.NotificationService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
@@ -65,13 +66,13 @@ public class ChallengeApplicationService {
             if(dto.getApplyStatus().equals(ChallengeApplyStatus.REJECTED)) {
                 app.updateAppStatus(ChallengeApplyStatus.REJECTED);
                 app.updateAppComment(dto.getComment());
-                type = "application_rejected";
-                content = "신청한 챌린지의 참여가 거부되었습니다.";
+                type = NotificationConstant.APPLICATION_REJECTED_TYPE;
+                content = NotificationConstant.APPLICATION_REJECTED;
             } else {
                 app.updateAppStatus(ChallengeApplyStatus.APPROVED);
                 app.updateAppComment(dto.getComment());
-                type = "application_approved";
-                content = "신청한 챌린지의 참여가 승인되었습니다.";
+                type = NotificationConstant.APPLICATION_APPROVED_TYPE;
+                content = NotificationConstant.APPLICATION_APPROVED;
                 Optional<ChallengeMember> findMember = challengeMemberService.getMemberByChallengeId(app.getUser().getId(), app.getChallenge().getId());
                 if(findMember.isPresent()){
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
@@ -172,8 +173,8 @@ public class ChallengeApplicationService {
 
         notificationService.sendNotification(
                 ownerId,
-                "새로운 챌린지 신청이 도착했습니다!",
-                "challenge_apply",
+                NotificationConstant.CHALLENGE_APPLY,
+                NotificationConstant.CHALLENGE_APPLY_TYPE,
                 "/challenge-manage/" + challenge.getId()
         );
 
