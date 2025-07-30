@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.auth.dto.SignupRequestDTO;
 import sarangbang.site.auth.exception.EmailAlreadyExistsException;
+import sarangbang.site.auth.exception.InvalidRefreshTokenException;
 import sarangbang.site.auth.exception.NicknameAlreadyExistsException;
 import sarangbang.site.file.service.ImageUploadService;
 import sarangbang.site.region.entity.Region;
@@ -52,7 +53,6 @@ public class AuthService {
             throw new NicknameAlreadyExistsException("이미 사용 중인 닉네임입니다.");
         }
 
-
         String hash = passwordEncoder.encode(requestDto.getPassword());
         String newUserId = UUID.randomUUID().toString();
 
@@ -83,27 +83,25 @@ public class AuthService {
         return saved.getId();
     }
 
-    public String refresh(String refreshToken) {
-        if (refreshToken == null) {
+    public String refresh(String refreshTokenValue) {
+        if (refreshTokenValue == null) {
             throw new IllegalArgumentException("리프레시 토큰이 없습니다.");
         }
 
-        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+        if (!jwtTokenProvider.validateRefreshToken(refreshTokenValue)) {
             throw new IllegalArgumentException("리프레시 토큰이 유효하지 않거나 만료되었습니다.");
         }
 
-        String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
+        refreshTokenService.findTokenByRefreshTokenValue(refreshTokenValue)
+                .orElseThrow(() -> new InvalidRefreshTokenException("서버에 저장된 리프레시 토큰이 아닙니다."));
 
-        refreshTokenService.findTokenByUserId(userId)
-                .filter(savedToken -> savedToken.equals(refreshToken))
-                .orElseThrow(() -> new RuntimeException("저장된 토큰과 일치하지 않습니다."));
-
+        String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshTokenValue);
         User user = userService.getUserById(userId);
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority).
-                toList();
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         return jwtTokenProvider.createAccessToken(
                 userId,
@@ -114,8 +112,7 @@ public class AuthService {
 
     public void logout(String refreshToken) {
         if (refreshToken != null) {
-            String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-            refreshTokenService.deleteToken(userId);
+            refreshTokenService.deleteTokenByRefreshTokenValue(refreshToken);
         }
     }
 }

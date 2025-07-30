@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import sarangbang.site.chat.dto.ChatRoomCreateRequestDto;
 import sarangbang.site.chat.dto.ChatRoomSummaryResponseDto;
 import sarangbang.site.chat.dto.UserChatRoomSummaryDto;
+import sarangbang.site.chat.entity.ChatMessage;
 import sarangbang.site.chat.entity.ChatReadStatus;
 import sarangbang.site.chat.entity.ChatRoom;
 import sarangbang.site.chat.repository.ChatMessageRepository;
@@ -12,7 +13,6 @@ import sarangbang.site.chat.repository.ChatReadStatusRepository;
 import sarangbang.site.chat.repository.ChatRoomRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -57,7 +57,7 @@ public class ChatRoomService {
     public List<UserChatRoomSummaryDto> getAllRooms(String userId) {
         // 1. 사용자가 참여한 모든 채팅방 목록을 조회합니다.
         List<ChatRoom> roomList = chatRoomRepository.findByParticipantsContaining(userId);
-        List<UserChatRoomSummaryDto> roomSummaries = new ArrayList<>();
+        List<UserChatRoomSummaryDto> roomSummaries;
 
         // 2. 사용자의 모든 '읽음 상태' 정보를 조회하여 Map으로 변환합니다. (Key: roomId, Value: lastReadAt)
         //    이렇게 하면 각 채팅방의 마지막 읽은 시간을 빠르게 찾을 수 있습니다.
@@ -72,19 +72,38 @@ public class ChatRoomService {
             LocalDateTime lastReadAt = readStatusMap.getOrDefault(room.getRoomId(), LocalDateTime.now().minusYears(1));
 
             // 마지막으로 읽은 시간 이후에 온 메시지의 개수를 DB에서 조회합니다.
-            long unreadCount = chatMessageRepository.countByRoomIdAndSender_UserIdNotAndCreatedAtAfter(room.getRoomId(), userId, lastReadAt);
+            long unreadCount = chatMessageRepository.countByRoomIdAndSenderNotAndCreatedAtAfter(room.getRoomId(), userId, lastReadAt);
+
+            ChatMessage lastChatMessage = chatMessageRepository.findTopByRoomIdOrderByCreatedAtDesc(room.getRoomId()).orElse(null);
 
             // 최종 DTO를 생성합니다.
-            UserChatRoomSummaryDto summaryDto = new UserChatRoomSummaryDto(
-                    room.getRoomId(),
-                    room.getRoomName(),
-                    room.getCreatorId(),
-                    room.getParticipants(),
-                    room.getCreatedAt(),
-                    room.getAvatar(),
-                    unreadCount // 계산된 안 읽은 메시지 수를 DTO에 포함
-            );
-            return summaryDto;
+            if (lastChatMessage != null) {
+                UserChatRoomSummaryDto summaryDto = new UserChatRoomSummaryDto(
+                        room.getRoomId(),
+                        room.getRoomName(),
+                        room.getCreatorId(),
+                        room.getParticipants(),
+                        room.getCreatedAt(),
+                        room.getAvatar(),
+                        unreadCount, // 계산된 안 읽은 메시지 수를 DTO에 포함
+                        lastChatMessage.getMessage(),
+                        lastChatMessage.getCreatedAt()
+                );
+                return summaryDto;
+            } else {
+                UserChatRoomSummaryDto summaryDto = new UserChatRoomSummaryDto(
+                        room.getRoomId(),
+                        room.getRoomName(),
+                        room.getCreatorId(),
+                        room.getParticipants(),
+                        room.getCreatedAt(),
+                        room.getAvatar(),
+                        unreadCount, // 계산된 안 읽은 메시지 수를 DTO에 포함
+                        null,
+                        null
+                );
+                return summaryDto;
+            }
         }).collect(Collectors.toList());
 
         // 생성된 DTO 리스트를 반환합니다.

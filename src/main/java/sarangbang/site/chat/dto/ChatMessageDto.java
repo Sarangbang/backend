@@ -35,6 +35,6 @@ public class ChatMessageDto {
         this.roomId = roomId;
         this.sender = sender;
         this.message = message;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt;              // 타임존 정보 제거 후 반환;
     }
 }

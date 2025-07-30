@@ -6,6 +6,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import sarangbang.site.chat.handler.ChatWebSocketHandler;
+import sarangbang.site.chat.handler.UserStatusWebSocketHandler;
 
 /**
  * WebSocket 관련 주요 설정을 정의하는 클래스입니다.
@@ -18,6 +19,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     // 직접 구현할 WebSocket 핸들러와 인터셉터를 주입받습니다.
     private final ChatWebSocketHandler chatWebSocketHandler;
+    private final UserStatusWebSocketHandler userStatusWebSocketHandler;
     private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
 
     /**
@@ -30,6 +32,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         // addHandler: 어떤 핸들러를 사용할지 지정합니다.
         // "/ws/chat": 클라이언트가 WebSocket 연결을 맺을 엔드포인트 경로입니다.
         .addHandler(chatWebSocketHandler, "/ws/chat")
+        .addHandler(userStatusWebSocketHandler, "/ws/user")
         // addInterceptors: 핸드셰이크 과정에 개입할 인터셉터를 추가합니다.
         // 여기서는 JWT 인증을 위해 구현한 인터셉터를 등록합니다.
         .addInterceptors(jwtHandshakeInterceptor)
