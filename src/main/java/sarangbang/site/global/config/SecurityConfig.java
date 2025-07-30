@@ -90,7 +90,8 @@ public class SecurityConfig {
                             "/api/regions/**",
                             "/api/files/**",  // 파일 다운로드 허용
                             "/error",
-                            "/ws/chat/**"
+                            "/ws/chat/**",
+                            "/api/notifications/subscribe"
                     ).permitAll();
 
                     // "dev" 프로필이 활성화되었는지 확인

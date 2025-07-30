@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.notification.service.NotificationService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
@@ -37,6 +38,7 @@ public class ChallengeApplicationService {
     private final ChallengeService challengeService;
     private final ApplicationEventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
+    private final NotificationService notificationService;
 
     // 챌린지 신청 수락/거부
     @Transactional
@@ -57,12 +59,19 @@ public class ChallengeApplicationService {
 
         if(member.get().getRole().equals("owner")) {
 
+            String type;
+            String content;
+
             if(dto.getApplyStatus().equals(ChallengeApplyStatus.REJECTED)) {
                 app.updateAppStatus(ChallengeApplyStatus.REJECTED);
                 app.updateAppComment(dto.getComment());
+                type = "application_rejected";
+                content = "신청한 챌린지의 참여가 거부되었습니다.";
             } else {
                 app.updateAppStatus(ChallengeApplyStatus.APPROVED);
                 app.updateAppComment(dto.getComment());
+                type = "application_approved";
+                content = "신청한 챌린지의 참여가 승인되었습니다.";
                 Optional<ChallengeMember> findMember = challengeMemberService.getMemberByChallengeId(app.getUser().getId(), app.getChallenge().getId());
                 if(findMember.isPresent()){
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
@@ -80,6 +89,15 @@ public class ChallengeApplicationService {
             challengeApplicationRepository.save(app);
 
             ChangeChallengeAppDTO changeApp = new ChangeChallengeAppDTO(app.getChallengeApplyStatus(), app.getComment());
+
+            // 신청자에게 알림 전송
+            notificationService.sendNotification(
+                    app.getUser().getId(),
+                    content,
+                    type,
+                    "신청서 결과 확인 url..(구현 전)"
+            );
+
             return changeApp;
 
         } else throw new SecurityException("챌린지 방장의 권한이 없습니다.");
@@ -147,6 +165,16 @@ public class ChallengeApplicationService {
                 challengeApplication.getCommitment(),
                 challengeApplication.getChallengeApplyStatus(),
                 challengeApplication.getChallenge().getId()
+        );
+
+        // 방장에게 알림 전송
+        String ownerId = challengeMemberService.findChallengeOwnerByChallengeId(challenge.getId());
+
+        notificationService.sendNotification(
+                ownerId,
+                "새로운 챌린지 신청이 도착했습니다!",
+                "challenge_apply",
+                "/challenge-manage/" + challenge.getId()
         );
 
         log.info("<= 챌린지 신청서 저장 로직 종료. userId: {}, applicationId: {}", userId, challengeApplication.getId());
