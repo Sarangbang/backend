@@ -71,7 +71,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                             oAuth2UserInfo.getName(), // nickname
                             null, // gender
                             null, // region
-                            oAuth2UserInfo.getProfileImageUrl(),
+                            null,
                             provider,
                             providerId,
                             false // profileComplete
