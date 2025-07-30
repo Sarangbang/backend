@@ -21,6 +21,7 @@ import sarangbang.site.chat.repository.ChatMessageRepository;
 import sarangbang.site.chat.repository.ChatReadStatusRepository;
 import sarangbang.site.chat.repository.ChatRoomRepository;
 import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.global.utils.WebSocketUtils;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.user.dto.UserProfileResponseDTO;
 import sarangbang.site.user.service.UserService;
@@ -47,6 +48,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserService userService;
     private final FileStorageService fileStorageService;
+    private final WebSocketUtils webSocketUtils;
 
     /**
      * 특정 채팅방의 메시지를 사용자가 모두 읽었음을 기록합니다.
@@ -192,10 +194,17 @@ public class ChatService {
                         int unreadCount = participants.size() - chatRooms.get(roomId).size();
                         log.info("채팅방 ID: {}, 참여자 수: {}, 현재 세션 수: {}, 안 읽은 메시지 수: {}", roomId, participants.size(), chatRooms.get(roomId).size(), unreadCount);
                         message.setUnreadCount(unreadCount);
-
                         String messagePayload = objectMapper.writeValueAsString(message);
                         TextMessage textMessage = new TextMessage(messagePayload);
                         session.sendMessage(textMessage);
+
+                        // 사용자 읽음 상태 업데이트
+                        CustomUserDetails customUserDetails = webSocketUtils.getCustomUserDetails(session);
+                        ChatReadStatus readStatus = chatReadStatusRepository.findByUserIdAndRoomId(customUserDetails.getId(), roomId)
+                                .orElse(new ChatReadStatus(customUserDetails.getId(), roomId));
+                        readStatus.updateLastReadAt();
+                        chatReadStatusRepository.save(readStatus);
+                        log.info("사용자 {}가 채팅방 {}에 메시지를 보냈습니다. 내용: {}", customUserDetails.getId(), roomId, message.getMessage());
                     }
                 }
             }
@@ -221,6 +230,11 @@ public class ChatService {
         List<ChatReadStatus> readStatusList = chatReadStatusRepository.findByRoomId(roomId);
 
         for (ChatReadStatus status : readStatusList) {
+            // 요청자의 읽음 상태를 현재 시간으로 설정
+            if (status.getUserId().equals(userId)) {
+                readStatusMap.put(status.getUserId(), LocalDateTime.now());
+                continue;
+            }
             readStatusMap.put(status.getUserId(), status.getLastReadAt());
         }
 
@@ -241,15 +255,14 @@ public class ChatService {
                     message.getCreatedAt()
             );
 
-            // 현재 사용자가 보낸 메시지에 대해서만 안 읽은 수를 계산
-            if (message.getSender().equals(userId)) {
-                int unreadCount = calculateUnreadCount(message, allParticipantIds, readStatusMap);
-                dto.setUnreadCount(unreadCount);
-            }
+            // 4. 안 읽은 사람 수를 계산합니다.
+            int unreadCount = calculateUnreadCount(message, allParticipantIds, readStatusMap);
+            dto.setUnreadCount(unreadCount);
 
             messageDtoList.add(dto);
         }
 
+        // 5. 메시지 목록과 다음 페이지 여부를 포함한 응답 DTO를 생성합니다.
         MessageHistoryResponseDto responseDto = new MessageHistoryResponseDto(messageDtoList, messageSlice.hasNext());
 
         return responseDto;
