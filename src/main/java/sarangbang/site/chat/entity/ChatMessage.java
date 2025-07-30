@@ -4,6 +4,7 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import sarangbang.site.chat.enums.MessageType;
@@ -28,6 +29,7 @@ public class ChatMessage {
 
     private String message;
 
+    @CreatedDate
     private LocalDateTime createdAt;
 
     public ChatMessage(String roomId, MessageType type, String sender, String message) {
@@ -35,6 +37,5 @@ public class ChatMessage {
         this.type = type;
         this.sender = sender;
         this.message = message;
-        this.createdAt = LocalDateTime.now();
     }
 }

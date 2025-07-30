@@ -3,8 +3,10 @@ package sarangbang.site.chat.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -14,14 +16,17 @@ import sarangbang.site.chat.dto.Sender;
 import sarangbang.site.chat.entity.ChatMessage;
 import sarangbang.site.chat.entity.ChatReadStatus;
 import sarangbang.site.chat.entity.ChatRoom;
+import sarangbang.site.chat.enums.MessageType;
 import sarangbang.site.chat.repository.ChatMessageRepository;
 import sarangbang.site.chat.repository.ChatReadStatusRepository;
 import sarangbang.site.chat.repository.ChatRoomRepository;
+import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.security.details.CustomUserDetails;
 import sarangbang.site.user.dto.UserProfileResponseDTO;
 import sarangbang.site.user.service.UserService;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
     // 채팅방 ID와 해당 방에 참여한 세션들의 Set을 매핑하여 관리합니다.
     // 동시성 문제를 방지하기 위해 ConcurrentHashMap을 사용합니다.
@@ -40,6 +46,7 @@ public class ChatService {
     private final ChatReadStatusRepository chatReadStatusRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final UserService userService;
+    private final FileStorageService fileStorageService;
 
     /**
      * 특정 채팅방의 메시지를 사용자가 모두 읽었음을 기록합니다.
@@ -47,6 +54,7 @@ public class ChatService {
      * @param userDetails 현재 로그인한 사용자 정보
      */
     @Transactional
+    @Deprecated
     public void markAsRead(String roomId, CustomUserDetails userDetails) {
         String userId = userDetails.getId(); // 사용자 ID 추출
 
@@ -66,11 +74,62 @@ public class ChatService {
      * @param roomId 채팅방 ID
      * @param session 추가할 WebSocket 세션
      */
+    @Transactional
     public void addSessionToRoom(String roomId, WebSocketSession session) {
         // computeIfAbsent: 키(roomId)에 해당하는 값이 없으면 새로운 HashSet을 생성하고, 있으면 기존 Set을 반환합니다.
         chatRooms.computeIfAbsent(roomId, k -> ConcurrentHashMap.newKeySet()).add(session);
         // 이전 대화 기록을 조회하여 새로운 세션에만 전송
 //        sendPreviousMessages(roomId, session);
+        try {
+            Authentication authentication = (Authentication) session.getAttributes().get("user");
+
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            if (customUserDetails == null) {
+                log.warn("세션에 사용자 정보가 없습니다. 세션 ID: {}", session.getId());
+                return;
+            }
+            // 채팅방 재입장 시 마지막으로 읽은 시간(lastReadAt)을 조회하여 메시지 전송
+            Optional<ChatReadStatus> chatReadStatus = chatReadStatusRepository.findByUserIdAndRoomId(customUserDetails.getId(), roomId);
+            if (chatReadStatus.isPresent()) {
+                ChatMessageDto enterMessage = new ChatMessageDto(
+                        null,
+                        MessageType.RE_ENTER,
+                        roomId,
+                        null,
+                        null,
+                        chatReadStatus.get().getLastReadAt()
+                );
+                sendMessageToRoom(roomId, enterMessage);
+                log.info("사용자 {}가 채팅방 {}에 재입장했습니다. 마지막 읽은 시간: {}", customUserDetails.getId(), roomId, chatReadStatus.get().getLastReadAt());
+                // 입장 시간 초기화
+                chatReadStatus.get().updateLastReadAt();
+                chatReadStatusRepository.save(chatReadStatus.get());
+                return;
+            }
+            // 새로 참여한 사용자 읽음 상태 초기화
+            ChatReadStatus readStatus = new ChatReadStatus(customUserDetails.getId(), roomId);
+            readStatus.updateLastReadAt();
+            chatReadStatusRepository.save(readStatus);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ChatMessageDto entityToChatMessageDto(ChatMessage chatMessage, CustomUserDetails userDetails) {
+        return new ChatMessageDto(
+                chatMessage.get_id(),
+                chatMessage.getType(),
+                chatMessage.getRoomId(),
+                new Sender(
+                        userDetails.getId(),
+                        userDetails.getNickname(),
+                        userDetails.getProfileImageUrl() == null ? null :
+                        fileStorageService.generatePresignedUrl(userDetails.getProfileImageUrl(), Duration.ofMinutes(10))
+                ),
+                chatMessage.getMessage(),
+                chatMessage.getCreatedAt()
+        );
+
     }
 
     private void sendPreviousMessages(String roomId, WebSocketSession session) {
@@ -100,29 +159,42 @@ public class ChatService {
         }
     }
 
+    public ChatMessage saveMessage(ChatMessageDto message) {
+        // 메시지 객체를 JSON 문자열로 변환합니다.
+        try {
+            ChatMessage chatMessage = new ChatMessage(
+                    message.getRoomId(),
+                    message.getType(),
+                    message.getSender().getUserId(),
+                    message.getMessage()
+            );
+            chatMessageRepository.save(chatMessage);
+            return chatMessage;
+        } catch (Exception e) {
+            // 로깅 또는 예외 처리
+            e.printStackTrace();
+        }
+        return null;
+    }
+
    
     public void sendMessageToRoom(String roomId, ChatMessageDto message) {
         // 메시지 객체를 JSON 문자열로 변환합니다.
         try {
-            ChatMessage chatMessage = new ChatMessage(message.getRoomId(), message.getType(), message.getSender().getUserId(), message.getMessage());
-            chatMessageRepository.save(chatMessage);
-
-            UserProfileResponseDTO user = userService.getUserProfile(message.getSender().getUserId());
-            ChatMessageDto chatMessageDto = new ChatMessageDto(
-                    chatMessage.get_id(),
-                    chatMessage.getType(),
-                    chatMessage.getRoomId(),
-                    new Sender(user.getId(), user.getNickname(), user.getProfileImageUrl()),
-                    chatMessage.getMessage(),
-                    chatMessage.getCreatedAt()
-            );
-            String messagePayload = objectMapper.writeValueAsString(chatMessageDto);
-            TextMessage textMessage = new TextMessage(messagePayload);
-
             // 해당 채팅방의 모든 세션에 대해 반복하며 메시지를 전송합니다.
             if (chatRooms.containsKey(roomId)) {
                 for (WebSocketSession session : chatRooms.get(roomId)) {
                     if (session.isOpen()) {
+                        List<String> participants = chatRoomRepository.findByRoomId(roomId)
+                                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다: " + roomId))
+                                .getParticipants();
+
+                        int unreadCount = participants.size() - chatRooms.get(roomId).size();
+                        log.info("채팅방 ID: {}, 참여자 수: {}, 현재 세션 수: {}, 안 읽은 메시지 수: {}", roomId, participants.size(), chatRooms.get(roomId).size(), unreadCount);
+                        message.setUnreadCount(unreadCount);
+
+                        String messagePayload = objectMapper.writeValueAsString(message);
+                        TextMessage textMessage = new TextMessage(messagePayload);
                         session.sendMessage(textMessage);
                     }
                 }

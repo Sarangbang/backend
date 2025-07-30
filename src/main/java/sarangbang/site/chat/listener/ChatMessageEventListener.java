@@ -47,6 +47,7 @@ public class ChatMessageEventListener {
             messageContent,
             LocalDateTime.now()
         );
+        chatService.saveMessage(entryMessage);
         chatService.sendMessageToRoom(chatRoom.getRoomId(), entryMessage);
     }
 } 

@@ -55,6 +55,7 @@ public class ChatRoomController {
      * @param userDetails 현재 로그인한 사용자 정보
      * @return 성공 시 200 OK
      */
+    @Deprecated
     @PostMapping("/{roomId}/read")
     public ResponseEntity<Void> markAsRead(
             @PathVariable String roomId,
