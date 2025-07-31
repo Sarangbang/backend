@@ -47,7 +47,7 @@ public class ChallengeController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(mediaType = "application/json"))
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> saveChallenge(@RequestPart ChallengeDTO challengeDTO, @RequestPart(value = "imageFile", required = false) MultipartFile imageFile, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> saveChallenge(@RequestPart("challengeDTO") ChallengeDTO challengeDTO, @RequestPart(value = "imageFile", required = false) MultipartFile imageFile, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             log.debug("챌린지 등록 요청 : {}, 요청자 : {}", challengeDTO, userDetails.getId());
             ChallengeDTO saveChallenge = challengeService.saveChallenge(challengeDTO, userDetails.getId(), imageFile);
