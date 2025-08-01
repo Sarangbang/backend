@@ -1,7 +1,9 @@
 package sarangbang.site.notification.controller;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,10 +37,14 @@ public class NotificationController {
 
     // 알림 리스트 조회
     @GetMapping
-    public ResponseEntity<List<NotificationResponseDTO>> getMyNotifications(@RequestParam("token") String token) {
-        String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
-        List<NotificationResponseDTO> notifications = notificationService.getUserNotifications(userId);
-        return ResponseEntity.ok(notifications);
+    public ResponseEntity<?> getMyNotifications(@RequestParam("token") String token) {
+        try{
+            String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
+            List<NotificationResponseDTO> notifications = notificationService.getUserNotifications(userId);
+            return ResponseEntity.ok(notifications);
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰이 만료 되었습니다.");
+        }
     }
 
     // 개별 알림 읽음 처리
