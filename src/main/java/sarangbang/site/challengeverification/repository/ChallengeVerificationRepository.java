@@ -42,7 +42,6 @@ public interface ChallengeVerificationRepository extends JpaRepository<Challenge
 
     List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
     Optional<ChallengeVerification> findByChallenge_IdAndUser_IdAndVerifiedAtBetween(Long challengeId, String userId, LocalDateTime start, LocalDateTime end);
-    List<ChallengeVerification> findChallengeVerificationsByUser_IdAndVerifiedAt(String userId, LocalDateTime today);
 
     String user(User user);
 

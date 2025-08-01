@@ -27,3 +27,18 @@ app:
 discord:
   webhook:
     url: "${DISCORD_WEBHOOK_URL:discord_webhook_url}"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info   # 필요한 엔드포인트만 노출
+
+  metrics:
+    distribution:
+      slo:
+        '[http.server.requests]': 50ms,100ms,300ms,1s
+
+  observations:
+    enable:
+      http.server.requests: true      # Observation 별 ON/OFF

@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import sarangbang.site.chat.enums.ChatSourceType;
 import sarangbang.site.chat.enums.RoomType;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "chat_rooms")
@@ -38,11 +38,11 @@ public class ChatRoom {
 
     @Indexed
     private List<String> participants;
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     private String avatar;
 
-    public ChatRoom(String roomId, RoomType roomType, ChatSourceType sourceType, Long sourceId, String roomName, String creatorId, List<String> participants, Instant createdAt, String avatar) {
+    public ChatRoom(String roomId, RoomType roomType, ChatSourceType sourceType, Long sourceId, String roomName, String creatorId, List<String> participants, LocalDateTime createdAt, String avatar) {
         this.roomId = roomId;
         this.roomType = roomType;
         this.sourceType = sourceType;

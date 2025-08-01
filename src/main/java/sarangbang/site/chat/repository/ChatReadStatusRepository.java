@@ -11,4 +11,6 @@ public interface ChatReadStatusRepository extends MongoRepository<ChatReadStatus
     Optional<ChatReadStatus> findByUserIdAndRoomId(String userId, String roomId);
 
     List<ChatReadStatus> findByUserId(String userId);
+
+    List<ChatReadStatus> findByRoomId(String roomId);
 }

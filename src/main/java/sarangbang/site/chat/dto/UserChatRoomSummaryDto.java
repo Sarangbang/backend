@@ -2,7 +2,7 @@ package sarangbang.site.chat.dto;
 
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -14,11 +14,13 @@ public class UserChatRoomSummaryDto {
     private String roomName;
     private String creatorId;
     private List<String> participants;
-    private Instant createdAt;
+    private LocalDateTime createdAt;
     private String avatar;
     private Long unreadCount;
+    private String lastChatMessage;
+    private LocalDateTime lastMessageCreatedAt;
 
-    public UserChatRoomSummaryDto(String roomId, String roomName, String creatorId, List<String> participants, Instant createdAt, String avatar) {
+    public UserChatRoomSummaryDto(String roomId, String roomName, String creatorId, List<String> participants, LocalDateTime createdAt, String avatar) {
         this.roomId = roomId;
         this.roomName = roomName;
         this.creatorId = creatorId;

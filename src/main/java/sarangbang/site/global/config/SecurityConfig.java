@@ -46,6 +46,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
+                "http://localhost:3001",
                 "https://*.ilsim.site",
                 "https://ilsim.site",
                 "https://www.ilsim.site",
@@ -90,7 +91,10 @@ public class SecurityConfig {
                             "/api/regions/**",
                             "/api/files/**",  // 파일 다운로드 허용
                             "/error",
-                            "/ws/chat/**"
+                            "/ws/chat/**",
+                            "/api/notifications/subscribe",
+                            "/ws/user/**",
+                            "/actuator/prometheus"
                     ).permitAll();
 
                     // "dev" 프로필이 활성화되었는지 확인

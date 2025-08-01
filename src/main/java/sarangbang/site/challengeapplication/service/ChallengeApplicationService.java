@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import sarangbang.site.challengeapplication.dto.MyPageApplicationDTO;
 import sarangbang.site.file.service.FileStorageService;
+import sarangbang.site.notification.constant.NotificationConstant;
+import sarangbang.site.notification.service.NotificationService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
 
@@ -40,6 +42,7 @@ public class ChallengeApplicationService {
     private final ChallengeService challengeService;
     private final ApplicationEventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
+    private final NotificationService notificationService;
     private final ChallengeMemberRepository challengeMemberRepository;
 
     // 챌린지 신청 수락/거부
@@ -61,12 +64,19 @@ public class ChallengeApplicationService {
 
         if(member.get().getRole().equals("owner")) {
 
+            String type;
+            String content;
+
             if(dto.getApplyStatus().equals(ChallengeApplyStatus.REJECTED)) {
                 app.updateAppStatus(ChallengeApplyStatus.REJECTED);
                 app.updateAppComment(dto.getComment());
+                type = NotificationConstant.APPLICATION_REJECTED_TYPE;
+                content = NotificationConstant.APPLICATION_REJECTED;
             } else {
                 app.updateAppStatus(ChallengeApplyStatus.APPROVED);
                 app.updateAppComment(dto.getComment());
+                type = NotificationConstant.APPLICATION_APPROVED_TYPE;
+                content = NotificationConstant.APPLICATION_APPROVED;
                 Optional<ChallengeMember> findMember = challengeMemberService.getMemberByChallengeId(app.getUser().getId(), app.getChallenge().getId());
                 if(findMember.isPresent()){
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
@@ -84,6 +94,15 @@ public class ChallengeApplicationService {
             challengeApplicationRepository.save(app);
 
             ChangeChallengeAppDTO changeApp = new ChangeChallengeAppDTO(app.getChallengeApplyStatus(), app.getComment());
+
+            // 신청자에게 알림 전송
+            notificationService.sendNotification(
+                    app.getUser().getId(),
+                    content,
+                    type,
+                    "신청서 결과 확인 url..(구현 전)"
+            );
+
             return changeApp;
 
         } else throw new SecurityException("챌린지 방장의 권한이 없습니다.");
@@ -98,10 +117,37 @@ public class ChallengeApplicationService {
 
         Challenge challenge = challengeService.getChallengeById(challengeJoinDTO.getChallengeId());
 
-        // DuplicateApplicationException 예외 처리
-        if (challengeApplicationRepository.existsByUserAndChallenge(user, challenge)) {
-            log.warn("!! 이미 참여 신청한 챌린지. userId: {}, challengeId: {}", userId, challenge.getId());
+        // DuplicateApplicationException 예외 처리 (거절된 신청서는 재신청 허용)
+        if (challengeApplicationRepository.existsByUserAndChallengeAndChallengeApplyStatusNot(user, challenge, ChallengeApplyStatus.REJECTED)) {
+            log.warn("!! 이미 참여 신청한 챌린지 (PENDING 또는 APPROVED 상태). userId: {}, challengeId: {}", userId, challenge.getId());
             throw new DuplicateApplicationException("이미 참여 신청한 챌린지입니다.");
+        }
+
+        // 거절된 신청서가 있는 경우 기존 신청서를 업데이트
+        Optional<ChallengeApplication> existingRejectedApplication = challengeApplicationRepository.findByUserAndChallenge(user, challenge);
+        if (existingRejectedApplication.isPresent() && existingRejectedApplication.get().getChallengeApplyStatus() == ChallengeApplyStatus.REJECTED) {
+            log.info("... 거절된 신청서 발견. 기존 신청서를 업데이트합니다. applicationId: {}", existingRejectedApplication.get().getId());
+
+            ChallengeApplication rejectedApp = existingRejectedApplication.get();
+            rejectedApp.updateApplication(
+                challengeJoinDTO.getIntroduction(),
+                challengeJoinDTO.getReason(),
+                challengeJoinDTO.getCommitment(),
+                ChallengeApplyStatus.PENDING
+            );
+
+            challengeApplicationRepository.save(rejectedApp);
+
+            ChallengeJoinDTO responseDTO = new ChallengeJoinDTO(
+                    rejectedApp.getIntroduction(),
+                    rejectedApp.getReason(),
+                    rejectedApp.getCommitment(),
+                    rejectedApp.getChallengeApplyStatus(),
+                    rejectedApp.getChallenge().getId()
+            );
+
+            log.info("<= 거절된 신청서 업데이트 완료. userId: {}, applicationId: {}", userId, rejectedApp.getId());
+            return responseDTO;
         }
 
         ChallengeApplication challengeApplication = new ChallengeApplication(
@@ -126,8 +172,50 @@ public class ChallengeApplicationService {
                 challengeApplication.getChallenge().getId()
         );
 
+        // 방장에게 알림 전송
+        String ownerId = challengeMemberService.findChallengeOwnerByChallengeId(challenge.getId());
+
+        notificationService.sendNotification(
+                ownerId,
+                NotificationConstant.CHALLENGE_APPLY,
+                NotificationConstant.CHALLENGE_APPLY_TYPE,
+                "/challenge-manage/" + challenge.getId()
+        );
+
         log.info("<= 챌린지 신청서 저장 로직 종료. userId: {}, applicationId: {}", userId, challengeApplication.getId());
         return responseDTO;
+    }
+
+    /**
+     * 사용자의 특정 챌린지 신청 상태 조회
+     * @param challengeId 챌린지 ID
+     * @param userId 사용자 ID
+     * @return 신청 상태 (PENDING, APPROVED, REJECTED), "OWNER" (방장), 또는 null (신청 안함)
+     */
+    public String getUserApplicationStatus(Long challengeId, String userId) {
+        log.info("=> 사용자 신청 상태 조회. challengeId: {}, userId: {}", challengeId, userId);
+
+        User user = userService.getUserById(userId);
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+
+        // 먼저 방장인지 확인 (ChallengeMember에서 role이 "owner"인지 확인)
+        Optional<ChallengeMember> memberInfo = challengeMemberService.getMemberByChallengeId(userId, challengeId);
+        if (memberInfo.isPresent() && "owner".equals(memberInfo.get().getRole())) {
+            log.info("<= 사용자는 챌린지 방장. status: OWNER");
+            return "OWNER";
+        }
+
+        // 방장이 아닌 경우 신청서 상태 확인
+        Optional<ChallengeApplication> application = challengeApplicationRepository.findByUserAndChallenge(user, challenge);
+
+        if (application.isPresent()) {
+            ChallengeApplyStatus status = application.get().getChallengeApplyStatus();
+            log.info("<= 사용자 신청 상태 조회 완료. status: {}", status);
+            return status.name();
+        } else {
+            log.info("<= 사용자 신청 내역 없음.");
+            return null;
+        }
     }
 
     /**
@@ -180,11 +268,11 @@ public class ChallengeApplicationService {
      */
     private void validateOwnerPermission(String ownerId, Long challengeId) {
         Optional<ChallengeMember> member = challengeMemberService.getMemberByChallengeId(ownerId, challengeId);
-        
+
         if (member.isEmpty()) {
             throw new IllegalArgumentException("챌린지 멤버를 찾을 수 없습니다.");
         }
-        
+
         if (!"owner".equals(member.get().getRole())) {
             throw new SecurityException("챌린지 방장만 참여 신청을 조회할 수 있습니다.");
         }

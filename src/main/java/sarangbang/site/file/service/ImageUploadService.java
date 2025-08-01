@@ -8,6 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import sarangbang.site.file.exception.FileStorageException;
 import sarangbang.site.global.config.StorageProperties;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -128,6 +131,21 @@ public class ImageUploadService {
             throw new FileStorageException(String.format(
                     "지원하지 않는 이미지 형식입니다. (현재: %s)", contentType
             ));
+        }
+
+        // 실제 이미지 파일 검증
+        try {
+            BufferedImage image = ImageIO.read(file.getInputStream());
+            if (image == null) {
+                throw new FileStorageException("유효하지 않은 이미지 파일입니다. 파일이 손상되었거나 지원하지 않는 형식일 수 있습니다.");
+            }
+
+            log.debug("이미지 검증 완료: {}x{}, 파일크기: {}bytes",
+                    image.getWidth(), image.getHeight(), file.getSize());
+
+        } catch (IOException e) {
+            log.error("이미지 파일 읽기 실패: {}", file.getOriginalFilename(), e);
+            throw new FileStorageException("이미지 파일을 읽을 수 없습니다. 파일이 손상되었을 수 있습니다.");
         }
     }
 

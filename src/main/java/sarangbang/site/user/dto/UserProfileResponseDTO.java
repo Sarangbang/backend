@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class UserProfileResponseDTO {
-
+    private String id;
     private String email;
     private String nickname;
     private String profileImageUrl;
