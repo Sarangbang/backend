@@ -1,4 +1,4 @@
-package sarangbang.site.challengeverification.dto;
+package sarangbang.site.challengeapplication.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

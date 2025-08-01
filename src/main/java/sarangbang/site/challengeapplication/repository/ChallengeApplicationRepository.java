@@ -36,4 +36,18 @@ public interface ChallengeApplicationRepository extends JpaRepository<ChallengeA
            "LEFT JOIN FETCH ca.user.region " +
            "WHERE ca.id = :applicationId")
     ChallengeApplication findByIdWithUserAndRegion(@Param("applicationId") Long applicationId);
+
+    /**
+     * 사용자의 챌린지 신청내역 조회 (마이페이지용)
+     *  조회되는 정보
+     *      - ChallengeApplication (신청서 정보)
+     *      - Challenge (챌린지 정보)
+     *      - Region (지역 정보)
+     */
+    @Query("SELECT ca FROM ChallengeApplication ca " +
+            "JOIN FETCH ca.challenge c " +
+            "LEFT JOIN FETCH c.region r " +
+            "WHERE ca.user.id = :userId " +
+            "ORDER BY ca.createdAt DESC")
+    List<ChallengeApplication> findByUserIdWithChallengeAndRegion(@Param("userId") String userId);
 }

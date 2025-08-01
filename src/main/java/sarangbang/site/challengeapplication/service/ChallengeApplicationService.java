@@ -14,14 +14,17 @@ import sarangbang.site.challengeapplication.enums.ChallengeApplyStatus;
 import sarangbang.site.challengeapplication.exception.DuplicateApplicationException;
 import sarangbang.site.challengeapplication.repository.ChallengeApplicationRepository;
 import sarangbang.site.challengemember.entity.ChallengeMember;
+import sarangbang.site.challengemember.repository.ChallengeMemberRepository;
 import sarangbang.site.challengemember.service.ChallengeMemberService;
 import org.springframework.context.ApplicationEventPublisher;
 import sarangbang.site.challengeapplication.event.ChallengeMemberAcceptedEvent;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import sarangbang.site.challengeapplication.dto.MyPageApplicationDTO;
 import sarangbang.site.file.service.FileStorageService;
 import sarangbang.site.user.entity.User;
 import sarangbang.site.user.service.UserService;
@@ -37,6 +40,7 @@ public class ChallengeApplicationService {
     private final ChallengeService challengeService;
     private final ApplicationEventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
+    private final ChallengeMemberRepository challengeMemberRepository;
 
     // 챌린지 신청 수락/거부
     @Transactional
@@ -185,4 +189,88 @@ public class ChallengeApplicationService {
             throw new SecurityException("챌린지 방장만 참여 신청을 조회할 수 있습니다.");
         }
     }
+
+    /**
+     * 사용자의 챌린지 신청 내역 조회 (마이페이지용)
+     *
+     * @param
+     * @return
+     */
+    @Transactional(readOnly = true)
+    public List<MyPageApplicationDTO> getMyApplications(String userId) {
+        log.info("=> 사용자 챌린지 신청내역 조회 시작. userId: {}", userId);
+
+        try {
+            // FETCH JOIN으로 N+1 문제 방지하며 조회
+            List<ChallengeApplication> applications = challengeApplicationRepository
+                    .findByUserIdWithChallengeAndRegion(userId);
+
+            // Entity -> DTO 변환
+            List<MyPageApplicationDTO> result = applications.stream()
+                    .map(this::convertToMyPageDTO)
+                    .collect(Collectors.toList());
+
+            log.info("<= 사용자 챌린지 신청내역 조회 완료. userId: {}, 건수: {}", userId, result.size());
+            return result;
+
+        } catch (Exception e) {
+            log.error("사용자 챌린지 신청내역 조회 실패. userId: {}, 오류: {}", userId, e.getMessage());
+            throw new RuntimeException("신청내역 조회 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    /**
+     * Entity를 MyPageApplicationDTO로 변환
+     */
+    private MyPageApplicationDTO convertToMyPageDTO(ChallengeApplication application) {
+        Challenge challenge = application.getChallenge();
+
+        // 추가 정보 조회
+        int currentParicipants = challengeMemberRepository.countByChallengeId(challenge.getId());
+        String imageUrl = generateImageUrl(challenge.getImage());
+        String location = challenge.getRegion().getFullAddress();
+
+        return MyPageApplicationDTO.builder()
+                // 신청서 정보
+                .applicationId(application.getId())
+                .introduction(application.getIntroduction())
+                .reason(application.getReason())
+                .commitment(application.getCommitment())
+                .challengeApplyStatus(application.getChallengeApplyStatus())
+                .comment(application.getComment())
+
+                // 챌린지 정보
+                .challengeId(challenge.getId())
+                .challengeTitle(challenge.getTitle())
+                .challengeDescription(challenge.getDescription())
+                .currentParticipants(currentParicipants)
+                .maxParticipants(challenge.getParticipants())
+                .imageUrl(imageUrl)
+                .location(location)
+
+                // 화면 표시용 데이터
+                .challengeDisplayTitle(createDisplayTitle(challenge, currentParicipants))
+                .build();
+    }
+
+    /**
+     * 이미지 URL 생성
+     */
+    private String generateImageUrl(String imagePath) {
+        if (imagePath == null) {
+            return null;
+        }
+        return fileStorageService.generatePresignedUrl(imagePath, Duration.ofMinutes(10));
+    }
+
+    /**
+     * 화면 표시용 제목 생성
+     */
+    private String createDisplayTitle(Challenge challenge, int currentParicipants) {
+        return String.format("%s [%d/%d]",
+                challenge.getTitle(),
+                currentParicipants,
+                challenge.getParticipants());
+    }
+
 }
