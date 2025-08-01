@@ -93,7 +93,8 @@ public class SecurityConfig {
                             "/error",
                             "/ws/chat/**",
                             "/api/notifications/subscribe",
-                            "/ws/user/**"
+                            "/ws/user/**",
+                            "/actuator/prometheus"
                     ).permitAll();
 
                     // "dev" 프로필이 활성화되었는지 확인
