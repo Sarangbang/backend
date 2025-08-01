@@ -24,6 +24,6 @@ public class ChallengeVerificationRequestDTO {
     private MultipartFile imageFile;
 
     @Schema(description = "인증 내용", example = "오늘 운동 완료했습니다!")
-    @Size(max = 100, message = "내용은 100자 미만으로 작성해주세요.")
+    @Size(max = 300, message = "내용은 300자 미만으로 작성해주세요.")
     private String content;
 }
