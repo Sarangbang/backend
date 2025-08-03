@@ -47,6 +47,9 @@ public class NotificationService {
 
         // 2. SSE 전송
         emitterManager.send(receiverId, NotificationResponseDTO.from(saved));
+
+        // 3. FCM 푸시 알림 전송
+        sendPushNotification(receiverId, content);
     }
 
     /**
