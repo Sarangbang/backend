@@ -73,5 +73,14 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
+    // 사용자 FCM 토큰 삭제
+    @DeleteMapping("/token")
+    public ResponseEntity<String> deleteFCMToken(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        notificationService.deleteFCMToken(userDetails.getId());
+        return ResponseEntity.ok("FCM 토큰이 삭제되었습니다.");
+    }
+
 
 }
