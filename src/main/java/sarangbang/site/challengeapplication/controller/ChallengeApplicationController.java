@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sarangbang.site.challengeapplication.dto.ChallengeJoinDTO;
+import sarangbang.site.challengeapplication.dto.MyPageApplicationDTO;
+import sarangbang.site.challengeapplication.entity.ChallengeApplication;
 import sarangbang.site.challengeapplication.exception.ChallengeApplicationExceptionHandler;
 import sarangbang.site.challengeapplication.service.ChallengeApplicationService;
 import sarangbang.site.security.details.CustomUserDetails;
@@ -193,20 +195,72 @@ public class ChallengeApplicationController {
     public ResponseEntity<String> getUserApplicationStatus(
             @PathVariable Long challengeId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        
+
         try {
             log.info("=> 사용자 신청 상태 조회 요청. challengeId: {}, userId: {}", challengeId, userDetails.getId());
-            
+
             String status = challengeApplicationService
                     .getUserApplicationStatus(challengeId, userDetails.getId());
-            
+
             log.info("<= 사용자 신청 상태 조회 성공. challengeId: {}, status: {}", challengeId, status);
             return ResponseEntity.ok(status);
-            
+
         } catch (IllegalArgumentException e) {
             log.error("사용자 신청 상태 조회 실패. challengeId: {}, 오류: {}", challengeId, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @GetMapping("/my-applications")
+    @Operation(
+            summary = "내 챌린지 신청내역 조회",
+            description = "로그인한 사용자의 모든 챌린지 신청내역을 조회합니다. " +
+                        "모든 상태(대기/승인/거절)의 신청서를 포함하며, " +
+                        "프론트엔드에서 상태별 탭 필터링을 수행합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "신청내역 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MyPageApplicationDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "인증되지 않은 사용자",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MyPageApplicationDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "서버 내부 오류",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
+    public ResponseEntity<List<MyPageApplicationDTO>> getMyApplications(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        try {
+            String userId = userDetails.getId();
+            log.info("=> 내 챌린지 신청내역 조회 요청. userId: {}", userId);
+
+            List<MyPageApplicationDTO> applications = challengeApplicationService
+                    .getMyApplications(userId);
+
+            log.info("<= 내 챌린지 신청내역 조회 성공. userId: {}, 건수: {}", userId, applications.size());
+            return ResponseEntity.ok(applications);
+
+        } catch (Exception e) {
+            log.error("내 챌린지 신청내역 조회 실패. 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
 }
 
