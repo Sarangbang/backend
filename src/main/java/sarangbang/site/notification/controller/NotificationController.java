@@ -40,6 +40,7 @@ public class NotificationController {
     public ResponseEntity<?> getMyNotifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
         try{
             String userId = userDetails.getId();
+
             List<NotificationResponseDTO> notifications = notificationService.getUserNotifications(userId);
             return ResponseEntity.ok(notifications);
         } catch (ExpiredJwtException e) {
