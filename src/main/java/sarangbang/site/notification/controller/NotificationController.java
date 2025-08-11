@@ -37,9 +37,10 @@ public class NotificationController {
 
     // 알림 리스트 조회
     @GetMapping
-    public ResponseEntity<?> getMyNotifications(@RequestParam("token") String token) {
+    public ResponseEntity<?> getMyNotifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
         try{
-            String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
+            String userId = userDetails.getId();
+
             List<NotificationResponseDTO> notifications = notificationService.getUserNotifications(userId);
             return ResponseEntity.ok(notifications);
         } catch (ExpiredJwtException e) {
