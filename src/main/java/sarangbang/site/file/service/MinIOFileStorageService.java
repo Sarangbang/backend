@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-@Profile("dev")
+@Profile({"dev", "prod"})
 public class MinIOFileStorageService implements FileStorageService {
 
     private final MinioClient minioClient;

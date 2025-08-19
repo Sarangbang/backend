@@ -22,7 +22,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "storage.type", havingValue = "s3")
-@Profile("prod")
+@Profile("S3")
 public class S3FileStorageService implements FileStorageService {
 
     private final S3Client s3Client;
@@ -49,7 +49,6 @@ public class S3FileStorageService implements FileStorageService {
     @Override
     public byte[] downloadFile(String filePath) {
         try {
-            GetObjectResponse response;
             byte[] data = s3Client.getObject(
                     GetObjectRequest.builder()
                             .bucket(storageProperties.getBucket())
