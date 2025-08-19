@@ -20,10 +20,6 @@ spring:
       uri: ${DB_MONGO_URI:mongodb://root:1234@localhost:27017/mongo?authSource=admin}
 
 # 애플리케이션 설정
-app:
-  storage:
-    type: s3
-
 discord:
   webhook:
     url: "${DISCORD_WEBHOOK_URL:discord_webhook_url}"
