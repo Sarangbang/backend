@@ -64,7 +64,6 @@ jwt:
   refresh-secret: ${REFRESH_TOKEN_SECRET:R4pW6qB1yH3aF7gK0jM5nC_U8iE2bT6dY9lX-cZ1vA4wS7hG3fJ0ko9zL2VeN8s}
 
 app:
-  base-url: ${APP_BASE_URL:http://localhost:8080}
   upload:
     max-file-size: 5242880  # 5MB
     allowed-image-types: image/jpeg,image/jpg,image/png,image/gif,image/webp
@@ -82,3 +81,11 @@ management:
     web:
       exposure:
         include: health
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:api-key-placeholder}
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    models:
+      chat: gemini-2.0-flash
+    timeout: 30s
