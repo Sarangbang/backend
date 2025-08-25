@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-@Profile("dev")
+@Profile({"dev", "prod"})
 public class MinIOFileStorageService implements FileStorageService {
 
     private final MinioClient minioClient;
@@ -97,6 +97,11 @@ public class MinIOFileStorageService implements FileStorageService {
 
     @Override
     public String generatePresignedUrl(String objectName, Duration timeToLive) throws FileStorageException {
+
+        if (objectName != null && objectName.startsWith("/images")) {
+            return objectName;
+        }
+
         // MinIO 클라이언트 생성
         MinioClient minioClient = MinioClient.builder()
                 .endpoint(storageProperties.getEndpoint()) // MinIO 주소
