@@ -16,6 +16,7 @@ import sarangbang.site.challenge.dto.ChallengeResponseDto;
 
 import sarangbang.site.challenge.entity.Challenge;
 import sarangbang.site.challenge.event.ChallengeCreatedEvent;
+import sarangbang.site.challenge.exception.ChallengeNotFoundException;
 import sarangbang.site.challenge.repository.ChallengeRepository;
 import sarangbang.site.challengecategory.entity.ChallengeCategory;
 import sarangbang.site.challengecategory.repository.ChallengeCategoryRepository;
@@ -152,7 +153,8 @@ public class ChallengeService {
     public Challenge getChallengeById(Long challengeId) {
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
         if(challenge == null) {
-            throw new IllegalArgumentException("챌린지가 존재하지 않습니다.");
+            log.error("챌린지 조회 실패 - 챌린지 Id : {}", challengeId);
+            throw new ChallengeNotFoundException("챌린지가 존재하지 않습니다.");
         }
         return challenge;
     }

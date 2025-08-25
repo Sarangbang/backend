@@ -3,11 +3,13 @@ package sarangbang.site.notification.controller;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import sarangbang.site.notification.component.EmitterManager;
 import sarangbang.site.notification.dto.NotificationResponseDTO;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/notifications")
+@Slf4j
 public class NotificationController {
 
     private final EmitterManager emitterManager;
@@ -32,7 +35,13 @@ public class NotificationController {
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@RequestParam("token") String token) {
         String userId = jwtTokenProvider.getUserIdFromAccessToken(token); // 사용자 ID 추출
-        return emitterManager.save(userId);
+        try{
+            return emitterManager.save(userId);
+        }catch (AsyncRequestTimeoutException e){
+            log.warn("userId: {} Notification async request timed out", userId);
+        }
+
+        return null;
     }
 
     // 알림 리스트 조회
